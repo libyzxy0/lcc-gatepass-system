@@ -56,7 +56,7 @@ export function LoginForm({
       console.log(values);
       await login(values.email, values.password);
       navigate('/admin');
-    } catch (error) {
+    } catch (error: any) {
       form.setError(error.response.status === 404 ? "email" : "password", {
         type: "manual",
         message: error.response?.data.message || "Failed to login!",
