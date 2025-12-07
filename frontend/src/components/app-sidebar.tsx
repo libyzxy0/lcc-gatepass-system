@@ -2,10 +2,12 @@
 
 import * as React from "react"
 import {
-  PieChart,
+  LayoutDashboard,
   Settings2,
   ClipboardClock,
-  Users
+  Users,
+  IdCard,
+  BookUser
 } from "lucide-react"
 
 import { NavData } from "@/components/nav-data"
@@ -21,14 +23,29 @@ import {
 } from "@/components/ui/sidebar"
 
 const data = {
-  /*
-  user: {
-    name: "Krisha Sophia De Peralta",
-    email: "krishasophia@gmail.com",
-    avatar: "https://graph.facebook.com/100009108078372/picture?width=720&height=720&access_token=6628568379%7Cc1e620fa708a1d5696fb991c1bde5662",
-  },
-  */
+  overview: [
+    {
+      name: "Overview",
+      url: "/admin",
+      icon: LayoutDashboard,
+    },
+    {
+      name: "Students Log",
+      url: "/admin/students/logs",
+      icon: BookUser,
+    },
+    {
+      name: "Visitors Log",
+      url: "/admin/visitors/logs",
+      icon: ClipboardClock,
+    },
+  ],
   navData: [
+    {
+      title: "Students RFID",
+      url: "/admin/students/rfid",
+      icon: IdCard,
+    },
     {
       title: "Visitors",
       url: "#",
@@ -44,11 +61,6 @@ const data = {
           url: "#",
         }
       ],
-    },
-    {
-      title: "Students RFID",
-      url: "/admin/students/rfid",
-      icon: Users,
     },
     {
       title: "Settings",
@@ -68,23 +80,6 @@ const data = {
           url: "#",
         }
       ],
-    },
-  ],
-  overview: [
-    {
-      name: "Overview",
-      url: "/admin",
-      icon: PieChart,
-    },
-    {
-      name: "Students Log",
-      url: "/admin/students/logs",
-      icon: ClipboardClock,
-    },
-    {
-      name: "Visitors Log",
-      url: "/admin/visitors/logs",
-      icon: ClipboardClock,
     },
   ],
 }

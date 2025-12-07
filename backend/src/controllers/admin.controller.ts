@@ -4,6 +4,7 @@ import { admin } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import jwt from "jsonwebtoken";
 import { generateAccessToken, generateRefreshToken } from '@/utils'
+
 type Admin = {
   id: string;
   firstname: string;
@@ -48,7 +49,6 @@ class AdminController {
   async login(req: Request, res: Response) {
     try {
       const { email, password } = req.body;
-      console.log("Someone trying to login:", email, password);
       const adminData: Admin[] = await db
         .select()
         .from(admin)
@@ -62,14 +62,12 @@ class AdminController {
         return res.status(400).json({ message: "Incorrect password" });
       }
 
-      //console.log(adminData[0]);
-
       const accessToken = generateAccessToken(adminData[0].id);
       const refreshToken = generateRefreshToken(adminData[0].id);
 
       res.cookie("refreshToken", refreshToken, {
         httpOnly: true,
-        secure: true,
+        secure: process.env.NODE_ENV === 'production' ? true : false,
         sameSite: "strict",
         maxAge: 7 * 24 * 60 * 60 * 1000,
       });
@@ -86,7 +84,6 @@ class AdminController {
 
   async refresh(req: Request, res: Response) {
     try {
-      console.log("Somone trying to refresh a token!");
       const refreshToken = req.cookies?.refreshToken;
       
       if (!refreshToken) {
@@ -116,7 +113,6 @@ class AdminController {
 
   async getSession(req: Request, res: Response) {
     try {
-      console.log("Someone trying to get session...");
       if (!req.admin) {
         return res.status(401).json({ message: "Unauthorized access!" });
       }

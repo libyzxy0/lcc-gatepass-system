@@ -1,7 +1,7 @@
 import {
   BadgeCheck,
   Bell,
-  ChevronsUpDown,
+  ChevronRight,
   LogOut,
 } from "lucide-react"
 
@@ -42,13 +42,13 @@ export function NavUser() {
             >
               <Avatar className="h-8 w-8 rounded-lg">
                 <AvatarImage src={admin.photo_url} alt={admin.firstname} />
-                <AvatarFallback className="rounded-lg">CN</AvatarFallback>
+                <AvatarFallback className="rounded-lg">{admin?.firstname.split("")[0] + admin.lastname.split("")[0]}</AvatarFallback>
               </Avatar>
               <div className="grid flex-1 text-left text-sm leading-tight">
                 <span className="truncate font-medium">{admin.firstname}{" "}{admin.lastname}</span>
-                <span className="truncate text-xs">{admin.email}</span>
+                <span className="truncate text-xs capitalize">{admin.role}</span>
               </div>
-              <ChevronsUpDown className="ml-auto size-4" />
+              <ChevronRight className="ml-auto size-4" />
             </SidebarMenuButton>
           </DropdownMenuTrigger>
           <DropdownMenuContent
@@ -61,11 +61,11 @@ export function NavUser() {
               <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                 <Avatar className="h-8 w-8 rounded-lg">
                   <AvatarImage src={admin.photo_url} alt={admin.firstname} />
-                  <AvatarFallback className="rounded-lg">CN</AvatarFallback>
+                  <AvatarFallback className="rounded-lg">{admin?.firstname.split("")[0] + admin.lastname.split("")[0]}</AvatarFallback>
                 </Avatar>
                 <div className="grid flex-1 text-left text-sm leading-tight">
                   <span className="truncate font-medium">{admin.firstname}{" "}{admin.lastname}</span>
-                  <span className="truncate text-xs">{admin.email}</span>
+                  <span className="truncate text-xs">{admin.role}</span>
                 </div>
               </div>
             </DropdownMenuLabel>
@@ -82,8 +82,8 @@ export function NavUser() {
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => logout()}>
-              <LogOut />
+            <DropdownMenuItem variant={"destructive"} onClick={logout}>
+              <LogOut className={'text-white'}/>
               Log out
             </DropdownMenuItem>
           </DropdownMenuContent>

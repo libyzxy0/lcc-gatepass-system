@@ -24,7 +24,7 @@ export function NavOverview({
 }) {
 
   return (
-    <SidebarGroup className="group-data-[collapsible=icon]:hidden">
+    <SidebarGroup>
       <SidebarGroupLabel>Overview</SidebarGroupLabel>
       <SidebarMenu>
         {overview.map((item) => (
