@@ -21,6 +21,7 @@
   "author": "Jan Liby Dela Costa (@libyzxy0)",
   "license": "MIT",
   "devDependencies": {
+    "@types/express-rate-limit": "^5.1.3",
     "@types/node": "^24.10.1",
     "drizzle-kit": "^0.22.7",
     "express-rate-limit": "^8.2.1",
