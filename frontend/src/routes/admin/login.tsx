@@ -38,7 +38,7 @@ export function LoginForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
-  const { login, admin } = useAuthStore();
+  const { login } = useAuthStore();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
 
@@ -72,7 +72,9 @@ export function LoginForm({
         <CardHeader className="text-center">
           <CardTitle className="text-2xl font-bold">Admin Login</CardTitle>
           <CardDescription>
-            Enter your username and password below to login to admin dashboard. Under Development this project isn't finished yet, please dont share this link to anyone hehe labyu guys.
+            Enter your username and password below to login to admin dashboard.
+            
+            Under Development this project isn't finished yet, please dont share this link to anyone hehe labyu guys.
           </CardDescription>
         </CardHeader>
         <CardContent>
