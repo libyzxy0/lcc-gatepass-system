@@ -47,7 +47,6 @@ api.interceptors.response.use(
       const token = useAuthStore.getState().accessToken;
 
       if (!token) {
-        useAuthStore.getState().logout();
         return Promise.reject(err);
       }
 

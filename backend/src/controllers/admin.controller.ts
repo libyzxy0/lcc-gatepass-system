@@ -59,7 +59,7 @@ class AdminController {
       }
 
       if (adminData[0].password !== password) {
-        return res.status(401).json({ message: "Incorrect password" });
+        return res.status(400).json({ message: "Incorrect password" });
       }
 
       //console.log(adminData[0]);
