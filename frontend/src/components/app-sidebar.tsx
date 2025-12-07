@@ -2,11 +2,6 @@
 
 import * as React from "react"
 import {
-  AudioWaveform,
-  BookOpen,
-  Bot,
-  GalleryVerticalEnd,
-  Map,
   PieChart,
   Settings2,
   ClipboardClock,
@@ -26,11 +21,13 @@ import {
 } from "@/components/ui/sidebar"
 
 const data = {
+  /*
   user: {
     name: "Krisha Sophia De Peralta",
     email: "krishasophia@gmail.com",
     avatar: "https://graph.facebook.com/100009108078372/picture?width=720&height=720&access_token=6628568379%7Cc1e620fa708a1d5696fb991c1bde5662",
   },
+  */
   navData: [
     {
       title: "Visitors",
@@ -51,7 +48,7 @@ const data = {
     {
       title: "Students RFID",
       url: "/admin/students/rfid",
-      icon: Bot,
+      icon: Users,
     },
     {
       title: "Settings",

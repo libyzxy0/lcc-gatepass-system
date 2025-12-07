@@ -1,16 +1,17 @@
 import axios, { AxiosError } from "axios";
 import { useAuthStore } from "@/stores/useAuthStore";
+import { API_BASE_URL } from '@/config'
 
 const MAX_RETRY = 1;
 
 export const api = axios.create({
-  baseURL: "http://localhost:3000/api/v1",
+  baseURL: API_BASE_URL,
   withCredentials: true,
   timeout: 10000,
 });
 
 const refreshApi = axios.create({
-  baseURL: "http://localhost:3000/api/v1",
+  baseURL: API_BASE_URL,
   withCredentials: true,
   timeout: 10000,
 });
@@ -81,7 +82,6 @@ api.interceptors.response.use(
         isRefreshing = false;
       }
     }
-
     return Promise.reject(err);
   }
 );

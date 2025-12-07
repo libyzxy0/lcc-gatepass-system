@@ -13,7 +13,6 @@ import {
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -27,7 +26,7 @@ import { useNavigate } from "react-router";
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 
 const formSchema = z.object({
   email: z.string().min(1, "Username required!"),
@@ -38,7 +37,7 @@ export function LoginForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
-  const { login, admin, getSession } = useAuthStore();
+  const { login, admin } = useAuthStore();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
 
@@ -56,7 +55,7 @@ export function LoginForm({
       await login(values.email, values.password);
       navigate('/admin');
     } catch (error) {
-      console.error("Login failed!");
+      console.error("Login failed:", error);
     } finally {
       setLoading(false);
     }
