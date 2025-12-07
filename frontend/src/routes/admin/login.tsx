@@ -28,6 +28,7 @@ import { useForm } from "react-hook-form"
 import { z } from "zod"
 import { useState } from 'react'
 
+
 const formSchema = z.object({
   email: z.string().min(1, "Username required!"),
   password: z.string().min(1, "Password required!"),
@@ -48,6 +49,7 @@ export function LoginForm({
       password: "",
     },
   })
+  
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
       setLoading(true);
@@ -55,11 +57,15 @@ export function LoginForm({
       await login(values.email, values.password);
       navigate('/admin');
     } catch (error) {
-      console.error("Login failed:", error);
+      form.setError(error.response.status === 404 ? "email" : "password", {
+        type: "manual",
+        message: error.response?.data.message || "Failed to login!",
+      });
     } finally {
       setLoading(false);
     }
   }
+  
   return (
     <div className={cn("w-[400px]", className)} {...props}>
       <Card>

@@ -32,14 +32,9 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   setAccessToken: (token: string) => set({ accessToken: token }),
 
   login: async (email: string, password: string) => {
-    try {
       const { data } = await api.post("/admin/login", { email, password });
       set({ accessToken: data.access_token });
       await get().getSession();
-    } catch (err) {
-      console.error("Session fetch failed after login:", err);
-      get().logout();
-    }
   },
   getSession: async () => {
     try {
