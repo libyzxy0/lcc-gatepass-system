@@ -35,7 +35,7 @@ export function NavData({
       <SidebarGroupLabel>Configure Data</SidebarGroupLabel>
       <SidebarMenu>
         {items.map((item) => (
-          <Link to={item.items ? null : item.url}>
+          <Link to={item.items ? "#" : item.url}>
             <Collapsible
               key={item.title}
               asChild

@@ -1,14 +1,36 @@
 import { create } from "zustand";
 import { api } from "@/api/axios";
 
+type Admin = {
+  id: string;
+  firstname: string;
+  lastname: string;
+  role: 'admin' | 'staff';
+  email: string;
+  phone_number: string;
+  password: string;
+  is_super_admin: boolean;
+  created_at: string;
+};
+
+type AuthState = {
+  admin: Admin | null;
+  accessToken: string | null;
+  isAuthenticated: boolean;
+  login: (email: string, password: string) => void;
+  setAccessToken: () => void;
+  getSession: () => void;
+  logout: () => void;
+}
+
 export const useAuthStore = create<AuthState>((set, get) => ({
   admin: null,
   accessToken: null,
   isAuthenticated: false,
 
-  setAccessToken: (token) => set({ accessToken: token }),
+  setAccessToken: (token: string) => set({ accessToken: token }),
 
-  login: async (email, password) => {
+  login: async (email: string, password: string) => {
     try {
       const { data } = await api.post("/admin/login", { email, password });
       set({ accessToken: data.access_token });
