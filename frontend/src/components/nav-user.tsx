@@ -30,6 +30,7 @@ import { useAuthStore } from "@/stores/useAuthStore";
 export function NavUser() {
   const { isMobile } = useSidebar()
   const { logout, admin } = useAuthStore();
+  if(!admin) return null;
   return (
     <SidebarMenu>
       <SidebarMenuItem>

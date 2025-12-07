@@ -9,6 +9,7 @@ type Admin = {
   email: string;
   phone_number: string;
   password: string;
+  photo_url: string;
   is_super_admin: boolean;
   created_at: string;
 };
@@ -18,7 +19,7 @@ type AuthState = {
   accessToken: string | null;
   isAuthenticated: boolean;
   login: (email: string, password: string) => void;
-  setAccessToken: () => void;
+  setAccessToken: (token: string) => void;
   getSession: () => void;
   logout: () => void;
 }

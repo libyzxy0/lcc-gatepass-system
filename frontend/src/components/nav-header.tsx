@@ -1,6 +1,5 @@
 "use client"
 
-import * as React from "react"
 import { DoorOpen } from "lucide-react"
 
 import {
