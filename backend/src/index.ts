@@ -15,10 +15,17 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 
-app.use(cors({
-  origin: process.env.FRONTEND_ORIGIN,
-  credentials: true,
-}));
+app.use(
+  cors({
+    origin: [
+      process.env.FRONTEND_ORIGIN,
+      "http://localhost:5173",
+      "https://lccgatepass.xyz",
+    ],
+    credentials: true,
+  })
+);
+
 
 //app.use(limiter);
 
