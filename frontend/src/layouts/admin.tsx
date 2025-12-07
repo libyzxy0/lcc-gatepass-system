@@ -7,7 +7,7 @@ function Admin() {
     <>
       <AppSidebar />
       <div className="p-8">
-          <Outlet />
+        <Outlet />
       </div>
     </>
   )
