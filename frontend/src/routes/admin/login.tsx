@@ -32,7 +32,7 @@ import lccBackground from '@/assets/lcc.webp'
 const formSchema = z.object({
   email: z.string().min(1, "Username required!"),
   password: z.string().min(1, "Password required!"),
-  captcha: z.string().min(1, "Please verify captcha first!"),
+  captcha: z.string()//.min(1, "Please verify captcha first!"),
 })
 
 export function LoginForm({
@@ -170,7 +170,7 @@ export default function Login() {
       <img
         src={lccBackground}
         alt="La Concepcion College"
-        className="absolute z-10 h-screen w-full object-cover blur-2xl"
+        className="absolute z-10 h-screen w-full object-cover blur-md"
       />
 
       <div className="absolute z-20 h-screen w-full bg-black opacity-50"></div>

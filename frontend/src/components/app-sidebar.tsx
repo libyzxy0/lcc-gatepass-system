@@ -36,7 +36,7 @@ const data = {
     },
     {
       name: "Visitors Log",
-      url: "/admin/visitors/logs",
+      url: "/dashboard/visitors/logs",
       icon: ClipboardClock,
     },
   ],

@@ -50,7 +50,7 @@ const visitors = [
 
 export function RecentLogs() {
   return (
-    <Card className="w-[400px]">
+    <Card>
       <CardHeader className="flex flex-row justify-between items-center">
         <CardTitle>Recent Logs</CardTitle>
       </CardHeader>

@@ -12,9 +12,9 @@ import {
 export default function Overview() {
   return (
     <div>
-      <h1 className="font-bold text-3xl">Overview</h1>
+      <h1 className="font-semibold text-2xl md:text-3xl">Overview</h1>
       <Counts />
-      <div className="mt-8 flex flex-row gap-4">
+      <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-4">
         <RecentLogs />
         <PendingVisitors />
       </div>
