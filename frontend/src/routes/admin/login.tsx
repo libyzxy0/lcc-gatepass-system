@@ -22,7 +22,7 @@ import { Input } from "@/components/ui/input"
 import { Spinner } from "@/components/ui/spinner"
 import { useAuthStore } from "@/stores/useAuthStore";
 import { useNavigate } from "react-router";
-
+import Turnstile, { useTurnstile } from "react-turnstile";
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
@@ -32,6 +32,7 @@ import { useState } from 'react'
 const formSchema = z.object({
   email: z.string().min(1, "Username required!"),
   password: z.string().min(1, "Password required!"),
+  captcha: z.string().min(1, "Please verify captcha first!"),
 })
 
 export function LoginForm({
@@ -40,6 +41,7 @@ export function LoginForm({
 }: React.ComponentProps<"div">) {
   const { login } = useAuthStore();
   const navigate = useNavigate();
+  const turnstile = useTurnstile();
   const [loading, setLoading] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -47,34 +49,52 @@ export function LoginForm({
     defaultValues: {
       email: "",
       password: "",
+      captcha: ""
     },
   })
-  
+
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
       setLoading(true);
       console.log(values);
-      await login(values.email, values.password);
-      navigate('/admin');
+      await login(values.email, values.password, values.captcha);
+      navigate('/dashboard');
+      turnstile.reset();
     } catch (error: any) {
-      form.setError(error.response.status === 404 ? "email" : "password", {
-        type: "manual",
-        message: error.response?.data.message || "Failed to login!",
-      });
+
+      if (error.response.status === 404) {
+        form.setError("email", {
+          type: "manual",
+          message: error.response?.data.message,
+        });
+      }
+      if (error.response.status === 400) {
+        form.setError("password", {
+          type: "manual",
+          message: error.response?.data.message,
+        });
+      }
+
+      if (error.response.status === 403) {
+        form.setError("captcha", {
+          type: "manual",
+          message: error.response?.data.message
+        })
+        turnstile.reset();
+      }
+
     } finally {
       setLoading(false);
     }
   }
-  
+
   return (
     <div className={cn("w-[400px]", className)} {...props}>
       <Card>
-        <CardHeader className="text-center">
-          <CardTitle className="text-2xl font-bold">Admin Login</CardTitle>
+        <CardHeader>
+          <CardTitle className="text-2xl font-bold">Login As Admin</CardTitle>
           <CardDescription>
-            Enter your username and password below to login to admin dashboard.
-            
-            Under Development this project isn't finished yet, please dont share this link to anyone hehe labyu guys.
+            Enter your email and password below to login to admin dashboard.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -107,6 +127,25 @@ export function LoginForm({
                     </FormItem>
                   )}
                 />
+
+                <FormField
+                  control={form.control}
+                  name="captcha"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormControl>
+                        <Turnstile
+                          sitekey="0x4AAAAAACFTRTyVip79G4aZ"
+                          onVerify={
+                            (token) => field.onChange(token)
+                          }
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
                 <Button type="submit" className="py-6" disabled={loading}>{loading ? (
                   <Spinner />
                 ) : (
@@ -115,11 +154,12 @@ export function LoginForm({
                   </>
                 )}</Button>
               </FieldGroup>
+
             </form>
           </Form>
         </CardContent>
       </Card>
-    </div>
+    </div >
   )
 }
 

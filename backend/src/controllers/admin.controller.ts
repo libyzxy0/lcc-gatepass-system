@@ -4,7 +4,7 @@ import { admin } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import jwt from "jsonwebtoken";
 import { generateAccessToken, generateRefreshToken } from '@/utils'
-
+import { verifyTurnstile } from '@/utils/verify-cf-turnstile'
 type Admin = {
   id: string;
   firstname: string;
@@ -48,7 +48,16 @@ class AdminController {
 
   async login(req: Request, res: Response) {
     try {
-      const { email, password } = req.body;
+      const { email, password, cloudflare_token } = req.body;
+      
+      const cloudflareTurnstile = await verifyTurnstile(cloudflare_token);
+      
+      console.log(cloudflare_token, cloudflareTurnstile);
+      
+      if(!cloudflareTurnstile) {
+        return res.status(403).json({ message: "Please verify CloudFlare captcha first!" });
+      }
+      
       const adminData: Admin[] = await db
         .select()
         .from(admin)

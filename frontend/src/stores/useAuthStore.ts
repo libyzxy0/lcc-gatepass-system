@@ -18,7 +18,7 @@ type AuthState = {
   admin: Admin | null;
   accessToken: string | null;
   isAuthenticated: boolean;
-  login: (email: string, password: string) => void;
+  login: (email: string, password: string, turnstileToken: string) => void;
   setAccessToken: (token: string) => void;
   getSession: () => void;
   logout: () => void;
@@ -28,11 +28,10 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   admin: null,
   accessToken: null,
   isAuthenticated: false,
-
   setAccessToken: (token: string) => set({ accessToken: token }),
 
-  login: async (email: string, password: string) => {
-      const { data } = await api.post("/admin/login", { email, password });
+  login: async (email: string, password: string, turnstileToken: string) => {
+      const { data } = await api.post("/admin/login", { email, password, cloudflare_token: turnstileToken });
       set({ accessToken: data.access_token });
       await get().getSession();
   },

@@ -1,12 +1,13 @@
 import { Outlet } from "react-router";
 import { useEffect, useState } from "react";
 import { useAuthStore } from "@/stores/useAuthStore";
-import Login from '@/routes/admin/login';
 import { Spinner } from "@/components/ui/spinner"
+import { useNavigate } from "react-router";
 
 export default function ProtectedRoute() {
   const { getSession, isAuthenticated } = useAuthStore();
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     async function restore() {
@@ -26,7 +27,10 @@ export default function ProtectedRoute() {
       <Spinner className="size-16" />
     </div>
   );
-  if (!isAuthenticated) return <Login />;
+  
+  if(!loading && !isAuthenticated) {
+    navigate('/login');
+  }
 
   return <Outlet />;
 }

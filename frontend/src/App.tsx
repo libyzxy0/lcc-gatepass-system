@@ -1,21 +1,30 @@
-import { Routes, Route } from "react-router";
-import Home from '@/routes/home';
+import { Routes, Route, Navigate } from "react-router";
 import AdminLayout from '@/layouts/admin';
 import Overview from '@/routes/admin/overview';
 import StudentsLog from '@/routes/admin/students-log';
 import VisitorsLog from '@/routes/admin/visitors-log';
 import ProtectedRoute from '@/routes/protected-route';
+import Login from '@/routes/admin/login';
 
 export default function App() {
   return (
     <Routes>
-      <Route index element={<Home />} />
+      <Route index element={<Navigate to="/dashboard" />} />
+      <Route path="login" element={<Login />} />
 
       <Route element={<ProtectedRoute />}>
-        <Route path="admin" element={<AdminLayout />}>
+        <Route path="dashboard" element={<AdminLayout />}>
+        
           <Route index element={<Overview />} />
-          <Route path="students/logs" element={<StudentsLog />} />
-          <Route path="visitors/logs" element={<VisitorsLog />} />
+          
+          <Route path="students">
+            <Route path="logs" element={<StudentsLog />} />
+          </Route>
+          
+          <Route path="visitors">
+            <Route path="logs" element={<VisitorsLog />} />
+          </Route>
+          
         </Route>
       </Route>
     </Routes>

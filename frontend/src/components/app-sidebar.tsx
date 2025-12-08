@@ -26,12 +26,12 @@ const data = {
   overview: [
     {
       name: "Overview",
-      url: "/admin",
+      url: "/dashboard",
       icon: LayoutDashboard,
     },
     {
       name: "Students Log",
-      url: "/admin/students/logs",
+      url: "/dashboard/students/logs",
       icon: BookUser,
     },
     {
@@ -43,7 +43,7 @@ const data = {
   navData: [
     {
       title: "Students RFID",
-      url: "/admin/students/rfid",
+      url: "/dashboard/students/rfid",
       icon: IdCard,
     },
     {

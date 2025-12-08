@@ -9,7 +9,7 @@ export function Counts() {
   return (
     <div className="mt-12">
       <h1 className="font-medium mb-4 text-gray-600">Students & Visitors</h1>
-      <div className="flex flex-row flex-wrap gap-6">
+      <div className="flex flex-row flex-wrap gap-4">
         <Card className="bg-green-100 border-green-400">
           <CardContent>
             <CardTitle className="text-3xl font-medium mb-2">2,138</CardTitle>
