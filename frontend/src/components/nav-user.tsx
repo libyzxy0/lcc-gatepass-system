@@ -40,9 +40,9 @@ export function NavUser() {
               size="lg"
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
             >
-              <Avatar className="h-8 w-8 rounded-lg">
+              <Avatar className="h-8 w-8 rounded-2xl">
                 <AvatarImage src={admin.photo_url} alt={admin.firstname} />
-                <AvatarFallback className="rounded-lg">{admin?.firstname.split("")[0] + admin.lastname.split("")[0]}</AvatarFallback>
+                <AvatarFallback className="rounded-2xl">{admin?.firstname.split("")[0] + admin.lastname.split("")[0]}</AvatarFallback>
               </Avatar>
               <div className="grid flex-1 text-left text-sm leading-tight">
                 <span className="truncate font-medium">{admin.firstname}{" "}{admin.lastname}</span>
@@ -59,13 +59,13 @@ export function NavUser() {
           >
             <DropdownMenuLabel className="p-0 font-normal">
               <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
-                <Avatar className="h-8 w-8 rounded-lg">
+                <Avatar className="h-8 w-8 rounded-2xl">
                   <AvatarImage src={admin.photo_url} alt={admin.firstname} />
-                  <AvatarFallback className="rounded-lg">{admin?.firstname.split("")[0] + admin.lastname.split("")[0]}</AvatarFallback>
+                  <AvatarFallback className="rounded-2xl">{admin?.firstname.split("")[0] + admin.lastname.split("")[0]}</AvatarFallback>
                 </Avatar>
                 <div className="grid flex-1 text-left text-sm leading-tight">
                   <span className="truncate font-medium">{admin.firstname}{" "}{admin.lastname}</span>
-                  <span className="truncate text-xs">{admin.role}</span>
+                  <span className="truncate text-xs capitalize">{admin.role}</span>
                 </div>
               </div>
             </DropdownMenuLabel>

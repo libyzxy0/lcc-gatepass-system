@@ -20,18 +20,18 @@ export function Counts() {
         
       <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-4">
       
-     <Card className="bg-green-100 border-green-400">
+     <Card className="bg-yellow-100 border-yellow-400">
           <CardContent>
             <CardTitle className="text-3xl font-medium mb-2 flex flex-row gap-2 items-center">
               <ContactRound />
               <h1>6,640</h1>
             </CardTitle>
             <CardDescription>
-              <p>Total People Today</p>
+              <p>People Today</p>
             </CardDescription>
           </CardContent>
         </Card>
-     <Card className="bg-sky-100 border-sky-400">
+     <Card className="bg-green-100 border-green-400">
           <CardContent>
             <CardTitle className="text-3xl font-medium mb-2 flex flex-row gap-2 items-center">
               <IdCard />
@@ -42,16 +42,7 @@ export function Counts() {
             </CardDescription>
           </CardContent>
         </Card>
-        <Card className="bg-blue-100 border-blue-400">
-          <CardContent>
-            <CardTitle className="text-3xl font-medium mb-2 flex flex-row gap-2 items-center">
-              <DoorOpen />
-              <h1>2,345</h1>
-            </CardTitle>
-            <CardDescription>Students Today</CardDescription>
-          </CardContent>
-        </Card>
-        <Card className="bg-pink-100 border-pink-400">
+        <Card className="bg-green-100 border-green-400">
           <CardContent>
             <CardTitle className="text-3xl font-medium mb-2 flex flex-row gap-2 items-center">
               <UserCheck />
@@ -63,13 +54,22 @@ export function Counts() {
         <Card className="bg-violet-100 border-violet-400">
           <CardContent>
             <CardTitle className="text-3xl font-medium mb-2 flex flex-row gap-2 items-center">
+              <DoorOpen />
+              <h1>2,345</h1>
+            </CardTitle>
+            <CardDescription>Students Today</CardDescription>
+          </CardContent>
+        </Card>
+        <Card className="bg-violet-100 border-violet-400">
+          <CardContent>
+            <CardTitle className="text-3xl font-medium mb-2 flex flex-row gap-2 items-center">
               <UserCog />
               <h1>4,003</h1>
             </CardTitle>
             <CardDescription>Visitors Today</CardDescription>
           </CardContent>
         </Card>
-        <Card className="bg-rose-100 border-rose-400">
+        <Card className="bg-orange-100 border-orange-400">
           <CardContent>
             <CardTitle className="text-3xl font-medium mb-2 flex flex-row gap-2 items-center">
               <CheckCheck />

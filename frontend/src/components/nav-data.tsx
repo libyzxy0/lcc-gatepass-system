@@ -32,7 +32,7 @@ export function NavData({
 }) {
   return (
     <SidebarGroup>
-      <SidebarGroupLabel>Configure Data</SidebarGroupLabel>
+      <SidebarGroupLabel>Manage</SidebarGroupLabel>
       <SidebarMenu>
         {items.map((item) => (
           <Collapsible

@@ -101,6 +101,7 @@ export const admin = pgTable("admin", {
   phone_number: text("phone_number").notNull(),
   email: text("email").notNull().unique(),
   password: text("password").notNull(),
+  photo_url: text("photo_url"),
   is_super_admin: boolean("is_super_admin").default(false),
   created_at: timestamp("created_at", { mode: "string" })
     .defaultNow()

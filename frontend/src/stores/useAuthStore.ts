@@ -8,7 +8,6 @@ type Admin = {
   role: 'admin' | 'staff';
   email: string;
   phone_number: string;
-  password: string;
   photo_url: string;
   is_super_admin: boolean;
   created_at: string;

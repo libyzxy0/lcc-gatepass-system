@@ -30,9 +30,9 @@ import { useState } from 'react'
 import lccBackground from '@/assets/lcc.webp'
 
 const formSchema = z.object({
-  email: z.string().min(1, "Username required!"),
+  email: z.string().email().min(1, "Email required!"),
   password: z.string().min(1, "Password required!"),
-  captcha: z.string()//.min(1, "Please verify captcha first!"),
+  captcha: z.string().min(1, "Please verify captcha first!"),
 })
 
 export function LoginForm({

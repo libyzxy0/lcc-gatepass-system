@@ -5,6 +5,10 @@ import { eq } from "drizzle-orm";
 import jwt from "jsonwebtoken";
 import { generateAccessToken, generateRefreshToken } from '@/utils'
 import { verifyTurnstile } from '@/utils/verify-cf-turnstile'
+import bcrypt from "bcryptjs";
+
+const SALT_ROUNDS = 10;
+
 type Admin = {
   id: string;
   firstname: string;
@@ -14,6 +18,7 @@ type Admin = {
   phone_number: string;
   password: string;
   is_super_admin: boolean;
+  photo_url: string;
   created_at: string;
 };
 
@@ -27,16 +32,19 @@ class AdminController {
         email,
         phone_number,
         password,
-        is_super_admin
+        photo_url
       } = req.body;
+
+      const hashedPassword = await bcrypt.hash(password, SALT_ROUNDS);
+
       await db.insert(admin).values({
         firstname,
         lastname,
         role,
         email,
         phone_number,
-        password,
-        is_super_admin
+        hashedPassword,
+        photo_url
       });
       res.status(200).json({
         message: "Admin created successfully",
@@ -49,25 +57,29 @@ class AdminController {
   async login(req: Request, res: Response) {
     try {
       const { email, password, cloudflare_token } = req.body;
-      
-      const cloudflareTurnstile = await verifyTurnstile(cloudflare_token);
-      
-      if(!cloudflareTurnstile && !cloudflareTurnstile.success) {
-        return res.status(403).json({ message: "Please verify CloudFlare captcha first!" });
+
+      /* Only verify CloudFlare turnstile in production */
+      if (process.env.NODE_ENV === 'production') {
+        const cloudflareTurnstile = await verifyTurnstile(cloudflare_token);
+        if (!cloudflareTurnstile && !cloudflareTurnstile.success) {
+          return res.status(403).json({ message: "Please verify CloudFlare captcha first!" });
+        }
       }
-      
-      
+
+
       const adminData: Admin[] = await db
         .select()
         .from(admin)
         .where(eq(admin.email, email));
 
       if (adminData.length <= 0) {
-        return res.status(404).json({ message: "Admin not found" });
+        return res.status(404).json({ message: "No admin associated with that email" });
       }
 
-      if (adminData[0].password !== password) {
-        return res.status(400).json({ message: "Incorrect password" });
+      const isValidPassword = await bcrypt.compare(password, adminData[0].password);
+
+      if (!isValidPassword) {
+        return res.status(400).json({ message: "Please enter the correct password" });
       }
 
       const accessToken = generateAccessToken(adminData[0].id);
@@ -93,7 +105,7 @@ class AdminController {
   async refresh(req: Request, res: Response) {
     try {
       const refreshToken = req.cookies?.refreshToken;
-      
+
       if (!refreshToken) {
         return res.status(401).json({ message: "Refresh token missing" });
       }
@@ -130,7 +142,29 @@ class AdminController {
         .from(admin)
         .where(eq(admin.id, req.admin.id));
 
-      return res.json(adminData[0]);
+      const {
+        id,
+        firstname,
+        lastname,
+        email,
+        photo_url,
+        phone_number,
+        role,
+        is_super_admin,
+        created_at
+      } = adminData[0];
+
+      return res.json({
+        id,
+        firstname,
+        lastname,
+        email,
+        photo_url,
+        phone_number,
+        role,
+        is_super_admin,
+        created_at
+      });
     } catch (error) {
       return res.status(401).json({ message: "Invalid or expired token" });
     }

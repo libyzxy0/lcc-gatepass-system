@@ -2,10 +2,15 @@ import { Routes, Route, Navigate } from "react-router";
 import AdminLayout from '@/layouts/admin';
 import Overview from '@/routes/admin/overview';
 import StudentsLog from '@/routes/admin/students-log';
+import Students from '@/routes/admin/students';
 import VisitorsLog from '@/routes/admin/visitors-log';
+import Visitors from '@/routes/admin/visitors';
 import ProtectedRoute from '@/routes/protected-route';
 import Login from '@/routes/admin/login';
 import NotFound from '@/routes/not-found';
+import Settings from '@/routes/admin/settings';
+import SettingsAdmins from '@/routes/admin/settings-admins';
+import Offices from '@/routes/admin/offices';
 
 export default function App() {
   return (
@@ -15,17 +20,20 @@ export default function App() {
 
       <Route element={<ProtectedRoute />}>
         <Route path="dashboard" element={<AdminLayout />}>
-        
+
           <Route index element={<Overview />} />
+
+          <Route path="students" element={<Students />} />
+          <Route path="students/logs" element={<StudentsLog />} />
+
+          <Route path="visitors" element={<Visitors />} />
+          <Route path="visitors/logs" element={<VisitorsLog />} />
           
-          <Route path="students">
-            <Route path="logs" element={<StudentsLog />} />
-          </Route>
+          <Route path="offices" element={<Offices />} />
           
-          <Route path="visitors">
-            <Route path="logs" element={<VisitorsLog />} />
-          </Route>
-          
+          <Route path="settings" element={<Settings />} />
+          <Route path="settings/admins" element={<SettingsAdmins />} />
+
         </Route>
       </Route>
       <Route path="*" element={<NotFound />} />

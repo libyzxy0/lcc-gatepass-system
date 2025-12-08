@@ -1,7 +1,7 @@
+import { EmptyDashboard } from '@/components/empty-dashboard'
+
 export default function StudentsLog() {
   return (
-    <div>
-      <h1>Students Log</h1>
-    </div>
+    <EmptyDashboard />
   )
 }

@@ -1,6 +1,6 @@
 import { EmptyDashboard } from '@/components/empty-dashboard'
 
-export default function VisitorsLog() {
+export default function Offices() {
   return (
     <EmptyDashboard />
   )

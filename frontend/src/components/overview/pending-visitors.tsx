@@ -56,7 +56,7 @@ const visitors = [
 
 export function PendingVisitors() {
   return (
-    <Card>
+    <Card className="col-span-1 md:col-span-2">
       <CardHeader className="flex flex-row justify-between items-center">
         <CardTitle>Pending Visitors</CardTitle>
         <CardDescription>5 Pedning</CardDescription>

@@ -7,7 +7,8 @@ import {
   ClipboardClock,
   Users,
   IdCard,
-  BookUser
+  BookUser,
+  BriefcaseBusiness
 } from "lucide-react"
 
 import { NavData } from "@/components/nav-data"
@@ -42,25 +43,19 @@ const data = {
   ],
   navData: [
     {
-      title: "Students RFID",
-      url: "/dashboard/students/rfid",
+      title: "Students",
+      url: "/dashboard/students",
       icon: IdCard,
     },
     {
       title: "Visitors",
-      url: "#",
+      url: "/dashboard/visitors",
       icon: Users,
-      isActive: true,
-      items: [
-        {
-          title: "Allowed",
-          url: "#",
-        },
-        {
-          title: "Pending Approval",
-          url: "#",
-        }
-      ],
+    },
+    {
+      title: "Offices",
+      url: "/dashboard/offices",
+      icon: BriefcaseBusiness ,
     },
     {
       title: "Settings",
@@ -69,15 +64,11 @@ const data = {
       items: [
         {
           title: "General",
-          url: "#",
-        },
-        {
-          title: "Offices",
-          url: "#",
+          url: "/dashboard/settings",
         },
         {
           title: "Admins & Staffs",
-          url: "#",
+          url: "/dashboard/settings/admins",
         }
       ],
     },
