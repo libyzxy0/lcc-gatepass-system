@@ -5,6 +5,7 @@ import StudentsLog from '@/routes/admin/students-log';
 import VisitorsLog from '@/routes/admin/visitors-log';
 import ProtectedRoute from '@/routes/protected-route';
 import Login from '@/routes/admin/login';
+import NotFound from '@/routes/not-found';
 
 export default function App() {
   return (
@@ -27,6 +28,7 @@ export default function App() {
           
         </Route>
       </Route>
+      <Route path="*" element={<NotFound />} />
     </Routes>
   );
 }

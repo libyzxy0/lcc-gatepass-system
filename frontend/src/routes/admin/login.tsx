@@ -27,7 +27,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 import { useState } from 'react'
-
+import lccBackground from '@/assets/lcc.webp'
 
 const formSchema = z.object({
   email: z.string().min(1, "Username required!"),
@@ -89,10 +89,10 @@ export function LoginForm({
   }
 
   return (
-    <div className={cn("w-[400px]", className)} {...props}>
-      <Card>
+    <div className={cn("w-[90%] md:w-[420px] z-20", className)} {...props}>
+      <Card className="rounded-xl">
         <CardHeader>
-          <CardTitle className="text-2xl font-bold">Login As Admin</CardTitle>
+          <CardTitle className="text-2xl font-bold text-blue-700">Login As Admin</CardTitle>
           <CardDescription>
             Enter your email and password below to login to admin dashboard.
           </CardDescription>
@@ -108,7 +108,7 @@ export function LoginForm({
                     <FormItem>
                       <FormLabel>Email</FormLabel>
                       <FormControl>
-                        <Input className="py-6" type="text" placeholder="aieshadacallos@gmail.com" {...field} />
+                        <Input className="py-6 " type="text" placeholder="aieshadacallos@gmail.com" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -146,7 +146,7 @@ export function LoginForm({
                   )}
                 />
 
-                <Button type="submit" className="py-6" disabled={loading}>{loading ? (
+                <Button type="submit" className="py-6 bg-blue-700" disabled={loading}>{loading ? (
                   <Spinner />
                 ) : (
                   <>
@@ -165,8 +165,19 @@ export function LoginForm({
 
 export default function Login() {
   return (
-    <div className="h-screen flex items-center justify-center">
-      <LoginForm />
+    <div className="h-screen flex items-center justify-center relative">
+      
+      <img
+        src={lccBackground}
+        alt="La Concepcion College"
+        className="absolute z-10 h-screen w-full object-cover blur-2xl"
+      />
+
+      <div className="absolute z-20 h-screen w-full bg-black opacity-50"></div>
+
+      <div className="relative z-30 w-full flex items-center justify-center relative">
+        <LoginForm />
+      </div>
     </div>
-  )
+  );
 }
