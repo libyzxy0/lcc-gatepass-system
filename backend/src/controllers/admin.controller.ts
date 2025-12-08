@@ -52,11 +52,10 @@ class AdminController {
       
       const cloudflareTurnstile = await verifyTurnstile(cloudflare_token);
       
-      console.log(cloudflare_token, cloudflareTurnstile);
-      
-      if(!cloudflareTurnstile) {
+      if(!cloudflareTurnstile && !cloudflareTurnstile.success) {
         return res.status(403).json({ message: "Please verify CloudFlare captcha first!" });
       }
+      
       
       const adminData: Admin[] = await db
         .select()
