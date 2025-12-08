@@ -2,7 +2,7 @@ import axios from 'axios'
 
 export const verifyTurnstile = async (token: string) => {
   try {
-    const response = axios.post('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
+    const response = await axios.post('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
       secret: process.env.CLOUDFLARE_TURNSTILE_SECRET,
       response: token,
     })
