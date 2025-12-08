@@ -27,8 +27,7 @@ app.use(
 );
 
 
-app.use(limiter);
-app.set("trust proxy", true);
+//app.use(limiter);
 
 Bootstrap(app);
 initializeRoutes(app);
