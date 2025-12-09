@@ -2,18 +2,19 @@ import {
   Card,
   CardContent,
   CardTitle,
-  CardDescription,
   CardHeader
 } from '@/components/ui/card'
-
+import {Link } from 'react-router'
 import {
   Table,
   TableBody,
   TableCell,
   TableHead,
   TableHeader,
-  TableRow,
+  TableRow
 } from "@/components/ui/table"
+import { Table as TableIcon } from 'lucide-react';
+
 
 const visitors = [
   {
@@ -53,13 +54,14 @@ const visitors = [
   },
 ]
 
-
 export function PendingVisitors() {
   return (
-    <Card className="col-span-1 md:col-span-2">
-      <CardHeader className="flex flex-row justify-between items-center">
+    <Card>
+      <CardHeader className="relative flex items-center">
         <CardTitle>Pending Visitors</CardTitle>
-        <CardDescription>5 Pedning</CardDescription>
+        <Link to="/visitors" className="absolute right-5">
+          <TableIcon className="size-5 text-muted-foreground" />
+        </Link>
       </CardHeader>
       <CardContent>
         <Table>

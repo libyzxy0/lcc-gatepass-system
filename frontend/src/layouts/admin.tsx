@@ -19,7 +19,7 @@ function Admin() {
       <AppSidebar />
       <div className="p-4 md:p-8 w-full">
         <div className="pb-5 flex flex-row items-center gap-2">
-          <SidebarTrigger />
+          <SidebarTrigger className="h-8 w-8 size-8" variant="outline" />
           <Breadcrumb>
             <BreadcrumbList>
               {parts.map((name, index) => (

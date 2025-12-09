@@ -1,83 +1,26 @@
-import {
-  Card,
-  CardContent,
-  CardTitle,
-  CardDescription
-} from '@/components/ui/card'
 import { 
   IdCard,
   DoorOpen,
-  UserCheck,
   UserCog,
   ContactRound,
-  CheckCheck
+  Users
 } from 'lucide-react';
+
+import { CountCard } from '@/components/CountCard'
 
 export function Counts() {
   return (
     <div className="mt-4 md:mt-8">
       <h1 className="font-medium mb-4 text-gray-600">Students & Visitors</h1>
         
-      <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
       
-     <Card className="bg-yellow-100 border-yellow-400">
-          <CardContent>
-            <CardTitle className="text-3xl font-medium mb-2 flex flex-row gap-2 items-center">
-              <ContactRound />
-              <h1>6,640</h1>
-            </CardTitle>
-            <CardDescription>
-              <p>People Today</p>
-            </CardDescription>
-          </CardContent>
-        </Card>
-     <Card className="bg-green-100 border-green-400">
-          <CardContent>
-            <CardTitle className="text-3xl font-medium mb-2 flex flex-row gap-2 items-center">
-              <IdCard />
-              <h1>4,890</h1>
-            </CardTitle>
-            <CardDescription>
-              <p>Enrolled Students</p>
-            </CardDescription>
-          </CardContent>
-        </Card>
-        <Card className="bg-green-100 border-green-400">
-          <CardContent>
-            <CardTitle className="text-3xl font-medium mb-2 flex flex-row gap-2 items-center">
-              <UserCheck />
-              <h1>1,757</h1>
-            </CardTitle>
-            <CardDescription>Approved Visitors</CardDescription>
-          </CardContent>
-        </Card>
-        <Card className="bg-violet-100 border-violet-400">
-          <CardContent>
-            <CardTitle className="text-3xl font-medium mb-2 flex flex-row gap-2 items-center">
-              <DoorOpen />
-              <h1>2,345</h1>
-            </CardTitle>
-            <CardDescription>Students Today</CardDescription>
-          </CardContent>
-        </Card>
-        <Card className="bg-violet-100 border-violet-400">
-          <CardContent>
-            <CardTitle className="text-3xl font-medium mb-2 flex flex-row gap-2 items-center">
-              <UserCog />
-              <h1>4,003</h1>
-            </CardTitle>
-            <CardDescription>Visitors Today</CardDescription>
-          </CardContent>
-        </Card>
-        <Card className="bg-orange-100 border-orange-400">
-          <CardContent>
-            <CardTitle className="text-3xl font-medium mb-2 flex flex-row gap-2 items-center">
-              <CheckCheck />
-              <h1>32,000</h1>
-            </CardTitle>
-            <CardDescription>Completed Visits</CardDescription>
-          </CardContent>
-        </Card>
+     <CountCard name="People Today" count={1473} className="bg-blue-100 border-blue-400" icon={ContactRound} />
+     <CountCard name="Enrolled Students" count={4789} className="bg-green-100 border-green-400" icon={IdCard} />
+     <CountCard name="Pending Visitors" count={36} className="bg-yellow-100 border-yellow-400" icon={UserCog} />
+     <CountCard name="Students Today" count={1402} className="bg-sky-100 border-sky-400" icon={DoorOpen} />
+     <CountCard name="Visitors Today" count={21} className="bg-neutral-100 border-neutral-400" icon={Users} />
+     <CountCard name="Staffs Today" count={50} className="bg-orange-100 border-orange-400" icon={Users} />
       </div>
     </div>
   )

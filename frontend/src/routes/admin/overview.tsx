@@ -14,7 +14,7 @@ export default function Overview() {
     <div>
       <h1 className="font-semibold text-2xl">Overview</h1>
       <Counts />
-      <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-4">
         <RecentLogs />
         <PendingVisitors />
       </div>

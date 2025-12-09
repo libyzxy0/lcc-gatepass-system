@@ -32,7 +32,7 @@ import lccBackground from '@/assets/lcc.webp'
 const formSchema = z.object({
   email: z.string().email().min(1, "Email required!"),
   password: z.string().min(1, "Password required!"),
-  captcha: z.string().min(1, "Please verify captcha first!"),
+  captcha: import.meta.env.MODE === "development" ? z.string() : z.string().min(1, "Please verify captcha first!"),
 })
 
 export function LoginForm({

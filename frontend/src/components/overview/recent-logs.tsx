@@ -18,39 +18,39 @@ const visitors = [
   {
     id: "1",
     name: "Jan Liby Dela Costa",
-    direction: "IN",
-    time: "8:24 AM"
+    time_out: null,
+    time_in: "8:24 AM"
   },
   {
     id: "2",
     name: "Krisha Sophia De Peralta",
-    direction: "IN",
-    time: "9:21 AM",
+    time_out: "3:30 PM",
+    time_in: "9:21 AM",
   },
   {
     id: "3",
     name: "Aiesha Jaden Dacallos",
-    direction: "IN",
-    time: "11:17 AM",
+    time_out: "N/A",
+    time_in: "11:17 AM",
   },
   {
     id: "4",
     name: "Rose Marie Indic",
-    direction: "OUT",
-    time: "4:33 PM",
+    time_out: "7:00 PM",
+    time_in: "4:33 PM",
   },
   {
     id: "5",
     name: "Rhonyl Caballes",
-    direction: "OUT",
-    time: "7:00 PM",
+    time_out: "11:00 AM",
+    time_in: "N/A",
   },
 ]
 
 
 export function RecentLogs() {
   return (
-    <Card className="col-span-1">
+    <Card>
       <CardHeader className="flex flex-row justify-between items-center">
         <CardTitle>Recent Logs</CardTitle>
       </CardHeader>
@@ -59,16 +59,16 @@ export function RecentLogs() {
           <TableHeader>
             <TableRow className="font-bold">
               <TableHead className="w-[100px]">Name</TableHead>
-              <TableHead>Direction</TableHead>
-              <TableHead>Time</TableHead>
+              <TableHead>TIME IN</TableHead>
+              <TableHead>TIME OUT</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {visitors.map((visitors) => (
               <TableRow key={visitors.id}>
                 <TableCell className="font-medium">{visitors.name}</TableCell>
-                <TableCell>{visitors.direction}</TableCell>
-                <TableCell className="text-wrap">{visitors.time}</TableCell>
+                <TableCell>{visitors.time_in}</TableCell>
+                <TableCell className="text-wrap">{visitors?.time_out ?? "N/A"}</TableCell>
               </TableRow>
             ))}
           </TableBody>
