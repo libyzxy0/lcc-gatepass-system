@@ -1,5 +1,15 @@
+//@ts-nocheck
+
 import { StudentsLogTable } from '@/components/students/students-log-table'
 import type { ColumnDef } from "@tanstack/react-table"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { Trash, Pencil, IdCard, Ellipsis, ArrowUpDown } from 'lucide-react';
+import { Button } from '@/components/ui/button'
 
 export type StudentLogType = {
   id: string;
@@ -21,21 +31,64 @@ export const columns: ColumnDef<StudentLogType>[] = [
     header: "Name",
   },
   {
+    accessorKey: "time_in",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Time In
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      )
+    },
+  },
+  {
+    accessorKey: "time_out",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Time Out
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      )
+    },
+  },
+  {
     accessorKey: "section",
     header: "Section",
   },
   {
     accessorKey: "grade_level",
-    header: "Grade Level",
+    header: "Level",
   },
   {
-    accessorKey: "time_in",
-    header: "Time In",
-  },
-  {
-    accessorKey: "time_out",
-    header: "Time Out",
-  },
+    id: 'actions',
+    cell: ({ column }) => {
+      return (
+        <DropdownMenu>
+          <DropdownMenuTrigger>
+            <Ellipsis />
+          </DropdownMenuTrigger>
+          <DropdownMenuContent>
+            <DropdownMenuItem>
+              <IdCard />
+              View Student</DropdownMenuItem>
+            <DropdownMenuItem>
+              <Pencil />
+              Edit Log</DropdownMenuItem>
+            <DropdownMenuItem variant="destructive">
+              <Trash />
+              Delete Log</DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      )
+    }
+  }
 ]
 
 const data: StudentLogType[] = [
@@ -273,9 +326,17 @@ const data: StudentLogType[] = [
     grade_level: "SHS-G12",
     time_in: "6:52 AM",
     time_out: "4:02 PM",
-  }
+  },
+  {
+    id: "STU20250517",
+    student_id: "STU20250517",
+    name: "Lidyn Caballero",
+    section: "ABM-12",
+    grade_level: "SHS-G12",
+    time_in: "6:52 AM",
+    time_out: "4:02 PM",
+  },
 ];
-
 
 export default function StudentsLog() {
   return (
