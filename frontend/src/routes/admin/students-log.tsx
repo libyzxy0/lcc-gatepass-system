@@ -1,6 +1,4 @@
-//@ts-nocheck
-
-import { StudentsLogTable } from '@/components/students/students-log-table'
+import { StudentTable } from '@/components/students/student-table'
 import type { ColumnDef } from "@tanstack/react-table"
 import {
   DropdownMenu,
@@ -68,7 +66,7 @@ export const columns: ColumnDef<StudentLogType>[] = [
   },
   {
     id: 'actions',
-    cell: ({ column }) => {
+    cell: () => {
       return (
         <DropdownMenu>
           <DropdownMenuTrigger>
@@ -344,7 +342,28 @@ export default function StudentsLog() {
       <header className="mb-8">
         <h1 className="font-semibold text-2xl">Students Log</h1>
       </header>
-      <StudentsLogTable columns={columns} data={data} />
+      <StudentTable 
+      columns={columns} 
+      data={data} 
+      filterSelect={[
+        {
+          id: 'name',
+          label: "Name"
+        },
+        {
+          id: 'student_id',
+          label: "Student ID"
+        },
+        {
+          id: 'section',
+          label: "Section"
+        },
+        {
+          id: 'grade_level',
+          label: "Grade Level"
+        },
+      ]}
+      />
     </div>
   )
 }

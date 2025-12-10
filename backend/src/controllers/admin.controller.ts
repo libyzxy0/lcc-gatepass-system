@@ -89,7 +89,7 @@ class AdminController {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production' ? true : false,
         sameSite: "strict",
-        maxAge: 7 * 24 * 60 * 60 * 1000,
+        maxAge: 30 * 24 * 60 * 60 * 1000,
       });
 
       return res.status(200).json({
@@ -116,7 +116,7 @@ class AdminController {
       );
 
       const newAccessToken = generateAccessToken(decoded.id);
-
+      
       return res.status(200).json({
         access_token: newAccessToken,
       });
@@ -136,6 +136,8 @@ class AdminController {
       if (!req.admin) {
         return res.status(401).json({ message: "Unauthorized access!" });
       }
+      
+      console.log(req.admin)
 
       const adminData: Admin[] = await db
         .select()

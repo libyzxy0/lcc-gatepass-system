@@ -1,5 +1,3 @@
-"use client"
-
 import * as React from "react"
 import {
   LayoutDashboard,
@@ -10,7 +8,6 @@ import {
   BookUser,
   BriefcaseBusiness
 } from "lucide-react"
-
 import { NavData } from "@/components/nav-data"
 import { NavOverview } from "@/components/nav-overview"
 import { NavUser } from "@/components/nav-user"
@@ -67,7 +64,7 @@ const data = {
           url: "/dashboard/settings",
         },
         {
-          title: "Admins & Staffs",
+          title: "Admin Personels",
           url: "/dashboard/settings/admins",
         }
       ],

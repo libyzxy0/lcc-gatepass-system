@@ -11,32 +11,40 @@ import NotFound from '@/routes/not-found';
 import Settings from '@/routes/admin/settings';
 import SettingsAdmins from '@/routes/admin/settings-admins';
 import Offices from '@/routes/admin/offices';
+import {
+  QueryClient,
+  QueryClientProvider,
+} from '@tanstack/react-query'
+
+const queryClient = new QueryClient();
 
 export default function App() {
   return (
-    <Routes>
-      <Route index element={<Navigate to="/dashboard" />} />
-      <Route path="login" element={<Login />} />
+    <QueryClientProvider client={queryClient}>
+      <Routes>
+        <Route index element={<Navigate to="/dashboard" />} />
+        <Route path="login" element={<Login />} />
 
-      <Route element={<ProtectedRoute />}>
-        <Route path="dashboard" element={<AdminLayout />}>
+        <Route element={<ProtectedRoute />}>
+          <Route path="dashboard" element={<AdminLayout />}>
 
-          <Route index element={<Overview />} />
+            <Route index element={<Overview />} />
 
-          <Route path="students" element={<Students />} />
-          <Route path="students/logs" element={<StudentsLog />} />
+            <Route path="students" element={<Students />} />
+            <Route path="students/logs" element={<StudentsLog />} />
 
-          <Route path="visitors" element={<Visitors />} />
-          <Route path="visitors/logs" element={<VisitorsLog />} />
-          
-          <Route path="offices" element={<Offices />} />
-          
-          <Route path="settings" element={<Settings />} />
-          <Route path="settings/admins" element={<SettingsAdmins />} />
+            <Route path="visitors" element={<Visitors />} />
+            <Route path="visitors/logs" element={<VisitorsLog />} />
 
+            <Route path="offices" element={<Offices />} />
+
+            <Route path="settings" element={<Settings />} />
+            <Route path="settings/admins" element={<SettingsAdmins />} />
+
+          </Route>
         </Route>
-      </Route>
-      <Route path="*" element={<NotFound />} />
-    </Routes>
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </QueryClientProvider>
   );
 }

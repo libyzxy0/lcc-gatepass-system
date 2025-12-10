@@ -7,7 +7,11 @@
     "test": "vitest",
     "start": "tsx src/index.ts",
     "dev": "tsx watch src/index.ts",
-    "format": "prettier . --write"
+    "format": "prettier . --write",
+    "db:migrate": "drizzle-kit push",
+    "db:seed:admin": "tsx src/db/seed/admin-seeder.ts",
+    "db:seed:student": "tsx src/db/seed/student-seeder.ts",
+    "db:seed:visitor": "tsx src/db/seed/visitor-seeder.ts"
   },
   "repository": {
     "type": "git",

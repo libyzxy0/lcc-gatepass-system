@@ -11,8 +11,8 @@ class StudentController {
         firstname,
         lastname,
         middle_initial,
-        grade_level,
         section,
+        grade_level,
         parent_phone_number,
         parent_email,
         rfid_code,
@@ -23,8 +23,8 @@ class StudentController {
         firstname,
         lastname,
         middle_initial,
-        grade_level,
         section,
+        grade_level,
         parent_phone_number,
         parent_email,
         rfid_code,
@@ -46,7 +46,7 @@ class StudentController {
       const studentData = await db.select().from(student).where(eq(student.id, id));
       if (studentData.length <= 0) {
         return res.status(404).json({
-          error: "No product associated with that ID"
+          error: "No student associated with that ID"
         })
       }
       res.status(200).json(studentData[0])

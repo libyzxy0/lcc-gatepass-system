@@ -1,0 +1,224 @@
+{
+  "_features": [
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {}
+  ],
+  "options": {
+    "filterFromLeafRows": false,
+    "maxLeafRowFilterDepth": 100,
+    "globalFilterFn": "auto",
+    "groupedColumnMode": "reorder",
+    "paginateExpandedRows": true,
+    "enableRowSelection": true,
+    "enableMultiRowSelection": true,
+    "enableSubRowSelection": true,
+    "columnResizeMode": "onEnd",
+    "columnResizeDirection": "ltr",
+    "state": {
+      "columnSizing": {},
+      "columnSizingInfo": {
+        "startOffset": null,
+        "startSize": null,
+        "deltaOffset": null,
+        "deltaPercentage": null,
+        "isResizingColumn": false,
+        "columnSizingStart": []
+      },
+      "rowSelection": {},
+      "rowPinning": {
+        "top": [],
+        "bottom": []
+      },
+      "expanded": {},
+      "grouping": [],
+      "sorting": [],
+      "columnFilters": [],
+      "columnPinning": {
+        "left": [],
+        "right": []
+      },
+      "columnOrder": [],
+      "columnVisibility": {},
+      "pagination": {
+        "pageIndex": 0,
+        "pageSize": 10
+      }
+    },
+    "renderFallbackValue": null,
+    "data": [
+      {
+        "student_id": "STU20250327",
+        "name": "Jan Liby Dela Costa",
+        "section": "ICT-12A",
+        "grade_level": "SHS-G12",
+        "time_in": "7:46 AM",
+        "time_out": "N/A"
+      },
+      {
+        "student_id": "STU20250326",
+        "name": "Aiesha Jaden Dacallos",
+        "section": "ICT-12A",
+        "grade_level": "SHS-G12",
+        "time_in": "7:48 AM",
+        "time_out": "N/A"
+      },
+      {
+        "student_id": "STU20250324",
+        "name": "Krisha Sophia De Peralta",
+        "section": "ICT-12A",
+        "grade_level": "SHS-G12",
+        "time_in": "7:43 AM",
+        "time_out": "N/A"
+      },
+      {
+        "student_id": "STU2025035",
+        "name": "Rhonyl Caballes",
+        "section": "ICT-12A",
+        "grade_level": "SHS-G12",
+        "time_in": "7:51 AM",
+        "time_out": "N/A"
+      },
+      {
+        "student_id": "STU20250226",
+        "name": "Kelvin John Capate",
+        "section": "ICT-12A",
+        "grade_level": "SHS-G12",
+        "time_in": "7:40 AM",
+        "time_out": "N/A"
+      },
+      {
+        "student_id": "STU20250157",
+        "name": "Prince Andrei Banting",
+        "section": "ICT-12A",
+        "grade_level": "SHS-G12",
+        "time_in": "7:44 AM",
+        "time_out": "N/A"
+      },
+      {
+        "student_id": "STU20250384",
+        "name": "Rose Marie Indic",
+        "section": "ICT-12A",
+        "grade_level": "SHS-G12",
+        "time_in": "7:49 AM",
+        "time_out": "N/A"
+      },
+      {
+        "student_id": "STU20250567",
+        "name": "Euclid Gundio",
+        "section": "ICT-12A",
+        "grade_level": "SHS-G12",
+        "time_in": "7:47 AM",
+        "time_out": "N/A"
+      },
+      {
+        "student_id": "STU20250537",
+        "name": "Melvin Clive",
+        "section": "ICT-12A",
+        "grade_level": "SHS-G12",
+        "time_in": "6:47 AM",
+        "time_out": "N/A"
+      },
+      {
+        "student_id": "STU20250537",
+        "name": "Prince Hassnan Gabumpa",
+        "section": "ICT-12A",
+        "grade_level": "SHS-G12",
+        "time_in": "6:45 AM",
+        "time_out": "N/A"
+      },
+      {
+        "student_id": "STU20250147",
+        "name": "Joanna Ajose Estacio",
+        "section": "ICT-12A",
+        "grade_level": "SHS-G12",
+        "time_in": "6:45 AM",
+        "time_out": "N/A"
+      },
+      {
+        "student_id": "STU20250146",
+        "name": "Kim Ahvril De Guzman",
+        "section": "ICT-12A",
+        "grade_level": "SHS-G12",
+        "time_in": "6:45 AM",
+        "time_out": "N/A"
+      },
+      {
+        "student_id": "STU20250145",
+        "name": "Hanna Butt",
+        "section": "ICT-12A",
+        "grade_level": "SHS-G12",
+        "time_in": "6:45 AM",
+        "time_out": "N/A"
+      }
+    ],
+    "columns": [
+      {
+        "accessorKey": "student_id",
+        "header": "Student ID"
+      },
+      {
+        "accessorKey": "name",
+        "header": "Name"
+      },
+      {
+        "accessorKey": "section",
+        "header": "Section"
+      },
+      {
+        "accessorKey": "grade_level",
+        "header": "Grade Level"
+      },
+      {
+        "accessorKey": "time_in",
+        "header": "Time In"
+      },
+      {
+        "accessorKey": "time_out",
+        "header": "Time Out"
+      }
+    ]
+  },
+  "initialState": {
+    "columnSizing": {},
+    "columnSizingInfo": {
+      "startOffset": null,
+      "startSize": null,
+      "deltaOffset": null,
+      "deltaPercentage": null,
+      "isResizingColumn": false,
+      "columnSizingStart": []
+    },
+    "rowSelection": {},
+    "rowPinning": {
+      "top": [],
+      "bottom": []
+    },
+    "expanded": {},
+    "grouping": [],
+    "sorting": [],
+    "columnFilters": [],
+    "columnPinning": {
+      "left": [],
+      "right": []
+    },
+    "columnOrder": [],
+    "columnVisibility": {},
+    "pagination": {
+      "pageIndex": 0,
+      "pageSize": 10
+    }
+  }
+}

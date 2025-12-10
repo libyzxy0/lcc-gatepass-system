@@ -23,8 +23,9 @@ export default function ProtectedRoute() {
   }, []);
 
   if (loading) return (
-    <div className="h-screen flex justify-center items-center">
-      <Spinner className="size-16" />
+    <div className="h-screen flex justify-center items-center gap-4">
+      <Spinner className="size-8" />
+      <p className="text-muted-foreground">Wait lang po...</p>
     </div>
   );
   

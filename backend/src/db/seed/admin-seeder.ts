@@ -2,26 +2,24 @@ import db from "@/db/drizzle";
 import { admin } from "@/db/schema";
 import bcrypt from "bcryptjs";
 
-const SALT_ROUNDS = 10;
-
-const createDefaultAdmin = async () => {
+const adminSeeder = async () => {
   try {
-    const hashedPassword = await bcrypt.hash("greensalt123", SALT_ROUNDS);
+    const hashedPassword = await bcrypt.hash("dev.libyzxy0@321", 10);
     
     const data = await db.insert(admin).values({
         firstname: "Jan Liby",
         lastname: "Dela Costa",
-        role: "admin",
+        role: "developer",
         email: "janlibydelacosta@gmail.com",
         phone_number: "09976953621",
         password: hashedPassword,
         is_super_admin: true,
-        photo_url: 'https://avatars.githubusercontent.com/u/107909653?v=4'
+        photo_url: "https://avatars.githubusercontent.com/u/107909653?v=4"
       });
-      console.log("Success:", data);
+      console.log(data);
   } catch (error) {
     console.error(error);
   }
 }
 
-createDefaultAdmin();
+adminSeeder();
