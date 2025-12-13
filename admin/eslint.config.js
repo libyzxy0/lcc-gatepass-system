@@ -20,9 +20,9 @@ export default defineConfig([
       globals: globals.browser,
     },
     rules: {
-      '@typescript-eslint/no-explicit-any': 'off',
       'react-refresh/only-export-components': 'off',
       'react-hooks/exhaustive-deps': 'off',
+      'react-hooks/incompatible-library': 'off',
     },
   },
 ])

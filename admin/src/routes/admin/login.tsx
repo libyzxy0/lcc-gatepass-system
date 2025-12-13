@@ -60,7 +60,7 @@ export function LoginForm({
       await login(values.email, values.password, values.captcha);
       navigate('/dashboard');
       turnstile.reset();
-    } catch (error: any) {
+    } catch (error) {
 
       if (error.response.status === 404) {
         form.setError("email", {
