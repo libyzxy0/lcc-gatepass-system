@@ -66,12 +66,15 @@ export const staff = pgTable("staff", {
 
 export const visitor = pgTable("visitor", {
   id: uuid("id").primaryKey().defaultRandom().notNull(),
+  visitor_id: text("visitor_id").notNull().unique(),
   firstname: text("firstname").notNull(),
   lastname: text("lastname").notNull(),
   middle_initial: text("middle_initial"),
   email: text("email").notNull().unique(),
   phone_number: text("phone_number").notNull(),
-  password: text("password").notNull(),
+  pin: text("pin").notNull(),
+  verified: boolean("verified").notNull().default(false),
+  activated: boolean("activated").notNull().default(false),
   valid_id_type: text("valid_id_type"),
   valid_id_photo_url: text("valid_id_photo_url"),
   photo_url: text("photo_url"),

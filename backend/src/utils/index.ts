@@ -27,3 +27,9 @@ export const generateRefreshToken = (id: string) => {
     expiresIn: "30d",
   });
 }
+
+export const generateVisitorID = () => {
+  const digit4 = Math.floor(Math.random() * (1000 - 9999 + 1)) + 1000;
+  const year = new Date().getFullYear();
+  return `VST${year}${digit4}`
+}

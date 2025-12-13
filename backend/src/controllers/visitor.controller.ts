@@ -2,6 +2,9 @@ import { Request, Response } from "express";
 import db from '@/db/drizzle'
 import { visitor } from '@/db/schema'
 import { eq } from 'drizzle-orm'
+import { generateRefreshToken, generateVisitorID } from '@/utils'
+
+type Visitor = typeof visitor.$inferSelect;
 
 class VisitorController {
   async registerVisitor(req: Request, res: Response) {
@@ -12,27 +15,133 @@ class VisitorController {
         middle_initial,
         email,
         phone_number,
-        purpose_of_visit,
-        office,
-        visit_date
+        pin,
+        valid_id_type,
+        valid_id_photo_url,
+        photo_url
       } = req.body;
+      
       await db.insert(visitor).values({
+        visitor_id: generateVisitorID(),
         firstname,
         lastname,
         middle_initial,
         email,
         phone_number,
-        purpose_of_visit,
-        office,
-        visit_date
+        pin,
+        valid_id_type,
+        valid_id_photo_url,
+        photo_url
       })
+      console.log("gooddds:", req.body)
       res.status(200).json({
-        message: "Visitor added successfully"
+        success: true,
+        data: {
+          phone_number,
+          pin
+        }
       })
     } catch (error: unknown) {
+      console.error(error);
       res.status(500).json({
-        message: "Failed to add visitor, something went wrong"
+        message: "Failed to register visitor, something went wrong"
       })
+    }
+  }
+
+  async login(req: Request, res: Response) {
+    try {
+      const { phone_number, pin } = req.body;
+      const visitorData: Visitor[] = await db
+        .select()
+        .from(visitor)
+        .where(eq(visitor.phone_number, phone_number));
+
+      if (visitorData.length <= 0) {
+        return res.status(404).json({ message: "No visitor associated with that phone number." });
+      }
+
+      if (visitorData[0].pin !== pin) {
+        return res.status(400).json({ message: "Please enter the correct pin" });
+      }
+
+      const accessToken = generateRefreshToken(visitorData[0].id);
+
+      return res.status(200).json({
+        message: "Login successful",
+        access_token: accessToken,
+      });
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({ message: "Something went wrong" });
+    }
+  }
+
+  async checkNum(req: Request, res: Response) {
+    try {
+      const { phone_number } = req.body;
+      const visitorData = await db.select().from(visitor).where(eq(visitor.phone_number, phone_number));
+      console.log(visitorData);
+      if (visitorData.length <= 0) {
+        return res.status(404).json({
+          error: "No visitor associated with that phone number."
+        })
+      }
+
+      res.status(200).json({
+        success: true
+      });
+    } catch (error: unknown) {
+      res.status(500).json({
+        error: "Failed to get visitor, something went wrong"
+      })
+    }
+  }
+
+  async getSession(req: Request, res: Response) {
+    try {
+      if (!req.visitor) {
+        return res.status(401).json({ message: "Unauthorized access!" });
+      }
+
+      console.log(req.visitor)
+
+      const adminData: Visitor[] = await db
+        .select()
+        .from(visitor)
+        .where(eq(visitor.id, req.visitor.id));
+
+      const {
+        id,
+        firstname,
+        lastname,
+        middle_initial,
+        email,
+        phone_number,
+        valid_id_type,
+        valid_id_photo_url,
+        photo_url,
+        created_at,
+        verified,
+        activated
+      } = adminData[0];
+
+      return res.json({
+        id,
+        firstname,
+        lastname,
+        middle_initial,
+        email,
+        phone_number,
+        valid_id_type,
+        valid_id_photo_url,
+        photo_url,
+        created_at,
+        verified,
+        activated
+      });
+    } catch (error) {
+      return res.status(401).json({ message: "Invalid or expired token" });
     }
   }
 
@@ -42,7 +151,7 @@ class VisitorController {
       const visitorData = await db.select().from(visitor).where(eq(visitor.id, id));
       if (visitorData.length <= 0) {
         return res.status(404).json({
-          error: "No product associated with that ID"
+          error: "No visitor associated with that ID"
         })
       }
       res.status(200).json(visitorData[0])

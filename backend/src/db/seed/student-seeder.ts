@@ -101,7 +101,7 @@ const studentsData = [
 ];
 
 
-const adminSeeder = async () => {
+const seeder = async () => {
   try {
     const data = await db.insert(student).values(studentsData);
     console.log(data);
@@ -110,4 +110,4 @@ const adminSeeder = async () => {
   }
 }
 
-adminSeeder();
+seeder();
