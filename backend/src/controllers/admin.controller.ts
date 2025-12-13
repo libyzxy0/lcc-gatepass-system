@@ -9,7 +9,7 @@ import bcrypt from "bcryptjs";
 
 const SALT_ROUNDS = 10;
 
-type Admin = {
+interface Admin {
   id: string;
   firstname: string;
   lastname: string;
@@ -21,6 +21,12 @@ type Admin = {
   photo_url: string;
   created_at: string;
 };
+
+interface TokenDecodedType {
+  id: string;
+  iat: number;
+  exp: number;
+}
 
 class AdminController {
   async newAdmin(req: Request, res: Response) {
@@ -49,7 +55,8 @@ class AdminController {
       res.status(200).json({
         message: "Admin created successfully",
       });
-    } catch (error: any) {
+    } catch (error) {
+      console.error("[ERROR ADMIN CONTROLLER]:", error);
       res.status(500).send({ message: "Something went wrong" });
     }
   }
@@ -97,7 +104,7 @@ class AdminController {
         access_token: accessToken,
       });
     } catch (error) {
-      console.error(error);
+      console.error("[ERROR ADMIN CONTROLLER]:", error);
       return res.status(500).json({ message: "Something went wrong" });
     }
   }
@@ -110,7 +117,7 @@ class AdminController {
         return res.status(401).json({ message: "Refresh token missing" });
       }
 
-      const decoded: any = jwt.verify(
+      const decoded: TokenDecodedType = jwt.verify(
         refreshToken,
         process.env.JWT_REFRESH_SECRET!
       );
@@ -120,8 +127,8 @@ class AdminController {
       return res.status(200).json({
         access_token: newAccessToken,
       });
-    } catch (error: any) {
-      console.error(error);
+    } catch (error) {
+      console.error("[ERROR ADMIN CONTROLLER]:", error);
       return res.status(403).json({ message: "Invalid refresh token" });
     }
   }
@@ -168,6 +175,7 @@ class AdminController {
         created_at
       });
     } catch (error) {
+      console.error("[ERROR ADMIN CONTROLLER]:", error);
       return res.status(401).json({ message: "Invalid or expired token" });
     }
   }

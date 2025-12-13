@@ -3,7 +3,7 @@ import Bootstrap from "@/bootstrap";
 import errorHandler from "@/middlewares/error-handler";
 import notFound from "@/middlewares/not-found";
 import { initializeRoutes } from "@/routes";
-import { limiter } from "@/middlewares/ratelimit";
+//import { limiter } from "@/middlewares/ratelimit";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 

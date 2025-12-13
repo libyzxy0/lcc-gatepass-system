@@ -1,14 +1,21 @@
 import jwt from 'jsonwebtoken';
-import { Request, Response } from "express";
+import type { Request, Response, NextFunction } from "express";
 import { getAccessTokenFromHeaders } from '@/utils'
 
-export const visitor_auth = async (req: Request, res: Response, next) => {
+interface TokenDecodedType {
+  id: string;
+  iat: number;
+  exp: number;
+}
+
+export const visitor_auth = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const token = getAccessTokenFromHeaders(req);
-    const decoded: any = jwt.verify(token, process.env.JWT_REFRESH_SECRET);
+    const decoded: TokenDecodedType = jwt.verify(token, process.env.JWT_REFRESH_SECRET!);
     req.visitor = decoded;
     next();
   } catch (error) {
+    console.error("[ERROR VISITOR AUTH MIDDLEWARE]:", error);
     res.status(401).send({ error: 'Unauthorized access!' });
   }
 };

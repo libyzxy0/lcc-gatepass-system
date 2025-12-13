@@ -1,4 +1,4 @@
-import { Router, Application, Request, Response } from "express";
+import { Router, Application } from "express";
 import adminRoutes from "./admin.routes";
 import studentRoutes from "./student.routes";
 import visitorRoutes from "./visitor.routes";

@@ -33,7 +33,8 @@ class StudentController {
       res.status(200).json({
         message: "Student added successfully"
       })
-    } catch (error: unknown) {
+    } catch (error) {
+      console.error("[ERROR STUDENT CONTROLLER]:", error);
       res.status(500).json({
         message: "Failed to add product, something went wrong"
       })
@@ -50,7 +51,8 @@ class StudentController {
         })
       }
       res.status(200).json(studentData[0])
-    } catch (error: unknown) {
+    } catch (error) {
+      console.error("[ERROR STUDENT CONTROLLER]:", error);
       res.status(500).json({
         error: "Failed to get student, something went wrong"
       })
@@ -87,7 +89,8 @@ class StudentController {
         .where(eq(student.id, student[0].id));
 
       res.status(200).json({ message: "Student updated successfully" })
-    } catch (error: unknown) {
+    } catch (error) {
+      console.error("[ERROR STUDENT CONTROLLER]:", error);
       res.status(500).json({
         error: "Failed to update student, something went wrong"
       })
@@ -108,7 +111,8 @@ class StudentController {
         .where(eq(student.id, student[0].id));
 
       res.status(200).json({ message: "Student deleted successfully" })
-    } catch (error: unknown) {
+    } catch (error) {
+      console.error("[ERROR STUDENT CONTROLLER]:", error);
       res.status(500).json({
         error: "Failed to delete student, something went wrong"
       })

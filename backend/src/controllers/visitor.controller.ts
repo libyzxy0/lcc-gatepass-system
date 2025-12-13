@@ -41,8 +41,8 @@ class VisitorController {
           pin
         }
       })
-    } catch (error: unknown) {
-      console.error(error);
+    } catch (error) {
+      console.error("[ERROR VISITOR CONTROLLER]:", error);
       res.status(500).json({
         message: "Failed to register visitor, something went wrong"
       })
@@ -72,7 +72,7 @@ class VisitorController {
         access_token: accessToken,
       });
     } catch (error) {
-      console.error(error);
+      console.error("[ERROR VISITOR CONTROLLER]:", error);
       return res.status(500).json({ message: "Something went wrong" });
     }
   }
@@ -91,7 +91,8 @@ class VisitorController {
       res.status(200).json({
         success: true
       });
-    } catch (error: unknown) {
+    } catch (error) {
+      console.error("[ERROR VISITOR CONTROLLER]:", error);
       res.status(500).json({
         error: "Failed to get visitor, something went wrong"
       })
@@ -141,6 +142,7 @@ class VisitorController {
         activated
       });
     } catch (error) {
+      console.error("[ERROR VISITOR CONTROLLER]:", error);
       return res.status(401).json({ message: "Invalid or expired token" });
     }
   }
@@ -155,7 +157,8 @@ class VisitorController {
         })
       }
       res.status(200).json(visitorData[0])
-    } catch (error: unknown) {
+    } catch (error) {
+      console.error("[ERROR VISITOR CONTROLLER]:", error);
       res.status(500).json({
         error: "Failed to get visitor, something went wrong"
       })
@@ -192,7 +195,8 @@ class VisitorController {
         .where(eq(visitor.id, visitorData[0].id));
 
       res.status(200).json({ message: "Visitor updated successfully" })
-    } catch (error: unknown) {
+    } catch (error) {
+      console.error("[ERROR VISITOR CONTROLLER]:", error);
       res.status(500).json({
         error: "Failed to update visitor, something went wrong"
       })
@@ -213,7 +217,8 @@ class VisitorController {
         .where(eq(visitor.id, visitorData[0].id));
 
       res.status(200).json({ message: "Visitor deleted successfully" })
-    } catch (error: unknown) {
+    } catch (error) {
+      console.error("[ERROR VISITOR CONTROLLER]:", error);
       res.status(500).json({
         error: "Failed to delete visitor, something went wrong"
       })
