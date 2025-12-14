@@ -44,7 +44,7 @@ export function ModalContent({
           borderRadius: 12,
           paddingHorizontal: 18,
           paddingVertical: 20,
-          marginHorizontal: 20,
+          marginHorizontal: 12,
           minWidth: 300,
           shadowColor: colors.background,
           shadowOffset: {
