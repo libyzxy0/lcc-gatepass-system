@@ -42,7 +42,12 @@ export default function Settings() {
           }} />
 
           <View>
-            <Text type="semibold">{visitor.firstname}{" "}{visitor.middle_initial}{" "}{visitor.lastname}</Text>
+            <Text type="semibold">
+            {visitor.firstname}
+            {" "}
+            {visitor.middle_initial}
+            {visitor.middle_initial !== null && " "}
+            {visitor.lastname}</Text>
             <Text type="secondary">{visitor.phone_number}</Text>
             {visitor.verified ? (
               <Text style={{

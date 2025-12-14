@@ -99,7 +99,10 @@ class VisitorController {
         .from(visitor)
         .where(eq(visitor.id, req.visitor.id));
 
-      return res.json(visitorData[0]);
+      return res.json({
+        ...visitorData[0],
+        middle_initial: visitorData[0].middle_initial === '' ? null : visitorData[0].middle_initial
+      });
     } catch (error) {
       console.error("[ERROR VISITOR CONTROLLER]:", error);
       return res.status(401).json({ message: "Invalid or expired token" });
@@ -137,11 +140,13 @@ class VisitorController {
   async updateVisitor(req: Request, res: Response) {
     try {
       const { id, fields } = req.body;
+      
       if (!fields) {
         return res.status(400).json({
           error: "Specify a fields to be updated"
         })
       }
+      
       const visitorData = await db.select().from(visitor).where(eq(visitor.id, id));
       if (visitorData.length <= 0) {
         return res.status(404).json({
@@ -153,11 +158,11 @@ class VisitorController {
         .set(fields)
         .where(eq(visitor.id, visitorData[0].id));
 
-      res.status(200).json({ message: "Visitor updated successfully" })
+      res.status(200).json({ message: "Successfully updated your account information" })
     } catch (error) {
       console.error("[ERROR VISITOR CONTROLLER]:", error);
       res.status(500).json({
-        error: "Failed to update visitor, something went wrong"
+        error: "Failed to update account information, something went wrong"
       })
     }
   }

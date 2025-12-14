@@ -1,8 +1,12 @@
+import React, { useState } from 'react'
 import { Text, View, Modal, ModalContent, Input, Button, showToast } from '@/components';
 import { useColors } from '@/hooks/useColors'
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { Visitor } from '@/types/visitor'
 import { useReducer } from 'react'
+import { updateVisitor } from '@/api/helper/update-account'
+import { useAuthStore } from "@/utils/auth-store";
+import { ActivityIndicator } from 'react-native'
 
 type EditProfileProps = {
   onClose?: () => void;
@@ -52,29 +56,48 @@ function reducer(state: StateType, action: ActionType) {
 }
 
 export function EditProfile({ onClose, visible, visitor }: EditProfileProps) {
-
+  const [loading, setLoading] = useState(false);
+  const { getSession } = useAuthStore();
   const [state, dispatch] = useReducer(reducer, {
     email: visitor.email,
     firstname: visitor.firstname,
     lastname: visitor.lastname,
     middle_initial: visitor.middle_initial
   });
-  
+
   const handleUpdateAccount = async () => {
     try {
+      setLoading(true);
+      const data = await updateVisitor({ id: visitor.id, fields: state });
+      await getSession();
+      if (data.error) {
+        showToast({
+          type: 'error',
+          text1: 'Failed to update your account',
+          text2: data.error
+        })
+        return;
+      }
       showToast({
         type: 'success',
-        text1: 'Update User',
-        text2: 'Successfully updated your personal information'
+        text1: 'Account Updated',
+        text2: data.message
       })
+      onClose?.();
     } catch (error) {
-      console.error(error);
+      showToast({
+        type: 'error',
+        text1: 'Unknown Error',
+        text2: 'Something went wrong, please try again later'
+      })
+    } finally {
+      setLoading(false)
     }
   }
 
   const colors = useColors();
   return (
-    <Modal visible={visible} onRequestClose={onClose} animationType={'slide'}>
+    <Modal visible={visible} onRequestClose={onClose}>
       <ModalContent style={{
         paddingVertical: 12,
         paddingHorizontal: 12,
@@ -85,9 +108,8 @@ export function EditProfile({ onClose, visible, visitor }: EditProfileProps) {
           alignItems: 'center',
           justifyContent: 'space-between'
         }}>
-          <Text type="semibold" style={{
-            fontSize: 18,
-            color: colors.primary
+          <Text type="bold" style={{
+            fontSize: 20
           }}>Edit Profile</Text>
           <Button variant="icon" onPress={onClose}>
             <Ionicons name="close-outline" size={22} color={colors.text} />
@@ -169,24 +191,22 @@ export function EditProfile({ onClose, visible, visitor }: EditProfileProps) {
           </View>
 
           <View style={{
-            flexDirection: 'row',
-            justifyContent: 'center',
-            gap: 20,
             marginTop: 12,
-            marginBottom: 5
+            marginBottom: 5,
+            width: '100%'
           }}>
-            <Button
-              variant={"outline"}
-              onPress={onClose}
-              style={{
-                paddingHorizontal: 42
-              }}
-            >Cancel</Button>
             <Button
               onPress={handleUpdateAccount}
               style={{
-                paddingHorizontal: 42
-              }}>Confirm</Button>
+                width: '100%',
+                minHeight: 40,
+                justifyContent: 'center',
+                alignItems: 'center'
+              }}>
+              {loading ? (
+                <ActivityIndicator size="small" color={"white"} />
+              ) : 'Update Account'}
+            </Button>
           </View>
 
         </View>
