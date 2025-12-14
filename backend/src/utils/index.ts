@@ -1,15 +1,6 @@
 import { Request } from "express";
 import jwt from "jsonwebtoken";
-
-const JWT_ACCESS_SECRET = process?.env?.JWT_ACCESS_SECRET;
-const JWT_REFRESH_SECRET = process?.env?.JWT_REFRESH_SECRET;
-
-if(!JWT_ACCESS_SECRET) {
-  throw new Error("JWT_ACCESS_SECRET cannot be found on engironment variables.")
-}
-if(!JWT_REFRESH_SECRET) {
-  throw new Error("JWT_ACCESS_SECRET cannot be found on engironment variables.")
-}
+import { JWT_ACCESS_SECRET, JWT_REFRESH_SECRET } from '@/secrets'
 
 export const getAccessTokenFromHeaders = (req: Request) => {
   const authHeader = req?.headers['authorization'];
@@ -21,21 +12,20 @@ export const getAccessTokenFromHeaders = (req: Request) => {
 }
 
 export const generateAccessToken = (id: string) => {
-  try {
-    const token = jwt.sign({ id }, JWT_ACCESS_SECRET, {
+    return jwt.sign({ id }, JWT_ACCESS_SECRET, {
       expiresIn: "15m",
     });
-    return token;
-  } catch (error) {
-    return null;
-    console.error("Token error:", error);
-  }
-
 }
 
 export const generateRefreshToken = (id: string) => {
   return jwt.sign({ id }, JWT_REFRESH_SECRET, {
-    expiresIn: "30d",
+    expiresIn: "7d",
+  });
+}
+
+export const generateVisitorToken = (id: string) => {
+  return jwt.sign({ id }, JWT_ACCESS_SECRET, {
+    expiresIn: "1d",
   });
 }
 

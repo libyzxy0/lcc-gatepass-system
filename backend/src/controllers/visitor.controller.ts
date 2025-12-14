@@ -2,44 +2,19 @@ import { Request, Response } from "express";
 import db from '@/db/drizzle'
 import { visitor } from '@/db/schema'
 import { eq } from 'drizzle-orm'
-import { generateRefreshToken, generateVisitorID } from '@/utils'
+import { generateVisitorToken, generateVisitorID } from '@/utils'
 
 type Visitor = typeof visitor.$inferSelect;
 
 class VisitorController {
   async registerVisitor(req: Request, res: Response) {
     try {
-      const {
-        firstname,
-        lastname,
-        middle_initial,
-        email,
-        phone_number,
-        pin,
-        valid_id_type,
-        valid_id_photo_url,
-        photo_url
-      } = req.body;
-      
       await db.insert(visitor).values({
         visitor_id: generateVisitorID(),
-        firstname,
-        lastname,
-        middle_initial,
-        email,
-        phone_number,
-        pin,
-        valid_id_type,
-        valid_id_photo_url,
-        photo_url
+        ...req.body
       })
-      console.log("gooddds:", req.body)
       res.status(200).json({
-        success: true,
-        data: {
-          phone_number,
-          pin
-        }
+        message: 'Account created successfully!'
       })
     } catch (error) {
       console.error("[ERROR VISITOR CONTROLLER]:", error);
@@ -65,7 +40,7 @@ class VisitorController {
         return res.status(400).json({ message: "Please enter the correct pin" });
       }
 
-      const accessToken = generateRefreshToken(visitorData[0].id);
+      const accessToken = generateVisitorToken(visitorData[0].id);
 
       return res.status(200).json({
         message: "Login successful",
@@ -77,20 +52,20 @@ class VisitorController {
     }
   }
 
-  async checkNum(req: Request, res: Response) {
+  async checkPhoneNumber(req: Request, res: Response) {
     try {
       const { phone_number } = req.body;
-      const visitorData = await db.select().from(visitor).where(eq(visitor.phone_number, phone_number));
-      console.log(visitorData);
-      if (visitorData.length <= 0) {
-        return res.status(404).json({
-          error: "No visitor associated with that phone number."
-        })
+      
+      const visitorData = await db.select({ id: visitor.id }).from(visitor).where(eq(visitor.phone_number, phone_number)) ?? null;
+      
+      if(visitorData.length === 0) {
+        res.status(404).json({
+          error: "Phone number not signed!"
+        });
       }
 
-      res.status(200).json({
-        success: true
-      });
+      res.status(200).json(visitorData[0]);
+      
     } catch (error) {
       console.error("[ERROR VISITOR CONTROLLER]:", error);
       res.status(500).json({
@@ -105,42 +80,26 @@ class VisitorController {
         return res.status(401).json({ message: "Unauthorized access!" });
       }
 
-      console.log(req.visitor)
-
-      const adminData: Visitor[] = await db
-        .select()
+      const visitorData: Visitor[] = await db
+        .select({
+          id: visitor.id,
+          visitor_id: visitor.visitor_id,
+          firstname: visitor.firstname,
+          lastname: visitor.lastname,
+          middle_initial: visitor.middle_initial,
+          email: visitor.email,
+          phone_number: visitor.phone_number,
+          verified: visitor.verified,
+          activated: visitor.activated,
+          valid_id_type: visitor.valid_id_type,
+          valid_id_photo_url: visitor.valid_id_photo_url,
+          photo_url: visitor.photo_url,
+          created_at: visitor.created_at,
+        })
         .from(visitor)
         .where(eq(visitor.id, req.visitor.id));
 
-      const {
-        id,
-        firstname,
-        lastname,
-        middle_initial,
-        email,
-        phone_number,
-        valid_id_type,
-        valid_id_photo_url,
-        photo_url,
-        created_at,
-        verified,
-        activated
-      } = adminData[0];
-
-      return res.json({
-        id,
-        firstname,
-        lastname,
-        middle_initial,
-        email,
-        phone_number,
-        valid_id_type,
-        valid_id_photo_url,
-        photo_url,
-        created_at,
-        verified,
-        activated
-      });
+      return res.json(visitorData[0]);
     } catch (error) {
       console.error("[ERROR VISITOR CONTROLLER]:", error);
       return res.status(401).json({ message: "Invalid or expired token" });

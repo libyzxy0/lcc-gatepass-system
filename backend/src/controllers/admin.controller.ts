@@ -1,32 +1,15 @@
 import { Request, Response } from "express";
+import { TokenDecodedType } from '@/types/token'
 import db from "@/db/drizzle";
+import jwt from "jsonwebtoken";
+import bcrypt from "bcryptjs";
 import { admin } from "@/db/schema";
 import { eq } from "drizzle-orm";
-import jwt from "jsonwebtoken";
-import { generateAccessToken, generateRefreshToken } from '@/utils'
 import { verifyTurnstile } from '@/utils/verify-cf-turnstile'
-import bcrypt from "bcryptjs";
+import { generateAccessToken, generateRefreshToken } from '@/utils'
+import { JWT_REFRESH_SECRET } from '@/secrets'
 
-const SALT_ROUNDS = 10;
-
-interface Admin {
-  id: string;
-  firstname: string;
-  lastname: string;
-  role: 'admin' | 'staff';
-  email: string;
-  phone_number: string;
-  password: string;
-  is_super_admin: boolean;
-  photo_url: string;
-  created_at: string;
-};
-
-interface TokenDecodedType {
-  id: string;
-  iat: number;
-  exp: number;
-}
+type Admin = typeof admin.$inferSelect;
 
 class AdminController {
   async newAdmin(req: Request, res: Response) {
@@ -41,7 +24,7 @@ class AdminController {
         photo_url
       } = req.body;
 
-      const hashedPassword = await bcrypt.hash(password, SALT_ROUNDS);
+      const hashedPassword = await bcrypt.hash(password, 10);
 
       await db.insert(admin).values({
         firstname,
@@ -94,7 +77,7 @@ class AdminController {
 
       res.cookie("refreshToken", refreshToken, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === 'production' ? true : false,
+        secure: process.env.NODE_ENV === 'production',
         sameSite: "strict",
         maxAge: 30 * 24 * 60 * 60 * 1000,
       });
@@ -119,7 +102,7 @@ class AdminController {
 
       const decoded: TokenDecodedType = jwt.verify(
         refreshToken,
-        process.env.JWT_REFRESH_SECRET!
+        JWT_REFRESH_SECRET
       );
 
       const newAccessToken = generateAccessToken(decoded.id);
@@ -143,40 +126,25 @@ class AdminController {
       if (!req.admin) {
         return res.status(401).json({ message: "Unauthorized access!" });
       }
-      
-      console.log(req.admin)
 
       const adminData: Admin[] = await db
-        .select()
+        .select({
+          id: admin.id,
+          firstname: admin.firstname,
+          lastname: admin.lastname,
+          email: admin.email,
+          phone_number: admin.phone_number,
+          role: admin.role,
+          is_super_admin: admin.is_super_admin,
+          created_at: admin.is_super_admin
+        })
         .from(admin)
         .where(eq(admin.id, req.admin.id));
 
-      const {
-        id,
-        firstname,
-        lastname,
-        email,
-        photo_url,
-        phone_number,
-        role,
-        is_super_admin,
-        created_at
-      } = adminData[0];
-
-      return res.json({
-        id,
-        firstname,
-        lastname,
-        email,
-        photo_url,
-        phone_number,
-        role,
-        is_super_admin,
-        created_at
-      });
+      return res.json(adminData[0]);
     } catch (error) {
       console.error("[ERROR ADMIN CONTROLLER]:", error);
-      return res.status(401).json({ message: "Invalid or expired token" });
+      return res.status(401).json({ message: "invalid or expired token" });
     }
   }
 }

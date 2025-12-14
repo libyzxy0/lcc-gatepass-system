@@ -23,6 +23,7 @@ export default defineConfig([
       'react-refresh/only-export-components': 'off',
       'react-hooks/exhaustive-deps': 'off',
       'react-hooks/incompatible-library': 'off',
+      '@typescript-eslint/no-explicit-any': 'off'
     },
   },
 ])

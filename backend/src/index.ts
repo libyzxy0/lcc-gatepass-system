@@ -3,9 +3,13 @@ import Bootstrap from "@/bootstrap";
 import errorHandler from "@/middlewares/error-handler";
 import notFound from "@/middlewares/not-found";
 import { initializeRoutes } from "@/routes";
-//import { limiter } from "@/middlewares/ratelimit";
 import cookieParser from "cookie-parser";
 import cors from "cors";
+
+/*
+* Comment for now, tanginang CloudFlare Turnstile
+*/
+/* import { limiter } from "@/middlewares/ratelimit"; */
 
 const app: Application = express();
 
@@ -15,21 +19,31 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 
+const allowedOrigins = [
+  process.env.FRONTEND_ORIGIN,
+  "http://localhost:5173",
+  "https://lccgatepass.xyz",
+  "https://www.lccgatepass.xyz"
+];
+
 app.use(
   cors({
-    origin: [
-      process.env.FRONTEND_ORIGIN,
-      "http://localhost:5173",
-      "https://lccgatepass.xyz",
-    ],
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
     credentials: true,
   })
 );
 
-
-//app.use(limiter);
+/*
+* Comment for now, tanginang CloudFlare Turnstile
+*/
+/* app.use(limiter); */
 
 Bootstrap(app);
 initializeRoutes(app);
 app.use(notFound);
-

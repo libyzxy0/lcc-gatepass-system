@@ -11,7 +11,7 @@ router.post("/update-visitor", admin_auth, controller.updateVisitor);
 router.delete("/delete-visitor/:id", admin_auth, controller.deleteVisitor);
 
 router.post("/new", controller.registerVisitor);
-router.post("/check-number", controller.checkNum);
+router.post("/check-number", controller.checkPhoneNumber);
 router.get("/get-session", visitor_auth, controller.getSession);
 router.post("/login", controller.login);
 

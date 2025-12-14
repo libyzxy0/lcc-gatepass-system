@@ -1,6 +1,7 @@
 import jwt from 'jsonwebtoken';
 import type { Request, Response, NextFunction } from "express";
 import { getAccessTokenFromHeaders } from '@/utils'
+import { JWT_ACCESS_SECRET } from '@/secrets'
 
 interface TokenDecodedType {
   id: string;
@@ -11,7 +12,7 @@ interface TokenDecodedType {
 export const visitor_auth = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const token = getAccessTokenFromHeaders(req);
-    const decoded: TokenDecodedType = jwt.verify(token, process.env.JWT_REFRESH_SECRET!);
+    const decoded: TokenDecodedType = jwt.verify(token, JWT_ACCESS_SECRET);
     req.visitor = decoded;
     next();
   } catch (error) {

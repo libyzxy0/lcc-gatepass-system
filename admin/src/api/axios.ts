@@ -23,9 +23,9 @@ api.interceptors.request.use((config) => {
 });
 
 let isRefreshing = false;
-let failedQueue = [];
+let failedQueue: any[] = [];
 
-const processQueue = (error: unknown, token: string | null = null) => {
+const processQueue = (error: any, token: string | null = null) => {
   failedQueue.forEach((prom) => {
     if (error) prom.reject(error);
     else prom.resolve(token);
@@ -35,7 +35,7 @@ const processQueue = (error: unknown, token: string | null = null) => {
 
 api.interceptors.response.use(
   (res) => res,
-  async (err: AxiosError & { config }) => {
+  async (err: AxiosError & { config?: any }) => {
     const originalRequest = err.config;
 
     if (err.code === "ECONNABORTED") {

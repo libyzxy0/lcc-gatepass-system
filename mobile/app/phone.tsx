@@ -71,7 +71,16 @@ export default function PhonePage() {
 
       const isValidNumber = await checkNumber(normalize(state.phone));
 
-      if (isValidNumber.success) {
+      if (isValidNumber.isServerError) {
+        showToast({
+          type: "error",
+          text1: "Ohh No, Something went wrong",
+          text2: 'An error occurred while verifying phone number',
+        });
+        return;
+      }
+
+      if (isValidNumber.valid) {
         setPhoneNumber(state.phone);
       } else {
         router.push(`/new/${state.phone}`);
