@@ -1,3 +1,4 @@
+import React, { useState } from 'react'
 import { Text, View, SafeAreaView, Button } from "@/components";
 import { ScrollView } from "react-native";
 import { useColors } from "@/hooks/useColors";
@@ -5,13 +6,21 @@ import { useAuthStore } from "@/utils/auth-store";
 import { Header } from "@/components/Header";
 import { Image } from 'expo-image'
 import avatar from '@/assets/images/avatar.png'
+import { EditProfile } from '@/components/EditProfile'
+
 export default function Settings() {
   const colors = useColors();
   const { logout, accessToken, visitor } = useAuthStore();
+  const [editProfile, showEditProfile] = useState(false);
 
   return (
     <SafeAreaView>
       <Header />
+      <EditProfile 
+      visible={editProfile}
+      onClose={() => showEditProfile(false)}
+      visitor={visitor}
+      />
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{
         paddingBottom: 20
       }}>
@@ -33,7 +42,12 @@ export default function Settings() {
           }} />
 
           <View>
-            <Text type="semibold">{visitor.firstname}{" "}{visitor.middle_initial}{" "}{visitor.lastname}</Text>
+            <Text type="semibold">
+            {visitor.firstname}
+            {" "}
+            {visitor.middle_initial}
+            {visitor.middle_initial !== null && " "}
+            {visitor.lastname}</Text>
             <Text type="secondary">{visitor.phone_number}</Text>
             {visitor.verified ? (
               <Text style={{
@@ -58,7 +72,7 @@ export default function Settings() {
             <Text type="semibold" style={{
               fontSize: 18
             }}>Visitor Info</Text>
-            <Text type="link">Edit Info</Text>
+            <Text type="link" onPress={() => showEditProfile(true)}>Edit Info</Text>
           </View>
 
           <View>
