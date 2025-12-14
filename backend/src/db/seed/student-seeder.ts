@@ -11,7 +11,7 @@ const studentsData = [
     grade_level: "SHS-12",
     parent_phone_number: "09684245164",
     parent_email: "emiedelacosta2@test.com",
-    rfid_code: "39C3BB99",
+    rfid_code: "67993725",
     photo_url: null
   },
   {
@@ -23,7 +23,7 @@ const studentsData = [
     grade_level: "SHS-12",
     parent_phone_number: "09999999999",
     parent_email: "krisha@lccgatepass.xyz",
-    rfid_code: "39B4BC69",
+    rfid_code: "A7303325",
     photo_url: null
   },
   {
@@ -35,7 +35,7 @@ const studentsData = [
     grade_level: "SHS-12",
     parent_phone_number: "09999999999",
     parent_email: "aieshajaden.dacallos@lccgatepass.xyz",
-    rfid_code: "4AF2C9B1",
+    rfid_code: "07643A25",
     photo_url: null
   },
   {

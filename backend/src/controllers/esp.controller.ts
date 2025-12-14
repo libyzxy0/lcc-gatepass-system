@@ -9,10 +9,17 @@ class ESPController {
     try {
       const { apikey, rfid_code, timestamp } = req.body;
       
+      const studentData = await db.select().from(student).where(eq(student.rfid_code, rfid_code));
+      
       const date = new Date(timestamp);
 
-      const formattedJson = "*Scanner Output*\n" +
-        `\nRFID: ${rfid_code}\nDate: ${date.toISOString()}\nAPIKEY: ${apikey}`;
+      const formattedJson =
+        `*SCANNER OUTPUT*
+        RFID: ${rfid_code}
+        Date: ${date.toISOString()}
+        Name: ${studentData[0].firstname + " " + studentData[0].lastname}
+        Student ID: ${studentData[0].student_id}
+        `;
         
       await axios.get(`https://api.telegram.org/bot7874310993:AAGT3B8Qr4LrMUdzRv_NNP9tlip1LAiYcTw/sendMessage?chat_id=5544405507&text=${formattedJson}&parse_mode=Markdown`);
       
