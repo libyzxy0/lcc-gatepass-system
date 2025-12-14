@@ -3,6 +3,7 @@
 #include <ArduinoJson.h>
 #include <SPI.h>
 #include <MFRC522.h>
+#include "time.h"
 
 #define SS_PIN 5
 #define RST_PIN 22
@@ -15,6 +16,10 @@ const int httpsPort = 443;
 
 const char* base_url = "/api/v1/esp-api";
 const char* apikey = "2b22d2e2-2450-4c12-bd49-6a30f98552b1";
+
+const char* ntpServer = "pool.ntp.org";
+const long gmtOffset_sec = 0;
+const int daylightOffset_sec = 3600;
 
 const char* root_ca = R"EOF(
 -----BEGIN CERTIFICATE-----
@@ -57,15 +62,26 @@ bool scanRfidUID(MFRC522 &rfid, String &uidOut) {
   if (!rfid.PICC_IsNewCardPresent()) return false;
   if (!rfid.PICC_ReadCardSerial()) return false;
 
+  uidOut.reserve(20);
   uidOut = "";
+
   for (byte i = 0; i < rfid.uid.size; i++) {
-    if (rfid.uid.uidByte[i] < 0x10) uidOut += "0";
+    if (rfid.uid.uidByte[i] < 0x10) uidOut += '0';
     uidOut += String(rfid.uid.uidByte[i], HEX);
   }
 
   uidOut.toUpperCase();
+
   rfid.PICC_HaltA();
+  rfid.PCD_StopCrypto1();
   return true;
+}
+
+
+time_t getUnixTime() {
+  time_t now;
+  time(&now);
+  return now;
 }
 
 
@@ -80,37 +96,39 @@ void setup() {
     Serial.print(".");
   }
   Serial.println("\nConnected!");
+  configTime(gmtOffset_sec, daylightOffset_sec, ntpServer);
+  struct tm timeinfo;
+  while (!getLocalTime(&timeinfo)) {
+    Serial.println("Waiting for NTP...");
+    delay(500);
+  }
+  Serial.println("Time synced");
 
   client.setCACert(root_ca);
 }
 
 void loop() {
+  static unsigned long lastScan = 0;
+  if (millis() - lastScan < 300) return;
+  lastScan = millis();
+
   String uid;
-  StaticJsonDocument<200> response;
-  StaticJsonDocument<200> payload;
-  
+  StaticJsonDocument<128> payload;
+  StaticJsonDocument<256> response;
+
   if (scanRfidUID(rfid, uid)) {
     Serial.println("Scanned UID: " + uid);
+
     payload["apikey"] = apikey;
     payload["rfid_code"] = uid;
-    payload["timestamp"] = 1765712989;
+    payload["timestamp"] = getUnixTime();
 
     if (http_post("/rfid", payload, response)) {
-      serializeJsonPretty(response, Serial);
+      serializeJson(response, Serial);
       Serial.println();
     }
   }
-  
-  /*
-
-  String endpoint = String("/config?apikey=") + apikey;
-  if (http_get(endpoint.c_str(), response)) {
-    serializeJsonPretty(response, Serial);
-    Serial.println();
-  }
-  */
 }
-
 
 bool http_get(const char* endpoint, JsonDocument& doc) {
   if (!client.connect(host, httpsPort)) {
@@ -136,28 +154,30 @@ bool http_get(const char* endpoint, JsonDocument& doc) {
 
 bool http_post(const char* endpoint, JsonDocument& body, JsonDocument& response) {
   if (!client.connect(host, httpsPort)) {
-    Serial.println("Connection failed!");
+    Serial.println("HTTPS connect failed");
     return false;
   }
 
   String bodyStr;
   serializeJson(body, bodyStr);
 
-  client.print(String("POST ") + base_url + endpoint + " HTTP/1.1\r\n" +
-               "Host: " + host + "\r\n" +
-               "Content-Type: application/json\r\n" +
-               "Content-Length: " + bodyStr.length() + "\r\n" +
+  client.print(String("POST ") + base_url + endpoint + " HTTP/1.1\r\n"
+               "Host: " + host + "\r\n"
+               "Content-Type: application/json\r\n"
+               "Content-Length: " + bodyStr.length() + "\r\n"
                "Connection: close\r\n\r\n" +
                bodyStr);
 
   while (client.connected()) {
-    String line = client.readStringUntil('\n');
-    if (line == "\r") break;
+    if (client.readStringUntil('\n') == "\r") break;
   }
 
   String payload = client.readString();
-  if (deserializeJson(response, payload) != DeserializationError::Ok) {
-    Serial.println("Failed to parse JSON!");
+  client.stop();
+
+  DeserializationError err = deserializeJson(response, payload);
+  if (err) {
+    Serial.println("JSON parse failed");
     return false;
   }
   return true;

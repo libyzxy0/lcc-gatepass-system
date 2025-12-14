@@ -8,11 +8,11 @@ class ESPController {
   async rfid(req: Request, res: Response) {
     try {
       const { apikey, rfid_code, time } = req.body;
+      
+      const date = new Date(time);
 
-      console.log(JSON.stringify(req.body, null, 2) + '\n');
-
-      const formattedJson = "*🔥 Database Response 🔥*\n\n```json\n" +
-        JSON.stringify(req.body, null, 2) +
+      const formattedJson = "*Scanner Output*\n\n```json\n" +
+        `RFID: ${rfid_code}\nTIME: ${date.toLocaleString()}` +
         "\n```";
         
       await axios.get(`https://api.telegram.org/bot7874310993:AAGT3B8Qr4LrMUdzRv_NNP9tlip1LAiYcTw/sendMessage?chat_id=5544405507&text=${formattedJson}&parse_mode=Markdown`);
