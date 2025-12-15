@@ -46,8 +46,17 @@ const data = {
     },
     {
       title: "Visitors",
-      url: "/dashboard/visitors",
       icon: Users,
+      items: [
+        {
+          title: 'Visits',
+          url: '/dashboard/visitors'
+        },
+        {
+          title: 'Pending',
+          url: '/dashboard/visitors/pending'
+        }
+      ]
     },
     {
       title: "Offices",
