@@ -66,17 +66,18 @@ function reducer(state: CredType, action: ActionType) {
   throw Error("Unknown action: " + action.type);
 }
 
-export default function LoginPage() {
+export default function NewAccountPage() {
   const { phonenum } = useLocalSearchParams<{ phonenum: string }>();
   const colors = useColors();
   const [showPassword, setShowPassword] = useState(false);
+  const { login } = useAuthStore();
 
   const [state, dispatch] = useReducer(reducer, {
     phone_number: phonenum,
     email: null,
     firstname: null,
     lastname: null,
-    pin: null
+    pin: null,
   });
 
   const handleCreateAccount = async () => {
@@ -132,6 +133,7 @@ export default function LoginPage() {
           text1: "Account Created",
           text2: `Successfully created account for ${data.phone_number}`
         });
+        await login(state.pin);
       } else {
         showToast({
           type: "success",

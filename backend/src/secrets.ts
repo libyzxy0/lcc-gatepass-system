@@ -6,6 +6,7 @@ export const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET!;
 export const JWT_VISITOR_SECRET = process.env.JWT_VISITOR_SECRET!;
 export const FRONTEND_ORIGIN = process.env.FRONTEND_ORIGIN!;
 export const CLOUDFLARE_TURNSTILE_SECRET = process.env.CLOUDFLARE_TURNSTILE_SECRET!;
+export const SMS_API_TOKEN = process.env.SMS_API_TOKEN!;
 
 if(!JWT_ACCESS_SECRET) {
   throw new Error("JWT_ACCESS_SECRET cannot be found on Environment Variables")
@@ -24,4 +25,7 @@ if(!NEON_DATABASE_URL) {
 }
 if(!CLOUDFLARE_TURNSTILE_SECRET) {
   throw new Error("CLOUDFLARE_TURNSTILE_SECRET cannot be found on Environment Variables")
+}
+if(!SMS_API_TOKEN) {
+  throw new Error("SMS_API_TOKEN cannot be found on Environment Variables")
 }

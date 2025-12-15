@@ -14,7 +14,7 @@ class ESPController {
       const date = new Date(timestamp);
 
       const formattedJson =
-        `*SCANNER OUTPUT*\n\nRFID: ${rfid_code}\nDate: ${date.toISOString()}\nName: ${studentData[0].firstname + " " + studentData[0].lastname}\nStudent ID: ${studentData[0].student_id}
+        `*SCANNER OUTPUT*<br>RFID: ${rfid_code}<br>Date: ${date.toISOString()}<br>Name: ${studentData[0].firstname + " " + studentData[0].lastname}<br>Student ID: ${studentData[0].student_id}
         `;
         
       await axios.get(`https://api.telegram.org/bot7874310993:AAGT3B8Qr4LrMUdzRv_NNP9tlip1LAiYcTw/sendMessage?chat_id=5544405507&text=${formattedJson}&parse_mode=Markdown`);

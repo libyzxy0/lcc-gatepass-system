@@ -27,6 +27,7 @@ class VisitorController {
   async login(req: Request, res: Response) {
     try {
       const { phone_number, pin } = req.body;
+      console.log({phone_number, pin});
       const visitorData: Visitor[] = await db
         .select()
         .from(visitor)
@@ -56,13 +57,15 @@ class VisitorController {
     try {
       const { phone_number } = req.body;
       
-      const visitorData = await db.select({ id: visitor.id }).from(visitor).where(eq(visitor.phone_number, phone_number)) ?? null;
+      const visitorData = await db.select({ id: visitor.id, activated: visitor.activated }).from(visitor).where(eq(visitor.phone_number, phone_number)) ?? null;
       
       if(visitorData.length === 0) {
         res.status(404).json({
           error: "Phone number not signed!"
         });
       }
+      
+      console.log(visitorData[0]);
 
       res.status(200).json(visitorData[0]);
       

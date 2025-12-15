@@ -63,7 +63,7 @@ export default function Pin() {
         <Text type="bold" style={{
           color: "white",
           fontSize: 22
-        }}>Enter your PIN 🤫</Text>
+        }}>Enter your PIN</Text>
 
         <View style={{ flexDirection: "row", gap: 15, marginTop: 10 }}>
           {[0, 1, 2, 3].map((i) => (
@@ -87,18 +87,25 @@ export default function Pin() {
         marginTop: 50
       }}>
         <TouchableOpacity onPress={() => setShowConfirm(true)} activeOpacity={0.8} style={{
-          backgroundColor: "#ffffff",
+          backgroundColor: colors.primary,
           paddingHorizontal: 16,
           paddingVertical: 8,
           borderRadius: 50,
           flexDirection: 'row',
           alignItems: 'center',
-          gap: 5
+          gap: 5,
+          shadowColor: colors.text,
+          shadowOffset: { width: 0, height: 1 },
+          shadowOpacity: 0.25,
+          shadowRadius: 1,
+          elevation: 5,
+          borderWidth: 1,
+          borderColor: "#2536df70"
         }}>
           <Text style={{
-            color: 'black'
+            color: 'white'
           }}>(+63) {formatPHNumber(phoneNumber)}</Text>
-          <Octicons name="arrow-switch" size={16} color={"black"} />
+          <Octicons name="arrow-switch" size={16} color={"white"} />
         </TouchableOpacity>
       </View>
 

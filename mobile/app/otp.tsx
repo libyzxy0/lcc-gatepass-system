@@ -1,6 +1,6 @@
 import { Text, View, SafeAreaView, showToast, Button } from '@/components'
 import { Image } from "expo-image";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Ionicons } from "@expo/vector-icons"
 import logo from "@/assets/images/logo.png";
 import { TouchableOpacity } from 'react-native'
@@ -10,13 +10,18 @@ import { useAuthStore } from "@/utils/auth-store";
 import { ModalConfirm } from '@/components/ui/modals/ModalConfirm'
 import { ModalLoading } from '@/components/ui/modals/ModalLoading'
 import { formatPHNumber } from '@/utils/format-ph-number'
+import { generateOTP, verifyOTP } from '@/api/helper/otp'
+import { useRouter } from 'expo-router';
 
 export default function OTPPage() {
+  const router = useRouter();
   const [pin, setPin] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
   const [showConfrim, setShowConfirm] = useState(false);
-  const { login, setPhoneNumber, phoneNumber, visitor, getSession } = useAuthStore();
+  const { login, phoneNumber, getSession } = useAuthStore();
   const colors = useColors();
+  const [sent, setSent] = useState(false);
+
   const handlePress = async (num: string) => {
     if (pin.length >= 6) return;
 
@@ -26,7 +31,31 @@ export default function OTPPage() {
     if (updatedPin.length === 6) {
       try {
         setLoading(true);
-        
+        const data = await verifyOTP(phoneNumber, updatedPin.join(""))
+        if (data?.server_error) {
+          showToast({
+            type: 'error',
+            text1: '[Server Err] Failed to Verify OTP',
+            text2: data.message
+          });
+          return;
+        }
+        if  (data.verified === true) {
+          showToast({
+            type: 'success',
+            text1: 'Account Successfully activated!',
+            text2: data.message
+          });
+          await getSession();
+          router.replace('/(tabs)/index');
+        } else {
+          showToast({
+            type: 'error',
+            text1: 'Something went wrong!',
+            text2: data.message
+          });
+        }
+
       } catch (error) {
         showToast({
           type: 'error',
@@ -44,6 +73,16 @@ export default function OTPPage() {
     setPin(pin.slice(0, -1));
   };
 
+  useEffect(() => {
+    if  (!sent) {
+        const sendOTP = async () => {
+          await generateOTP(phoneNumber);
+        }
+        sendOTP();
+        setSent(true);
+    }
+  }, [])
+
   return (
     <SafeAreaView style={{ flex: 1, paddingHorizontal: 20 }}>
       <ModalLoading visible={loading} />
@@ -53,7 +92,7 @@ export default function OTPPage() {
           color: colors.text,
           fontSize: 22
         }}>Verify Your Account</Text>
-        <Text>Please enter the One Time Pin (OTP) we've sent to your phone number <Text type="link">(+63) {formatPHNumber(visitor?.phone_number)}</Text>.</Text>
+        <Text>Please enter the One Time Pin (OTP) we've sent to your phone number <Text type="link">(+63) {formatPHNumber(phoneNumber)}</Text>.</Text>
       </View>
 
       <View style={{
@@ -73,9 +112,9 @@ export default function OTPPage() {
                 justifyContent: 'center'
               }}
             >
-            <Text style={{
-              fontSize: 24
-            }}>{pin[i]}</Text>
+              <Text style={{
+                fontSize: 24
+              }}>{pin[i]}</Text>
             </View>
           ))}
         </View>

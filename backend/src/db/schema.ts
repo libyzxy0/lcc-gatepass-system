@@ -151,9 +151,8 @@ export const otp = pgTable("otp", {
   id: uuid("id").primaryKey().defaultRandom().notNull(),
   code: text("code").notNull(),
   user_type: userTypeEnum("user_type").notNull(),
-  visitor_id: uuid("visitor_id").references(() => visitor.id),
-  student_id: uuid("student_id").references(() => student.id),
-  staff_id: uuid("staff_id").references(() => staff.id),
+  visitor_id: uuid("visitor_id").references(() => visitor.id).unique(),
+  admin_id: uuid("admin_id").references(() => admin.id).unique(),
   revoked: boolean("revoked").default(false),
   expires_at: timestamp("expires_at", { mode: "string" }),
   created_at: timestamp("created_at", { mode: "string" }).defaultNow()

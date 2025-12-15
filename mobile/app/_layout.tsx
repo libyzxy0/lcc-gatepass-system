@@ -7,7 +7,7 @@ import {
 import { useFonts } from "expo-font";
 import { Stack, useRouter } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import "react-native-reanimated";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { useColorScheme } from "@/hooks/useColorScheme";
@@ -15,6 +15,8 @@ import { useAuthStore } from "@/utils/auth-store";
 import { useColors } from "@/hooks/useColors";
 import * as SystemUI from "expo-system-ui";
 import { Toast } from "@/components";
+import { checkNumber } from '@/api/helper/check-num'
+import { normalize } from '@/utils/format-ph-number'
 export {
   // Catch any errors thrown by the Layout component.
   ErrorBoundary,
@@ -59,6 +61,13 @@ function RootLayoutNav() {
   useEffect(() => {
     const retrieveSession = async () => {
       try {
+        const num_status = await checkNumber(normalize(phoneNumber));
+
+        if (num_status && !num_status.isServerError && !num_status.activated) {
+          router.replace('/otp');
+          return;
+        }
+
         await getSession();
         if (visitor === null) {
           await logout();
@@ -67,9 +76,8 @@ function RootLayoutNav() {
       } catch (error) {
         router.push('/phone');
         console.error(error);
-      } finally {
-        SplashScreen.hideAsync();
       }
+      SplashScreen.hideAsync();
     }
     retrieveSession();
   }, [])
@@ -81,8 +89,25 @@ function RootLayoutNav() {
       <SafeAreaProvider>
         <Stack>
           <Stack.Protected guard={isLoggedIn}>
+            <Stack.Screen
+              name="(tabs)"
+              options={{
+                headerShown: false,
+                animation: "fade"
+              }}
+            />
+          </Stack.Protected>
 
-            <Stack.Protected guard={!visitor?.activated}>
+          <Stack.Protected guard={!isLoggedIn}>
+
+            <Stack.Protected guard={!!phoneNumber}>
+              <Stack.Screen
+                name="pin"
+                options={{
+                  headerShown: false,
+                  animation: "fade"
+                }}
+              />
               <Stack.Screen
                 name="otp"
                 options={{
@@ -91,27 +116,7 @@ function RootLayoutNav() {
                 }}
               />
             </Stack.Protected>
-            <Stack.Protected guard={visitor?.activated}>
-              <Stack.Screen
-                name="(tabs)"
-                options={{
-                  headerShown: false,
-                  animation: "fade"
-                }}
-              />
-            </Stack.Protected>
-          </Stack.Protected>
-          <Stack.Protected guard={!isLoggedIn}>
-            <Stack.Protected guard={phoneNumber}>
-              <Stack.Screen
-                name="pin"
-                options={{
-                  headerShown: false,
-                  animation: "fade"
-                }}
-              />
 
-            </Stack.Protected>
             <Stack.Protected guard={!phoneNumber}>
               <Stack.Screen
                 name="phone"
