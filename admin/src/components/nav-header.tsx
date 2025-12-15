@@ -1,7 +1,3 @@
-"use client"
-
-import { DoorOpen } from "lucide-react"
-
 import {
   SidebarMenu,
   SidebarMenuButton,
