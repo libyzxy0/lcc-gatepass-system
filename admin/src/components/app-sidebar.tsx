@@ -47,6 +47,7 @@ const data = {
     {
       title: "Visitors",
       icon: Users,
+      url: '#',
       items: [
         {
           title: 'Visits',
