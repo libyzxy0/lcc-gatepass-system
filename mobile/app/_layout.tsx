@@ -55,12 +55,12 @@ function RootLayoutNav() {
   const colorScheme = useColorScheme();
   const { isLoggedIn, phoneNumber, getSession, visitor, logout } = useAuthStore();
   const router = useRouter();
-  
+
   useEffect(() => {
-    const retrieveSession = async() => {
+    const retrieveSession = async () => {
       try {
         await getSession();
-        if(visitor === null) {
+        if (visitor === null) {
           await logout();
           router.push('/phone');
         }
@@ -81,13 +81,25 @@ function RootLayoutNav() {
       <SafeAreaProvider>
         <Stack>
           <Stack.Protected guard={isLoggedIn}>
-            <Stack.Screen
-              name="(tabs)"
-              options={{
-                headerShown: false,
-                animation: "fade"
-              }}
-            />
+
+            <Stack.Protected guard={!visitor?.activated}>
+              <Stack.Screen
+                name="otp"
+                options={{
+                  headerShown: false,
+                  animation: "fade"
+                }}
+              />
+            </Stack.Protected>
+            <Stack.Protected guard={visitor?.activated}>
+              <Stack.Screen
+                name="(tabs)"
+                options={{
+                  headerShown: false,
+                  animation: "fade"
+                }}
+              />
+            </Stack.Protected>
           </Stack.Protected>
           <Stack.Protected guard={!isLoggedIn}>
             <Stack.Protected guard={phoneNumber}>
@@ -98,6 +110,7 @@ function RootLayoutNav() {
                   animation: "fade"
                 }}
               />
+
             </Stack.Protected>
             <Stack.Protected guard={!phoneNumber}>
               <Stack.Screen
@@ -117,6 +130,7 @@ function RootLayoutNav() {
               }}
             />
           </Stack.Protected>
+
         </Stack>
         <Toast />
       </SafeAreaProvider>

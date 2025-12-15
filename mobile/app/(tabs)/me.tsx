@@ -7,6 +7,7 @@ import { Header } from "@/components/Header";
 import { Image } from 'expo-image'
 import avatar from '@/assets/images/avatar.png'
 import { EditProfile } from '@/components/EditProfile'
+import { formatPHNumber } from '@/utils/format-ph-number'
 
 export default function Settings() {
   const colors = useColors();
@@ -33,10 +34,10 @@ export default function Settings() {
             alignItems: 'center'
           }}
         >
-          <Image source={{ uri: visitor?.photo_url }} style={{
-            width: 60,
-            height: 60,
-            borderRadius: 100,
+          <Image source={{ uri: visitor.photo_url ? visitor.photo_url : `https://avatar.iran.liara.run/username?username=${visitor.firstname}+${visitor.lastname}` }} style={{
+            width: 70,
+            height: 70,
+            borderRadius: 50,
             borderWidth: 2,
             borderColor: colors.primary
           }} />
@@ -48,15 +49,15 @@ export default function Settings() {
             {visitor.middle_initial}
             {visitor.middle_initial !== null && " "}
             {visitor.lastname}</Text>
-            <Text type="secondary">{visitor.phone_number}</Text>
-            {visitor.verified ? (
+            <Text type="secondary">{"(+63) "}{formatPHNumber(visitor.phone_number)}</Text>
+            {visitor.verified && visitor.activated ? (
               <Text style={{
                 color: colors.success
-              }}>Verified Account</Text>
+              }}>Verified</Text>
             ) : (
               <Text style={{
                 color: colors.danger
-              }}>Unverified Account</Text>
+              }}>Not Verified</Text>
             )}
           </View>
         </View>
@@ -114,7 +115,7 @@ export default function Settings() {
               }}>Phone Number</Text>
               <Text type="semibold" style={{
                 fontSize: 16
-              }}>{visitor.phone_number}</Text>
+              }}>{"(+63) "}{formatPHNumber(visitor.phone_number)}</Text>
             </View>
           </View>
 
