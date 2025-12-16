@@ -19,7 +19,7 @@ export type ColorsType = {
 
 export const Colors = {
   light: {
-    primary: "#1f58db",
+    primary: "#6165e3ff",
     text: "#000000",
     textSecondary: "#8c8c8c",
     background: "#f7f7f7",
@@ -32,7 +32,7 @@ export const Colors = {
     gray: '#bababa'
   },
   dark: {
-    primary: "#1f58db",
+    primary: "#6165e3ff",
     text: "#000000",
     textSecondary: "#8c8c8c",
     background: "#f7f7f7",

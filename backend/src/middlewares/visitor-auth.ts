@@ -16,7 +16,7 @@ export const visitor_auth = async (req: Request, res: Response, next: NextFuncti
     req.visitor = decoded;
     next();
   } catch (error) {
-    console.error("[ERROR VISITOR AUTH MIDDLEWARE]:", error);
+   // console.error("[ERROR VISITOR AUTH MIDDLEWARE]:", error);
     res.status(401).send({ error: 'Unauthorized access!' });
   }
 };

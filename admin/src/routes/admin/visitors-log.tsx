@@ -11,10 +11,10 @@ import { Button } from '@/components/ui/button'
 
 export type VisitorLogType = {
   id: string;
-  visitor_id: string;
+  student_id: string;
   name: string;
   section: string;
-  visiting: string;
+  grade_level: string;
   time_in: string;
   time_out: string;
 }
@@ -57,8 +57,12 @@ export const columns: ColumnDef<VisitorLogType>[] = [
     },
   },
   {
-    accessorKey: "visiting",
-    header: "Visitong",
+    accessorKey: "section",
+    header: "Section",
+  },
+  {
+    accessorKey: "grade_level",
+    header: "Level",
   },
   {
     id: 'actions',
@@ -91,7 +95,7 @@ const data: VisitorLogType[] = [
     visitor_id: "STU20250327",
     name: "Jan Liby Dela Costa",
     section: "ICT-12A",
-    visiting: "SHS-G12",
+    grade_level: "SHS-G12",
     time_in: "7:46 AM",
     time_out: "4:12 PM",
   },

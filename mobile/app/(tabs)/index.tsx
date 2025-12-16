@@ -1,20 +1,55 @@
 import React, { useState } from 'react'
-import { Text, View, SafeAreaView, Button, Link, Input, showToast } from "@/components";
-import { ModalConfirm } from '@/components/ui/modals/ModalConfirm'
-import { ModalDestructive } from '@/components/ui/modals/ModalDestructive'
+import { Text, View, SafeAreaView } from "@/components";
 import { Header } from '@/components/Header'
 import { useColors } from '@/hooks/useColors'
 import { ScrollView } from 'react-native'
-import Octicons from '@expo/vector-icons/Octicons';
+import { VisitCard } from '@/components/VisitCard'
+import { FlatList } from 'react-native'
+import { CreateNewVisit } from '@/components/CreateNewVisit';
+
+const data = [
+  {
+    id: "123", 
+    name: "Visit Accounting Office", 
+    description: "I want to pay all of my school fees, tuition, uniform",
+    visiting: "Cashier",
+    secured: true,
+    status: "pending"
+  },
+  {
+    id: "1234", 
+    name: "Enroll", 
+    description: "I want to enroll my son to grade 11.",
+    visiting: "Admission Office",
+    secured: true,
+    status: "approved"
+  },
+  {
+    id: "12346", 
+    name: "test", 
+    description: "test description",
+    visiting: "Cashier",
+    secured: false,
+    status: "pending"
+  },
+  {
+    id: "1235", 
+    name: "test", 
+    description: "test description",
+    visiting: "Cashier",
+    secured: true,
+    status: "pending"
+  },
+]
 
 export default function Main() {
   const colors = useColors();
-  const [showConfirmModal, setShowConfirmModal] = useState(false);
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [createnew, setCreateNew] = useState(false);
   return (
     <SafeAreaView>
       <ScrollView showsVerticalScrollIndicator={false}>
         <Header />
+        <CreateNewVisit visible={createnew} onClose={() => setCreateNew(false)} />
         <View style={{
           paddingVertical: 20,
           marginHorizontal: 20,
@@ -23,77 +58,29 @@ export default function Main() {
           alignItems: 'center'
         }}>
           <Text type="semibold">My Gatepass</Text>
-          <Text type="link">Create New</Text>
+          <Text type="link" onPress={() => setCreateNew(true)}>Create Pass</Text>
         </View>
 
         <View style={{
           marginHorizontal: 20
         }}>
-
-
-          <View
-            style={{
-              backgroundColor: colors.card,
-              borderRadius: 8,
-              borderWidth: 1,
-              borderColor: colors.border,
-              paddingVertical: 12,
-              paddingHorizontal: 14,
-              gap: 2
-            }}
-          >
-            <Text
-              style={{
-                fontSize: 16,
-              }}
-              type="bold"
-            >
-              Pay Tuition, Fieldtrip and Uniform
-            </Text>
-
-
-            <Text type="secondary" style={{ fontSize: 12 }}>
-              “I want to pay my son's tuition fees, fieldtrip and uniform.”
-            </Text>
-
-            <View style={{
-              flexDirection: 'row-reverse',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              marginTop: 2
-            }}>
-              <View style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                gap: 5
-              }}>
-                <Text style={{ fontSize: 14, color: colors.primary }}>
-                  Cashier
-                </Text>
-                <View style={{
-                  width: 1,
-                  height: 10,
-                  backgroundColor: colors.border
-                }} />
-                <Text style={{ fontSize: 14, color: colors.warning }}>
-                  Pending
-                </Text>
-              </View>
-
-              <View style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                gap: 5
-              }}>
-                <Octicons name="shield-check" size={16} color={colors.success} />
-                <Text style={{
-                  fontSize: 14,
-                  color: colors.success
-                }}>Secured Pass</Text>
-              </View>
-            </View>
-          </View>
-
+          <FlatList
+          contentContainerStyle={{
+            gap: 8
+          }}
+            data={data}
+            keyExtractor={(item) => item.id}
+            renderItem={({item}) => (
+              <VisitCard 
+                id={item.id}
+                name={item.name}
+                description={item.description}
+                visiting={item.visiting}
+                status={item.status}
+                secured={item.secured}
+               />
+            )}
+          />
 
         </View>
       </ScrollView>
