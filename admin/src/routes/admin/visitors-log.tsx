@@ -11,7 +11,7 @@ import { Button } from '@/components/ui/button'
 
 export type VisitorLogType = {
   id: string;
-  student_id: string;
+  visitor_id: string;
   name: string;
   section: string;
   grade_level: string;
