@@ -54,6 +54,7 @@
     "express": "^4.19.2",
     "jsonwebtoken": "^9.0.2",
     "postgres": "^3.4.7",
+    "tsc-alias": "^1.8.16",
     "tsx": "^4.15.7",
     "vitest": "^1.6.0"
   }
