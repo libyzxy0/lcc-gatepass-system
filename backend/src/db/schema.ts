@@ -156,5 +156,6 @@ export const otp = pgTable("otp", {
   admin_id: uuid("admin_id").references(() => admin.id).unique(),
   revoked: boolean("revoked").default(false),
   expires_at: timestamp("expires_at", { mode: "string" }),
+  updated_at: timestamp("updated_at", { mode: "string" }).defaultNow(),
   created_at: timestamp("created_at", { mode: "string" }).defaultNow()
 });

@@ -6,6 +6,19 @@ import { generateVisitorToken, generateVisitorID } from '@/utils'
 
 type Visitor = typeof visitor.$inferSelect;
 
+type VisitorSession = Omit<Visitor, "pin"> & {
+  pin?: string;
+};
+
+interface TokenDecodedType {
+  id: string;
+  iat: number;
+  exp: number;
+}
+
+interface VisitorRequest extends Request {
+  visitor?: TokenDecodedType;
+}
 class VisitorController {
   async registerVisitor(req: Request, res: Response) {
     try {
@@ -82,13 +95,13 @@ class VisitorController {
     }
   }
 
-  async getSession(req: Request, res: Response) {
+  async getSession(req: VisitorRequest, res: Response) {
     try {
       if (!req.visitor) {
         return res.status(401).json({ message: "Unauthorized access!" });
       }
 
-      const visitorData: Visitor[] = await db
+      const visitorData: VisitorSession[] = await db
         .select({
           id: visitor.id,
           visitor_id: visitor.visitor_id,

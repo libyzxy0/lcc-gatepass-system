@@ -1,5 +1,4 @@
 import { Request, Response } from "express";
-import { TokenDecodedType } from '@/types/token'
 import db from "@/db/drizzle";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
@@ -10,6 +9,20 @@ import { generateAccessToken, generateRefreshToken } from '@/utils'
 import { JWT_REFRESH_SECRET } from '@/secrets'
 
 type Admin = typeof admin.$inferSelect;
+
+type AdminSession = Omit<Admin, "password"> & {
+  password?: string;
+};
+
+interface TokenDecodedType {
+  id: string;
+  iat: number;
+  exp: number;
+}
+
+interface AdminRequest extends Request {
+  admin?: TokenDecodedType;
+}
 
 class AdminController {
   async newAdmin(req: Request, res: Response) {
@@ -32,7 +45,7 @@ class AdminController {
         role,
         email,
         phone_number,
-        hashedPassword,
+        password: hashedPassword,
         photo_url
       });
       res.status(200).json({
@@ -100,10 +113,10 @@ class AdminController {
         return res.status(401).json({ message: "Refresh token missing" });
       }
 
-      const decoded: TokenDecodedType = jwt.verify(
+      const decoded = jwt.verify(
         refreshToken,
         JWT_REFRESH_SECRET
-      );
+      ) as TokenDecodedType;
 
       const newAccessToken = generateAccessToken(decoded.id);
       
@@ -121,13 +134,13 @@ class AdminController {
     return res.status(200).json({ message: "Logged out successfully" });
   }
 
-  async getSession(req: Request, res: Response) {
+  async getSession(req: AdminRequest, res: Response) {
     try {
       if (!req.admin) {
         return res.status(401).json({ message: "Unauthorized access!" });
       }
 
-      const adminData: Admin[] = await db
+      const adminData: AdminSession[] = await db
         .select({
           id: admin.id,
           firstname: admin.firstname,
@@ -136,7 +149,8 @@ class AdminController {
           phone_number: admin.phone_number,
           role: admin.role,
           is_super_admin: admin.is_super_admin,
-          created_at: admin.is_super_admin
+          photo_url: admin.photo_url,
+          created_at: admin.created_at
         })
         .from(admin)
         .where(eq(admin.id, req.admin.id));

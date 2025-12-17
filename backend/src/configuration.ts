@@ -1,3 +1,1 @@
-export const config = {
-  SMS_ENABLED: false /* Enable later in presentation */
-};
+export const SMS_ENABLED = false; /* Enable later in presentation */

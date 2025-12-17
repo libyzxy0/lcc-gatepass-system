@@ -23,21 +23,21 @@ class OTPController {
       const smsotp = await sendSMSOTP(phone_number, code);
 
       const expiresAt = new Date(Date.now() + 5 * 60 * 1000);
-
+      const now = new Date();
       await db
         .insert(otp)
         .values({
           user_type: 'visitor',
           visitor_id: vst[0].id,
           code,
-          expires_at: expiresAt
+          expires_at: expiresAt.toISOString()
         })
         .onConflictDoUpdate({
           target: otp.visitor_id,
           set: {
             code,
-            expires_at: expiresAt,
-            updated_at: new Date()
+            expires_at: expiresAt.toISOString(),
+            updated_at: now.toISOString()
           }
         });
 
@@ -54,8 +54,6 @@ class OTPController {
     try {
       const { phone_number, code } = req.body;
 
-      console.log({ phone_number, code })
-
       const vst = await db
         .select({ id: visitor.id })
         .from(visitor)
@@ -64,6 +62,8 @@ class OTPController {
       if (!vst.length) {
         return res.status(404).json({ error: 'Visitor not found' });
       }
+      
+      const now = new Date();
 
       const validOtp = await db
         .select()
@@ -72,7 +72,7 @@ class OTPController {
           and(
             eq(otp.visitor_id, vst[0].id),
             eq(otp.code, code),
-            gt(otp.expires_at, new Date())
+            gt(otp.expires_at, now.toISOString())
           )
         );
 
