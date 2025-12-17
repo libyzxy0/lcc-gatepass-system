@@ -20,7 +20,7 @@ app.use(express.json());
 
 
 const allowedOrigins = [
-  process.env.FRONTEND_ORIGIN,
+  "https://admin.lccgatepass.xyz",
   "http://localhost:5173",
   "https://lccgatepass.xyz",
   "https://www.lccgatepass.xyz"
