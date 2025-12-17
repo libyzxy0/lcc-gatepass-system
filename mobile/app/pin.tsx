@@ -45,7 +45,7 @@ export default function Pin() {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1, paddingHorizontal: 20, backgroundColor: colors.primary }}>
+    <SafeAreaView style={{ flex: 1, paddingHorizontal: 20, backgroundColor: colors.backgroundPinScreen }}>
       <ModalLoading visible={loading} />
       <ModalConfirm
         visible={showConfrim}
@@ -87,7 +87,7 @@ export default function Pin() {
         marginTop: 50
       }}>
         <TouchableOpacity onPress={() => setShowConfirm(true)} activeOpacity={0.8} style={{
-          backgroundColor: colors.primary,
+          backgroundColor: colors.backgroundPinScreen,
           paddingHorizontal: 16,
           paddingVertical: 8,
           borderRadius: 50,
@@ -100,7 +100,7 @@ export default function Pin() {
           shadowRadius: 1,
           elevation: 5,
           borderWidth: 1,
-          borderColor: "#2536df70"
+          borderColor: "#1925a370"
         }}>
           <Text style={{
             color: 'white'

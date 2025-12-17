@@ -10,6 +10,7 @@ export type ColorThemeType = {
   warning: string;
   success: string;
   gray: string;
+  backgroundPinScreen: string;
 }
 
 export type ColorsType = {
@@ -19,7 +20,7 @@ export type ColorsType = {
 
 export const Colors = {
   light: {
-    primary: "#6165e3ff",
+    primary: "#1f58db",
     text: "#000000",
     textSecondary: "#8c8c8c",
     background: "#f7f7f7",
@@ -29,10 +30,11 @@ export const Colors = {
     danger: "#e30f0f",
     warning: '#c8ac10',
     success: '#15c122',
-    gray: '#bababa'
+    gray: '#bababa',
+    backgroundPinScreen: '#191d81'
   },
   dark: {
-    primary: "#6165e3ff",
+    primary: "#1f58db",
     text: "#000000",
     textSecondary: "#8c8c8c",
     background: "#f7f7f7",
@@ -42,6 +44,7 @@ export const Colors = {
     danger: "#e30f0f",
     warning: '#c8ac10',
     success: '#15c122',
-    gray: '#bababa'
+    gray: '#bababa',
+    backgroundPinScreen: '#191d81'
   }
 } satisfies ColorsType;

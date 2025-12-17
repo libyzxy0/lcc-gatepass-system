@@ -2,7 +2,6 @@ import React, { useState } from 'react'
 import { Text, View, SafeAreaView } from "@/components";
 import { Header } from '@/components/Header'
 import { useColors } from '@/hooks/useColors'
-import { ScrollView } from 'react-native'
 import { VisitCard } from '@/components/VisitCard'
 import { FlatList } from 'react-native'
 import { CreateNewVisit } from '@/components/CreateNewVisit';
@@ -10,35 +9,35 @@ import { CreateNewVisit } from '@/components/CreateNewVisit';
 const data = [
   {
     id: "123", 
-    name: "Visit Accounting Office", 
-    description: "I want to pay all of my school fees, tuition, uniform",
+    name: "Im Paying to Cashier", 
+    description: "I want to pay all of my school fees, tuition, uniform, fieldtrip.",
     visiting: "Cashier",
     secured: true,
-    status: "pending"
+    status: "approved"
   },
   {
     id: "1234", 
     name: "Enroll", 
     description: "I want to enroll my son to grade 11.",
-    visiting: "Admission Office",
+    visiting: "Admission",
     secured: true,
-    status: "approved"
+    status: "completed"
   },
   {
     id: "12346", 
-    name: "test", 
-    description: "test description",
-    visiting: "Cashier",
+    name: "Im getting the card of my child.", 
+    description: "Im going to get my childs' card to see my childs grades.",
+    visiting: "Jay Pineda",
     secured: false,
-    status: "pending"
+    status: "approved"
   },
   {
     id: "1235", 
-    name: "test", 
-    description: "test description",
-    visiting: "Cashier",
+    name: "Sign Clearance", 
+    description: "Im requesting to sign my clearance.",
+    visiting: "Accounting",
     secured: true,
-    status: "pending"
+    status: "rejected"
   },
 ]
 
@@ -47,7 +46,7 @@ export default function Main() {
   const [createnew, setCreateNew] = useState(false);
   return (
     <SafeAreaView>
-      <ScrollView showsVerticalScrollIndicator={false}>
+      <View>
         <Header />
         <CreateNewVisit visible={createnew} onClose={() => setCreateNew(false)} />
         <View style={{
@@ -83,7 +82,7 @@ export default function Main() {
           />
 
         </View>
-      </ScrollView>
+      </View>
     </SafeAreaView>
   );
 }

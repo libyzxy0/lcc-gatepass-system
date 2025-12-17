@@ -85,6 +85,7 @@ export const visit = pgTable("visit", {
   id: uuid("id").primaryKey().defaultRandom().notNull(),
   visitor_id: uuid("visitor_id").references(() => visitor.id),
   purpose: text("purpose").notNull(),
+  description: text("description").notNull(),
   visiting: text("visiting"),
   schedule_date: timestamp("schedule_date", { mode: "string" }),
   status: statusEnum("status").default("pending"),

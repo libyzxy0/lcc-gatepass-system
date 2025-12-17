@@ -15,19 +15,19 @@ import { useAuthStore } from "@/utils/auth-store";
 import { useColors } from "@/hooks/useColors";
 import * as SystemUI from "expo-system-ui";
 import { Toast } from "@/components";
-import { checkNumber } from '@/api/helper/check-num'
-import { normalize } from '@/utils/format-ph-number'
+import { checkNumber } from "@/api/helper/check-num";
+import { normalize } from "@/utils/format-ph-number";
+import SplashLoading from '@/components/SplashLoading'
+
 export {
-  // Catch any errors thrown by the Layout component.
   ErrorBoundary,
 } from "expo-router";
 
 export const unstable_settings = {
-  // Ensure that reloading on `/modal` keeps a back button present.
-  initialRouteName: "(tabs)"
+  initialRouteName: "(tabs)",
 };
 
-// Prevent the splash screen from auto-hiding before asset loading is complete.
+// Prevent splash screen from auto hiding
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
@@ -37,50 +37,87 @@ export default function RootLayout() {
     NunitoItalic: require("../assets/fonts/Nunito-Italic.ttf"),
     NunitoSemiBold: require("../assets/fonts/Nunito-SemiBold.ttf"),
     NunitoBold: require("../assets/fonts/Nunito-Bold.ttf"),
-    ...Ionicons.font
+    ...Ionicons.font,
   });
 
   SystemUI.setBackgroundColorAsync(useColors().background);
 
-  // Expo Router uses Error Boundaries to catch errors in the navigation tree.
   useEffect(() => {
     if (error) throw error;
   }, [error]);
 
-  if (!loaded) {
-    return null;
-  }
+  if (!loaded) return null;
+
   return <RootLayoutNav />;
 }
 
 function RootLayoutNav() {
   const colorScheme = useColorScheme();
-  const { isLoggedIn, phoneNumber, getSession, visitor, logout } = useAuthStore();
   const router = useRouter();
+  const {
+    isLoggedIn,
+    phoneNumber,
+    getSession,
+    visitor,
+    logout,
+  } = useAuthStore();
+
+  const [sessionReady, setSessionReady] = useState(false);
+  const [checkedNumber, setCheckedNumber] = useState(false);
+  const [isOTPNeed, setOTPNeed] = useState(false);
 
   useEffect(() => {
-    const retrieveSession = async () => {
+    const restoreSession = async () => {
       try {
-        const num_status = await checkNumber(normalize(phoneNumber));
-
-        if (num_status && !num_status.isServerError && !num_status.activated) {
-          router.replace('/otp');
-          return;
-        }
-
         await getSession();
         if (visitor === null) {
           await logout();
-          router.push('/phone');
         }
-      } catch (error) {
-        router.push('/phone');
-        console.error(error);
+      } catch (e) {
+        console.error(e);
+      } finally {
+        setSessionReady(true);
       }
+    };
+
+    restoreSession();
+  }, []);
+
+  useEffect(() => {
+    const verifyNumber = async () => {
+      if (!phoneNumber) {
+        setOTPNeed(false);
+        setCheckedNumber(true);
+        return;
+      }
+
+      try {
+        const status = await checkNumber(normalize(phoneNumber));
+
+        setOTPNeed(
+          !!status &&
+          !status.isServerError &&
+          !status.activated
+        );
+      } catch (e) {
+        console.error(e);
+      } finally {
+        setCheckedNumber(true);
+      }
+    };
+
+    verifyNumber();
+  }, [phoneNumber]);
+
+  useEffect(() => {
+    if (sessionReady && checkedNumber) {
       SplashScreen.hideAsync();
     }
-    retrieveSession();
-  }, [])
+  }, [sessionReady, checkedNumber]);
+
+  if (!sessionReady || !checkedNumber) {
+    return <SplashLoading />
+  }
 
   return (
     <ThemeProvider
@@ -91,52 +128,41 @@ function RootLayoutNav() {
           <Stack.Protected guard={isLoggedIn}>
             <Stack.Screen
               name="(tabs)"
-              options={{
-                headerShown: false,
-                animation: "fade"
-              }}
+              options={{ headerShown: false, animation: "fade" }}
             />
           </Stack.Protected>
 
           <Stack.Protected guard={!isLoggedIn}>
-
             <Stack.Protected guard={!!phoneNumber}>
-              <Stack.Screen
-                name="pin"
-                options={{
-                  headerShown: false,
-                  animation: "fade"
-                }}
-              />
-              <Stack.Screen
-                name="otp"
-                options={{
-                  headerShown: false,
-                  animation: "fade"
-                }}
-              />
+              <Stack.Protected guard={isOTPNeed}>
+                <Stack.Screen
+                  name="otp"
+                  options={{ headerShown: false, animation: "fade" }}
+                />
+              </Stack.Protected>
+
+              <Stack.Protected guard={!isOTPNeed}>
+                <Stack.Screen
+                  name="pin"
+                  options={{ headerShown: false, animation: "fade" }}
+                />
+              </Stack.Protected>
             </Stack.Protected>
 
             <Stack.Protected guard={!phoneNumber}>
               <Stack.Screen
                 name="phone"
-                options={{
-                  headerShown: false,
-                  animation: "fade"
-                }}
+                options={{ headerShown: false, animation: "fade" }}
               />
             </Stack.Protected>
 
             <Stack.Screen
               name="new/[phonenum]"
-              options={{
-                headerShown: false,
-                animation: "fade"
-              }}
+              options={{ headerShown: false, animation: "fade" }}
             />
           </Stack.Protected>
-
         </Stack>
+
         <Toast />
       </SafeAreaProvider>
     </ThemeProvider>

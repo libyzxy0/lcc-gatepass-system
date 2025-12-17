@@ -9,13 +9,9 @@ type VisitorRegType = {
   pin: string;
 }
 
-type APIResDataType = {
-  success: boolean;
-  phone_number: string;
-}
 type APIResponseType = {
   success: boolean;
-  data: APIResDataType;
+  message: string;
 }
 
 export const visitorRegister = async ({
@@ -25,14 +21,27 @@ export const visitorRegister = async ({
   phone_number,
   pin
 }: VisitorRegType): Promise<APIResponseType | null> => {
-  const response = await api.post('/visitor/new', {
-    firstname,
-    lastname,
-    email,
-    phone_number,
-    pin
-  });
-  console.warn(response.data);
-  if (!response.data) return null;
-  return response.data;
+  try {
+    const response = await api.post('/visitor/new', {
+      firstname,
+      lastname,
+      email,
+      phone_number,
+      pin
+    });
+    if (!response.data) return {
+      success: false,
+      message: "[ERR2007]: Something went wrong!"
+    };;
+    return {
+      success: true,
+      message: response.data.message
+    };
+  } catch (error) {
+    console.error("Error visitor registration:", error.message);
+    return {
+      success: false,
+      message: error.response ? error.response.error : error.message
+    }
+  }
 }

@@ -37,7 +37,7 @@ export function Header() {
           }}
           contentFit="fill"
         />
-        <TouchableOpacity onPress={() => setShowLogout(true)} activeOpacity={0.8}>
+        <TouchableOpacity onPress={() => setShowLogout(true)} activeOpacity={0.6}>
           <Ionicons name="exit-outline" size={24} color={colors.text} />
         </TouchableOpacity>
       </View>

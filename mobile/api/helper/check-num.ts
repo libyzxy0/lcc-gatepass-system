@@ -17,7 +17,6 @@ export const checkNumber = async (phone_number: string): Promise<CheckPhoneNumbe
     };
 
   } catch (error) {
-    console.error(error)
     return {
       id: null,
       valid: false,

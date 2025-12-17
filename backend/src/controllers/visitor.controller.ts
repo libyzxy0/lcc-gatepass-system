@@ -9,17 +9,22 @@ type Visitor = typeof visitor.$inferSelect;
 class VisitorController {
   async registerVisitor(req: Request, res: Response) {
     try {
+      if (!req.body) {
+        res.status(400).json({
+          error: "Failed to register visitor, missing request body!"
+        })
+      }
       await db.insert(visitor).values({
         visitor_id: generateVisitorID(),
         ...req.body
       })
       res.status(200).json({
-        message: 'Account created successfully!'
+        message: `Account for ${req.body.phone_number} created successfully!`
       })
     } catch (error) {
       console.error("[ERROR VISITOR CONTROLLER]:", error);
       res.status(500).json({
-        message: "Failed to register visitor, something went wrong"
+        error: "Failed to register visitor, something went wrong"
       })
     }
   }
@@ -27,7 +32,7 @@ class VisitorController {
   async login(req: Request, res: Response) {
     try {
       const { phone_number, pin } = req.body;
-      console.log({phone_number, pin});
+      console.log({ phone_number, pin });
       const visitorData: Visitor[] = await db
         .select()
         .from(visitor)
@@ -48,7 +53,7 @@ class VisitorController {
         access_token: accessToken,
       });
     } catch (error) {
-      console.error("[ERROR VISITOR CONTROLLER]:", error);
+      console.error("[ERROR VISITOR CONTROLLER]:", error.message);
       return res.status(500).json({ message: "Something went wrong" });
     }
   }
@@ -56,19 +61,19 @@ class VisitorController {
   async checkPhoneNumber(req: Request, res: Response) {
     try {
       const { phone_number } = req.body;
-      
+
       const visitorData = await db.select({ id: visitor.id, activated: visitor.activated }).from(visitor).where(eq(visitor.phone_number, phone_number)) ?? null;
-      
-      if(visitorData.length === 0) {
+
+      if (visitorData.length === 0) {
         res.status(404).json({
           error: "Phone number not signed!"
         });
       }
-      
+
       console.log(visitorData[0]);
 
       res.status(200).json(visitorData[0]);
-      
+
     } catch (error) {
       console.error("[ERROR VISITOR CONTROLLER]:", error);
       res.status(500).json({
@@ -143,13 +148,13 @@ class VisitorController {
   async updateVisitor(req: Request, res: Response) {
     try {
       const { id, fields } = req.body;
-      
+
       if (!fields) {
         return res.status(400).json({
           error: "Specify a fields to be updated"
         })
       }
-      
+
       const visitorData = await db.select().from(visitor).where(eq(visitor.id, id));
       if (visitorData.length <= 0) {
         return res.status(404).json({

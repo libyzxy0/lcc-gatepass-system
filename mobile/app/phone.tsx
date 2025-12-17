@@ -115,7 +115,7 @@ export default function PhonePage() {
           contentFit="contain"
         />
 
-        <Text type="bold">Enter Your Mobile Number</Text>
+        <Text type="bold">Enter Mobile Number</Text>
         <Text type="secondary" style={{
           textAlign: 'center',
           marginHorizontal: 20

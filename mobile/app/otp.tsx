@@ -18,9 +18,23 @@ export default function OTPPage() {
   const [pin, setPin] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
   const [showConfrim, setShowConfirm] = useState(false);
-  const { login, phoneNumber, getSession } = useAuthStore();
+  const { login, phoneNumber, setPhoneNumber, getSession } = useAuthStore();
   const colors = useColors();
   const [sent, setSent] = useState(false);
+  const [time, setTime] = useState(5 * 60);
+
+  useEffect(() => {
+    if (time === 0) return;
+
+    const interval = setInterval(() => {
+      setTime((prev) => prev - 1);
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [time]);
+
+  const minutes = Math.floor(time / 60);
+  const seconds = time % 60;
 
   const handlePress = async (num: string) => {
     if (pin.length >= 6) return;
@@ -38,22 +52,25 @@ export default function OTPPage() {
             text1: '[Server Err] Failed to Verify OTP',
             text2: data.message
           });
+          setPin([]);
           return;
         }
-        if  (data.verified === true) {
+        if (data.verified === true) {
           showToast({
             type: 'success',
             text1: 'Account Successfully activated!',
             text2: data.message
           });
           await getSession();
-          router.replace('/(tabs)/index');
+          router.replace('/');
+          setPin([]);
         } else {
           showToast({
             type: 'error',
             text1: 'Something went wrong!',
             text2: data.message
           });
+          setPin([]);
         }
 
       } catch (error) {
@@ -74,30 +91,35 @@ export default function OTPPage() {
   };
 
   useEffect(() => {
-    if  (!sent) {
-        const sendOTP = async () => {
-          await generateOTP(phoneNumber);
-        }
-        sendOTP();
-        setSent(true);
+    if (!sent) {
+      const sendOTP = async () => {
+        await generateOTP(phoneNumber);
+      }
+      sendOTP();
+      setSent(true);
     }
   }, [])
 
   return (
     <SafeAreaView style={{ flex: 1, paddingHorizontal: 20 }}>
       <ModalLoading visible={loading} />
-
+      <ModalConfirm
+        visible={showConfrim}
+        onConfirm={() => setPhoneNumber(null)}
+        onClose={() => setShowConfirm(false)}
+        title={"Change Number?"}
+        description={"Are you sure you want to change your number to login?"} closeAfterConfirm />
       <View style={{ marginTop: 80, marginHorizontal: 12, gap: 10 }}>
         <Text type="bold" style={{
           color: colors.text,
           fontSize: 22
-        }}>Verify Your Account</Text>
-        <Text>Please enter the One Time Pin (OTP) we've sent to your phone number <Text type="link">(+63) {formatPHNumber(phoneNumber)}</Text>.</Text>
+        }}>Enter your One Time Pin (OTP)</Text>
+        <Text>Please enter the One Time Pin (OTP) we've sent to your phone number <Text onPress={() => setShowConfirm(true)} type="link">(+63) {formatPHNumber(phoneNumber)}</Text>.</Text>
       </View>
 
       <View style={{
         alignItems: 'center',
-        marginBottom: 60
+        marginBottom: 20
       }}>
         <View style={{ flexDirection: "row", gap: 8, marginTop: 40 }}>
           {[0, 1, 2, 3, 4, 5].map((i) => (
@@ -118,6 +140,15 @@ export default function OTPPage() {
             </View>
           ))}
         </View>
+      </View>
+
+      <View style={{
+        justifyContent: 'center',
+        marginBottom: 20
+      }}>
+        <Text type={'secondary'} style={{
+          textAlign: 'center'
+        }}>Resend after {minutes}:{seconds}</Text>
       </View>
 
       <View style={{

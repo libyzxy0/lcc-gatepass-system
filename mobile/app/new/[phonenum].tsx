@@ -16,6 +16,7 @@ import React, { useState, useReducer } from "react";
 import { ScrollView } from 'react-native'
 import { useLocalSearchParams } from 'expo-router';
 import { visitorRegister } from '@/api/helper/register'
+import { useRouter } from 'expo-router'
 
 type ActionType = {
   type: 'email_change' | 'pin_change' | 'phone_change' | 'firstname_change' | 'lastname_change';
@@ -71,6 +72,8 @@ export default function NewAccountPage() {
   const colors = useColors();
   const [showPassword, setShowPassword] = useState(false);
   const { login } = useAuthStore();
+  const router = useRouter();
+  const [loading, setLoading] = useState(false);
 
   const [state, dispatch] = useReducer(reducer, {
     phone_number: phonenum,
@@ -81,73 +84,68 @@ export default function NewAccountPage() {
   });
 
   const handleCreateAccount = async () => {
-    try {
-      if (!state.firstname) {
-        showToast({
-          type: "warning",
-          text1: "Failed to create account!",
-          text2: `Please enter your firstname.`
-        });
-        return;
-      }
-      if (!state.lastname) {
-        showToast({
-          type: "warning",
-          text1: "Failed to create account!",
-          text2: `Please enter your lastname.`
-        });
-        return;
-      }
-      if (!state.email) {
-        showToast({
-          type: "warning",
-          text1: "Failed to create account!",
-          text2: `Please enter your email.`
-        });
-        return;
-      }
+    setLoading(true);
+    if (!state.firstname) {
+      showToast({
+        type: "warning",
+        text1: "Failed to create account!",
+        text2: `Please enter your firstname.`
+      });
+      return;
+    }
+    if (!state.lastname) {
+      showToast({
+        type: "warning",
+        text1: "Failed to create account!",
+        text2: `Please enter your lastname.`
+      });
+      return;
+    }
+    if (!state.email) {
+      showToast({
+        type: "warning",
+        text1: "Failed to create account!",
+        text2: `Please enter your email.`
+      });
+      return;
+    }
 
-      if (!state.phone_number) {
-        showToast({
-          type: "warning",
-          text1: "Failed to create account!",
-          text2: `Please enter your phone number.`
-        });
-        return;
-      }
+    if (!state.phone_number) {
+      showToast({
+        type: "warning",
+        text1: "Failed to create account!",
+        text2: `Please enter your phone number.`
+      });
+      return;
+    }
 
-      if (!state.pin) {
-        showToast({
-          type: "warning",
-          text1: "Failed to create account!",
-          text2: `Please enter your desired pin!`
-        });
-        return;
-      }
+    if (!state.pin) {
+      showToast({
+        type: "warning",
+        text1: "Failed to create account!",
+        text2: `Please enter your desired pin!`
+      });
+      return;
+    }
 
-      const data = await visitorRegister(state);
+    const data = await visitorRegister(state);
 
-      if (data && data.success) {
-        showToast({
-          type: "success",
-          text1: "Account Created",
-          text2: `Successfully created account for ${data.phone_number}`
-        });
-        await login(state.pin);
-      } else {
-        showToast({
-          type: "success",
-          text1: "Failed to create account",
-          text2: `Something went wrong, try again later`
-        });
-      }
-    } catch (error: any) {
+    if (data && data.success) {
+      showToast({
+        type: "success",
+        text1: "Account Created",
+        text2: data.message
+      });
+      await login(state.pin);
+      router.push('/otp');
+    } else {
       showToast({
         type: "error",
         text1: "Failed to create account",
-        text2: `${error.response ? error.response.data.message : error.message}`
+        text2: data.message
       });
     }
+    setLoading(false);
   };
 
   return (
@@ -357,8 +355,9 @@ export default function NewAccountPage() {
                 width: "100%",
                 borderRadius: 10
               }}
+              disabled={loading}
             >
-              Create Account
+              {loading ? 'Loading...' : 'Create Account'}
             </Button>
           </View>
 
