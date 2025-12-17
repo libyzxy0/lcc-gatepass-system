@@ -4,17 +4,17 @@ import bcrypt from "bcryptjs";
 
 const adminSeeder = async () => {
   try {
-    const hashedPassword = await bcrypt.hash("dev.marvin@321", 10);
+    const hashedPassword = await bcrypt.hash("dev.libyzyx0@321", 10);
     
     const data = await db.insert(admin).values({
-        firstname: "Marvin",
-        lastname: "Saik",
+        firstname: "Jan Liby",
+        lastname: "Dela Costa",
         role: "developer",
-        email: "marvinsaik@lccgatepass.xyz",
-        phone_number: "09999999999",
+        email: "janlibydelacosta@gmail.com",
+        phone_number: "09976953622",
         password: hashedPassword,
         is_super_admin: true,
-        photo_url: "https://avatars.githubusercontent.com/u/113106676?v=4"
+        photo_url: "https://github.com/libyzxy0.png"
       });
       console.log(data);
   } catch (error) {

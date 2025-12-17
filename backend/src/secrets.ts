@@ -1,6 +1,6 @@
 import "dotenv/config";
 
-export const NEON_DATABASE_URL = process.env.NEON_DATABASE_URL!;
+export const DATABASE_URL = process.env.DATABASE_URL!;
 export const JWT_ACCESS_SECRET = process.env.JWT_ACCESS_SECRET!;
 export const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET!;
 export const JWT_VISITOR_SECRET = process.env.JWT_VISITOR_SECRET!;
@@ -17,10 +17,10 @@ if(!JWT_REFRESH_SECRET) {
 if(!JWT_VISITOR_SECRET) {
   throw new Error("JWT_VISITOR_SECRET cannot be found on Environment Variables")
 }
-if(!NEON_DATABASE_URL) {
+if(!DATABASE_URL) {
   throw new Error("NEON_DATABASE_URL cannot be found on Environment Variables")
 }
-if(!NEON_DATABASE_URL) {
+if(!DATABASE_URL) {
   throw new Error("FRONTEND_ORIGIN cannot be found on Environment Variables")
 }
 if(!CLOUDFLARE_TURNSTILE_SECRET) {
