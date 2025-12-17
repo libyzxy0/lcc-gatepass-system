@@ -21,9 +21,9 @@ app.use(express.json());
 
 const allowedOrigins = [
   "https://admin.lccgatepass.xyz",
-  "http://localhost:5173",
   "https://lccgatepass.xyz",
-  "https://www.lccgatepass.xyz"
+  "https://www.lccgatepass.xyz",
+  "http://localhost:5173"
 ];
 
 app.use(
