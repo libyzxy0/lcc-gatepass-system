@@ -71,7 +71,7 @@ export default function NewAccountPage() {
   const { phonenum } = useLocalSearchParams<{ phonenum: string }>();
   const colors = useColors();
   const [showPassword, setShowPassword] = useState(false);
-  const { login } = useAuthStore();
+  const { login, setPhoneNumber } = useAuthStore();
   const router = useRouter();
   const [loading, setLoading] = useState(false);
 
@@ -136,6 +136,7 @@ export default function NewAccountPage() {
         text1: "Account Created",
         text2: data.message
       });
+      setPhoneNumber(phonenum);
       await login(state.pin);
       router.push('/otp');
     } else {

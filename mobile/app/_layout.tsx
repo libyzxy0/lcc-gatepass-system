@@ -56,15 +56,13 @@ function RootLayoutNav() {
   const router = useRouter();
   const {
     isLoggedIn,
-    phoneNumber,
     getSession,
     visitor,
     logout,
+    phoneNumber
   } = useAuthStore();
 
   const [sessionReady, setSessionReady] = useState(false);
-  const [checkedNumber, setCheckedNumber] = useState(false);
-  const [isOTPNeed, setOTPNeed] = useState(false);
 
   useEffect(() => {
     const restoreSession = async () => {
@@ -84,38 +82,18 @@ function RootLayoutNav() {
   }, []);
 
   useEffect(() => {
-    const verifyNumber = async () => {
-      if (!phoneNumber) {
-        setOTPNeed(false);
-        setCheckedNumber(true);
-        return;
-      }
-
-      try {
-        const status = await checkNumber(normalize(phoneNumber));
-
-        setOTPNeed(
-          !!status &&
-          !status.isServerError &&
-          !status.activated
-        );
-      } catch (e) {
-        console.error(e);
-      } finally {
-        setCheckedNumber(true);
-      }
-    };
-
-    verifyNumber();
-  }, [phoneNumber]);
+    if (isLoggedIn && visitor?.activated === false) {
+      router.replace('/otp');
+    }
+  }, [isLoggedIn])
 
   useEffect(() => {
-    if (sessionReady && checkedNumber) {
+    if (sessionReady) {
       SplashScreen.hideAsync();
     }
-  }, [sessionReady, checkedNumber]);
+  }, [sessionReady]);
 
-  if (!sessionReady || !checkedNumber) {
+  if (!sessionReady) {
     return <SplashLoading />
   }
 
@@ -130,23 +108,18 @@ function RootLayoutNav() {
               name="(tabs)"
               options={{ headerShown: false, animation: "fade" }}
             />
+            <Stack.Screen
+              name="otp"
+              options={{ headerShown: false, animation: "fade" }}
+            />
           </Stack.Protected>
 
           <Stack.Protected guard={!isLoggedIn}>
             <Stack.Protected guard={!!phoneNumber}>
-              <Stack.Protected guard={isOTPNeed}>
-                <Stack.Screen
-                  name="otp"
-                  options={{ headerShown: false, animation: "fade" }}
-                />
-              </Stack.Protected>
-
-              <Stack.Protected guard={!isOTPNeed}>
-                <Stack.Screen
-                  name="pin"
-                  options={{ headerShown: false, animation: "fade" }}
-                />
-              </Stack.Protected>
+              <Stack.Screen
+                name="pin"
+                options={{ headerShown: false, animation: "fade" }}
+              />
             </Stack.Protected>
 
             <Stack.Protected guard={!phoneNumber}>
