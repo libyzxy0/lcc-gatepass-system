@@ -129,7 +129,7 @@ export default function Settings() {
             <Text type="semibold" style={{
               fontSize: 18
             }}>Valid ID ({visitor.valid_id_type})</Text>
-            <Text type="link">Upload New</Text>
+            <Text type="link">Upload</Text>
           </View>
           <Image
             style={{
@@ -141,7 +141,7 @@ export default function Settings() {
             }}
             contentFit="contain"
             source={{
-              uri: `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${visitor.firstname + " " + visitor.lastname}`
+              uri: visitor.valid_id_photo_url
             }} />
         </View>
       </ScrollView>

@@ -22,7 +22,7 @@ export const visitorRegister = async ({
   pin
 }: VisitorRegType): Promise<APIResponseType | null> => {
   try {
-    const response = await api.post('/visitor/new', {
+    const response = await api.post('/visitor/register', {
       firstname,
       lastname,
       email,

@@ -2,16 +2,19 @@ import { Text, View } from "@/components"
 import Octicons from '@expo/vector-icons/Octicons';
 import { useColors } from '@/hooks/useColors'
 import { TouchableOpacity } from 'react-native'
-type VisitorCard = {
+import Ionicons from '@expo/vector-icons/Ionicons';
+
+interface VisitorCard {
   id: string;
-  name: string;
+  purpose: string;
   description: string;
   visiting: string;
   secured: boolean;
-  status: string;
+  status: 'pending' | 'approved' | 'rejected';
+  date: string;
 }
 
-export function VisitCard({ id, name, description, visiting, secured, status }: VisitorCard) {
+export function VisitCard({ id, purpose, description, visiting, secured, status, date }: VisitorCard) {
   const colors = useColors();
 
   const colorStatusMap = {
@@ -39,13 +42,21 @@ export function VisitCard({ id, name, description, visiting, secured, status }: 
         }}
         type="bold"
       >
-        {name}
+        {purpose}
       </Text>
 
 
       <Text type="secondary" style={{ fontSize: 12 }}>
         “{description}”
       </Text>
+      <View style={{
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 5
+      }}>
+      <Ionicons name="calendar-outline" size={12} color={colors.warning} />
+      <Text style={{ fontSize: 12, color: colors.warning }} type="italic">{(new Date(date)).toDateString()}</Text>
+      </View>
 
       <View style={{
         flexDirection: 'row-reverse',

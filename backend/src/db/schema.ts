@@ -17,8 +17,7 @@ export const adminRoleEnum = pgEnum("admin_role", [
 export const statusEnum = pgEnum("status", [
   "pending",
   "approved",
-  "rejected",
-  "completed",
+  "rejected"
 ]);
 
 export const userTypeEnum = pgEnum("user_type", [
@@ -86,8 +85,9 @@ export const visit = pgTable("visit", {
   visitor_id: uuid("visitor_id").references(() => visitor.id),
   purpose: text("purpose").notNull(),
   description: text("description").notNull(),
-  visiting: text("visiting"),
-  schedule_date: timestamp("schedule_date", { mode: "string" }),
+  visiting: text("visiting").notNull(),
+  secured: boolean("secured").notNull().default(true),
+  schedule_date: timestamp("schedule_date", { mode: "string" }).notNull(),
   status: statusEnum("status").default("pending"),
   created_at: timestamp("created_at", { mode: "string" }).defaultNow()
 })

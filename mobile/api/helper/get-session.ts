@@ -18,7 +18,7 @@ type Visitor = {
 
 export const getVisitorSession = async (): Promise<Visitor | null> => {
   try {
-    const response = await api.get('/visitor/get-session');
+    const response = await api.get('/visitor/me');
     if (!response.data) return null;
     return response.data;
   } catch (error) {

@@ -8,6 +8,13 @@
       "when": 1765950212572,
       "tag": "0000_hard_harry_osborn",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1765974319084,
+      "tag": "0001_harsh_vertigo",
+      "breakpoints": true
     }
   ]
 }

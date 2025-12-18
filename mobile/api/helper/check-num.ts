@@ -9,7 +9,7 @@ interface CheckPhoneNumberType {
 
 export const checkNumber = async (phone_number: string): Promise<CheckPhoneNumberType> => {
   try {
-    const response = await api.post('/visitor/check-number', { phone_number });
+    const response = await api.post('/visitor/me/check', { phone_number });
     return {
       valid: true,
       isServerError: false,

@@ -31,7 +31,7 @@ export default function Pin() {
         showToast({
           type: 'error',
           text1: 'Login Failed',
-          text2: error.response ? error.response.data.message : "Something went wrong, try again later"
+          text2: error.response ? error.response.data.error : "Something went wrong, try again later"
         });
         setPin([]);
       } finally {

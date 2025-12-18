@@ -12,29 +12,10 @@ import logo from "@/assets/images/logo.png";
 import { useColors } from "@/hooks/useColors";
 import { useAuthStore } from "@/utils/auth-store";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import React, { useState, useReducer, useRef } from "react";
+import React, { useState, useRef } from "react";
 import { checkNumber } from '@/api/helper/check-num'
 import { useRouter } from 'expo-router'
 import { normalize, isValidPHPhoneNumber } from '@/utils/format-ph-number'
-type ActionType = {
-  type: 'phone_change';
-  value: string | null;
-};
-type CredType = {
-  username: string | null;
-  password: string | null;
-}
-
-function reducer(state: CredType, action: ActionType) {
-  switch (action.type) {
-    case "phone_change": {
-      return {
-        phone: action.value
-      };
-    }
-  }
-  throw Error("Unknown action: " + action.type);
-}
 
 export default function PhonePage() {
   const router = useRouter();
@@ -42,16 +23,12 @@ export default function PhonePage() {
   const { setPhoneNumber } = useAuthStore();
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-
-
-  const [state, dispatch] = useReducer(reducer, {
-    phone: null
-  });
+  const [phone, setPhone] = useState<string | null>(null);
 
   const handleLogin = async () => {
     try {
       setLoading(true);
-      if (!state.phone) {
+      if (!phone) {
         showToast({
           type: "warning",
           text1: "Empty Phone Number",
@@ -60,7 +37,7 @@ export default function PhonePage() {
         return;
       }
 
-      if (!isValidPHPhoneNumber(state.phone)) {
+      if (!isValidPHPhoneNumber(phone)) {
         showToast({
           type: "warning",
           text1: "Invalid Phone Number",
@@ -69,7 +46,7 @@ export default function PhonePage() {
         return;
       }
 
-      const isValidNumber = await checkNumber(normalize(state.phone));
+      const isValidNumber = await checkNumber(normalize(phone));
 
       if (isValidNumber.isServerError) {
         showToast({
@@ -81,9 +58,9 @@ export default function PhonePage() {
       }
 
       if (isValidNumber.valid) {
-        setPhoneNumber(state.phone);
+        setPhoneNumber(phone);
       } else {
-        router.push(`/new/${state.phone}`);
+        router.push(`/new/${phone}`);
       }
 
     } catch (error: any) {
@@ -146,12 +123,9 @@ export default function PhonePage() {
           }}>
             <Input
               onChangeText={value =>
-                dispatch({
-                  type: "phone_change",
-                  value
-                })
+                setPhone(value)
               }
-              value={state.username ?? undefined}
+              value={phone ?? undefined}
               cursorColor={colors.primary}
               textContentType={"telephoneNumber"}
               keyboardType={"numeric"}

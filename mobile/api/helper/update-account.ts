@@ -17,7 +17,7 @@ type APIResposneType = {
 
 export const updateVisitor = async ({ id, fields }: { id: string; fields: UpdateVisitor }): Promise<APIResposneType | null> => {
   try {
-    const response = await api.post('/visitor/update-visitor', { id, fields: fields });
+    const response = await api.post('/visitor/me/update', { id, fields: fields });
 
     if (!response.data) {
       return {

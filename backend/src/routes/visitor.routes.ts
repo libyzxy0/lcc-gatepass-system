@@ -5,14 +5,18 @@ import controller from "@/controllers/visitor.controller";
 
 const router = Router();
 
+/* Admin routes */
 router.get("/get-visitors", admin_auth, controller.getVisitors);
 router.post("/get-visitor", admin_auth, controller.getVisitor);
 router.delete("/delete-visitor/:id", admin_auth, controller.deleteVisitor);
 
-router.post("/new", controller.registerVisitor);
-router.post("/check-number", controller.checkPhoneNumber);
-router.get("/get-session", visitor_auth, controller.getSession);
+/* User visitor routes */
+router.get("/me", visitor_auth, controller.getSession);
+router.post("/register", controller.register);
 router.post("/login", controller.login);
-router.post("/update-visitor", visitor_auth, controller.updateVisitor);
+router.post("/me/update", visitor_auth, controller.updateAccount);
+router.post("/me/check", controller.checkPhoneNumber);
+router.post("/me/create-visit", visitor_auth, controller.createVisit);
+router.get("/me/visits", visitor_auth, controller.visits);
 
 export default router;
