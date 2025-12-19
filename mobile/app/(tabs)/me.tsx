@@ -5,10 +5,12 @@ import { useColors } from "@/hooks/useColors";
 import { useAuthStore } from "@/utils/auth-store";
 import { Header } from "@/components/Header";
 import { Image } from "expo-image";
-import avatar from "@/assets/images/avatar.png";
 import { EditProfile } from "@/components/EditProfile";
 import { formatPHNumber } from "@/utils/format-ph-number";
 import { ProfileImage } from "@/components/ProfileImage";
+import Octicons from '@expo/vector-icons/Octicons';
+import Ionicons from "@expo/vector-icons/Ionicons";
+import { TouchableOpacity } from 'react-native'
 
 export default function Settings() {
   const colors = useColors();
@@ -38,40 +40,34 @@ export default function Settings() {
             alignItems: "center"
           }}
         >
-          <ProfileImage url={visitor.photo_url} id={visitor.id}/>
+          <ProfileImage url={visitor?.photo_url} id={visitor.id} />
           <View>
             <Text type="semibold">
               {visitor.firstname} {visitor.middle_initial}
               {visitor.middle_initial !== null && " "}
               {visitor.lastname}
+              {" "}
             </Text>
             <Text type="secondary">
-              {"(+63) "}
-              {formatPHNumber(visitor.phone_number)}
+              {"(+63) " + formatPHNumber(visitor.phone_number)}
             </Text>
-            {visitor.verified && visitor.activated ? (
-              <Text
-                style={{
-                  color: colors.success
-                }}
-              >
-                Verified
-              </Text>
-            ) : (
-              <Text
-                style={{
-                  color: colors.danger
-                }}
-              >
-                Not Verified
-              </Text>
-            )}
+            <View style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              gap: 5
+            }}>
+              <Octicons name={visitor.verified && visitor.activated ? 'verified' : 'unverified'} size={12} color={visitor.verified && visitor.activated ? colors.primary : colors.textSecondary} />
+              <Text style={{
+                fontSize: 12,
+                color: visitor.verified && visitor.activated ? colors.primary : colors.textSecondary
+              }}>{visitor.verified && visitor.activated ? 'Account Verified' : 'Please submit your Valid ID'}</Text>
+            </View>
           </View>
         </View>
         <View
           style={{
             marginHorizontal: 20,
-            marginTop: 16
+            marginTop: 12
           }}
         >
           <View
@@ -156,6 +152,24 @@ export default function Settings() {
                   fontSize: 12
                 }}
               >
+                Address
+              </Text>
+              <Text
+                type="semibold"
+                style={{
+                  fontSize: 16
+                }}
+              >
+                {visitor.address ?? 'N/A'}
+              </Text>
+            </View>
+            <View>
+              <Text
+                type="secondary"
+                style={{
+                  fontSize: 12
+                }}
+              >
                 Email
               </Text>
               <Text
@@ -182,44 +196,56 @@ export default function Settings() {
                   fontSize: 16
                 }}
               >
-                {"(+63) "}
-                {formatPHNumber(visitor.phone_number)}
+                {"(+63) " + formatPHNumber(visitor.phone_number)}
+                {" "}
+                <Octicons name="verified" size={16} color={colors.success} />
               </Text>
             </View>
           </View>
 
-          <View
-            style={{
-              flexDirection: "row",
-              justifyContent: "space-between",
-              alignItems: "center",
-              marginTop: 20,
-              marginBottom: 10
-            }}
-          >
-            <Text
-              type="semibold"
-              style={{
-                fontSize: 18
-              }}
-            >
-              Valid ID ({visitor.valid_id_type})
-            </Text>
-            <Text type="link">Upload</Text>
+
+          <View style={{
+            flex: 1,
+            marginTop: 20
+          }}>
+            {visitor.valid_id_photo_url ? (
+                <Image
+                  style={{
+                    width: 280,
+                    height: 180,
+                    borderRadius: 12,
+                    borderWidth: 2,
+                    borderColor: colors.border
+                  }}
+                  contentFit="contain"
+                  source={{
+                    uri: visitor.valid_id_photo_url
+                  }}
+                />
+            ) : (
+              <TouchableOpacity
+                activeOpacity={0.7}
+                style={{
+                  width: 280,
+                  height: 180,
+                  borderRadius: 12,
+                  borderWidth: 2,
+                  borderColor: colors.border,
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  borderStyle: 'dotted',
+                  gap: 5
+                }}>
+                <Ionicons
+                  name="cloud-upload-outline"
+                  size={30}
+                  color={colors.textSecondary}
+                />
+                <Text type="secondary">Click here to upload your valid ID</Text>
+              </TouchableOpacity>
+            )}
+
           </View>
-          <Image
-            style={{
-              width: 280,
-              height: 180,
-              borderRadius: 12,
-              borderWidth: 2,
-              borderColor: colors.border
-            }}
-            contentFit="contain"
-            source={{
-              uri: visitor.valid_id_photo_url
-            }}
-          />
         </View>
       </ScrollView>
     </SafeAreaView>

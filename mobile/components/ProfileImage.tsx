@@ -67,7 +67,8 @@ export function ProfileImage({ url, id }: { url: string | null; id: string; }) {
 
                 showToast({
                     type: "success",
-                    text1: "Profile image updated successfully!"
+                    text1: "Account Updated",
+                    text2: data.message
                 });
             } catch (error) {
                 showToast({
@@ -118,8 +119,8 @@ export function ProfileImage({ url, id }: { url: string | null; id: string; }) {
                 ) : (
                     <Ionicons
                         name="cloud-upload-outline"
-                        size={14}
-                        color="black"
+                        size={12}
+                        color={colors.text}
                     />
                 )}
             </Button>

@@ -32,8 +32,8 @@ export function Button({
           alignSelf: 'flex-start',
           borderWidth: 1,
           borderColor: colors.border,
-          paddingVertical: 7.5,
-          paddingHorizontal: 15.5,
+          paddingVertical: 8,
+          paddingHorizontal: 16,
           borderRadius: 6
         } : null,
         variant === 'secondary' ? {

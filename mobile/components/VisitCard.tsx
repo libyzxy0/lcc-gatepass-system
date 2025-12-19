@@ -1,6 +1,7 @@
 import { Text, View } from "@/components"
 import Octicons from '@expo/vector-icons/Octicons';
 import { useColors } from '@/hooks/useColors'
+import { useRouter } from 'expo-router'
 import { TouchableOpacity } from 'react-native'
 import Ionicons from '@expo/vector-icons/Ionicons';
 
@@ -16,6 +17,7 @@ interface VisitorCard {
 }
 
 export function VisitCard({ id, purpose, description, visiting, secured, status, date, onDelete }: VisitorCard) {
+  const router = useRouter();
   const colors = useColors();
 
   const colorStatusMap = {
@@ -26,7 +28,8 @@ export function VisitCard({ id, purpose, description, visiting, secured, status,
 }
   return (
     <TouchableOpacity
-      delayLongPress={300}
+      onPress={() => router.push(`/gatepass/${id}`)}
+      delayLongPress={200}
       onLongPress={onDelete}
       activeOpacity={0.7}
       style={{

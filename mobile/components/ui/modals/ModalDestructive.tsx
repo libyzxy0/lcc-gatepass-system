@@ -24,7 +24,9 @@ export function ModalDestructive({ onConfirm, onClose, visible, title, descripti
   }
   return (
     <Modal onRequestClose={onClose} visible={visible}>
-      <ModalContent>
+      <ModalContent style={{
+        width: 200,
+      }}>
         <View>
           <View style={{
             alignItems: 'center',
@@ -35,7 +37,7 @@ export function ModalDestructive({ onConfirm, onClose, visible, title, descripti
               borderRadius: 100,
               marginBottom: 4
             }}>
-              <Ionicons name="warning-outline" size={28} color={"white"} />
+              <Ionicons name="warning-outline" size={24} color={"white"} />
             </View>
             <Text type={"bold"} style={{
               color: colors.danger,

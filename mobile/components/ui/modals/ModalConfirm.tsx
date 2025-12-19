@@ -34,7 +34,7 @@ export function ModalConfirm({ onConfirm, onClose, visible, title, description, 
               borderRadius: 100,
               marginBottom: 4
             }}>
-              <Ionicons name="checkmark-done-outline" size={28} color={"white"} />
+              <Ionicons name="checkmark-done-outline" size={24} color={"white"} />
             </View>
             <Text type={"bold"} style={{
               color: colors.primary,

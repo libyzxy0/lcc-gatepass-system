@@ -100,7 +100,7 @@ export default function Pin() {
           shadowRadius: 1,
           elevation: 5,
           borderWidth: 1,
-          borderColor: "#1925a370"
+          borderColor: colors.primary + '0A'
         }}>
           <Text style={{
             color: 'white'

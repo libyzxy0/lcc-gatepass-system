@@ -85,6 +85,7 @@ class VisitorController {
           firstname: visitor.firstname,
           lastname: visitor.lastname,
           middle_initial: visitor.middle_initial,
+          address: visitor.address,
           email: visitor.email,
           phone_number: visitor.phone_number,
           verified: visitor.verified,

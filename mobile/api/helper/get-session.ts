@@ -1,4 +1,4 @@
-import { api } from '../axios'
+import { api } from '@/api/axios'
 import { Alert } from 'react-native'
 
 type Visitor = {
@@ -14,6 +14,7 @@ type Visitor = {
   created_at: string;
   verified: boolean;
   activated: boolean;
+  address: string;
 }
 
 export const getVisitorSession = async (): Promise<Visitor | null> => {

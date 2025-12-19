@@ -20,13 +20,13 @@ export function CreateVisitFloatingButton({ onPress }: { onPress: () => void; })
         backgroundColor: colors.primary,
         alignItems: 'center',
         justifyContent: 'center',
-        shadowColor: colors.text,
+        shadowColor: colors.shadow,
         shadowOffset: { width: 0, height: 1 },
         shadowOpacity: 0.15,
         shadowRadius: 1,
         elevation: 5,
         borderWidth: 1,
-        borderColor: "#3343e670"
+        borderColor: colors.shadow + '0A'
       }}>
       <Octicons name="plus" size={26} color={'white'} />
     </TouchableOpacity>

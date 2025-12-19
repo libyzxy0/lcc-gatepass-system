@@ -109,6 +109,10 @@ function RootLayoutNav() {
               options={{ headerShown: false, animation: "fade" }}
             />
             <Stack.Screen
+              name="gatepass/[visitId]"
+              options={{ headerShown: false, animation: "slide_from_right" }}
+            />
+            <Stack.Screen
               name="otp"
               options={{ headerShown: false, animation: "fade" }}
             />

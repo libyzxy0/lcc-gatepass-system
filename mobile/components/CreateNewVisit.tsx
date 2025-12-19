@@ -265,10 +265,10 @@ export function CreateNewVisit({
           }}>
 
             <BouncyCheckbox
-              iconComponent={<Octicons name={'shield-check'} size={12} color={'#ffffff'} />}
+              iconComponent={state.secured && <Octicons name={'shield-check'} size={12} color={colors.text} />}
               size={20}
               fillColor={colors.success}
-              unFillColor="#FFFFFF"
+              unFillColor={colors.card}
               text="Enable Secured Pass"
               innerIconStyle={{ borderWidth: 1 }}
               disableText={true}

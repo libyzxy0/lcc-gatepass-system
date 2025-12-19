@@ -15,7 +15,7 @@ type EditProfileProps = {
 }
 
 type ActionType = {
-  type: 'email_change' | 'mi_change' | 'firstname_change' | 'lastname_change';
+  type: 'email_change' | 'mi_change' | 'firstname_change' | 'lastname_change' | 'address_change';
   value: string | null;
 }
 type StateType = {
@@ -51,6 +51,12 @@ function reducer(state: StateType, action: ActionType) {
         middle_initial: action.value
       };
     }
+    case "address_change": {
+      return {
+        ...state,
+        address: action.value
+      };
+    }
   }
   throw Error("Unknown action: " + action.type);
 }
@@ -62,7 +68,8 @@ export function EditProfile({ onClose, visible, visitor }: EditProfileProps) {
     email: visitor.email,
     firstname: visitor.firstname,
     lastname: visitor.lastname,
-    middle_initial: visitor.middle_initial
+    middle_initial: visitor.middle_initial,
+    address: visitor.address
   });
 
   const handleUpdateAccount = async () => {
@@ -170,6 +177,25 @@ export function EditProfile({ onClose, visible, visitor }: EditProfileProps) {
               }
               value={state.middle_initial ?? undefined}
               placeholder="Enter your middle initial"
+            />
+          </View>
+          <View style={{
+            gap: 2
+          }}>
+            <Text style={{
+              fontSize: 12
+            }}>Address</Text>
+            <Input
+              onChangeText={value =>
+                dispatch({
+                  type: "address_change",
+                  value
+                })
+              }
+              multiline
+              numberOfLines={4}
+              value={state.address ?? undefined}
+              placeholder="Enter your current address"
             />
           </View>
           <View style={{

@@ -43,6 +43,7 @@ export default function Main() {
                         value: null
                     });
                 }}
+                description={'Are you sure that you want to delete this gatepass? This will revoke your gatepass!'}
                 onClose={() =>
                     showDeleteModal({
                         state: false,

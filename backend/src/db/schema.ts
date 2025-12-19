@@ -69,6 +69,7 @@ export const visitor = pgTable("visitor", {
   firstname: text("firstname").notNull(),
   lastname: text("lastname").notNull(),
   middle_initial: text("middle_initial"),
+  address: text("address"),
   email: text("email").notNull().unique(),
   phone_number: text("phone_number").notNull(),
   pin: text("pin").notNull(),
