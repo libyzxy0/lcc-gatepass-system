@@ -1,0 +1,32 @@
+import { api } from '@/api/axios';
+
+export const uploadImage = async (uri: string) => {
+  try {
+    const formData = new FormData();
+
+    formData.append('file', {
+      uri,
+      name: `image-${Date.now()}.jpg`,
+      type: 'image/jpeg',
+    } as any);
+
+    const response = await api.post(
+      '/upload/imagekit',
+      formData,
+      {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          Accept: 'application/json',
+        },
+      }
+    );
+    
+    if(!response.data) throw new Error("Failed to upload ):");
+
+    return response.data;
+
+  } catch (error: any) {
+    console.error(error);
+    throw error;
+  }
+};

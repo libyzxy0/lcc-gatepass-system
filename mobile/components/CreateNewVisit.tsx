@@ -6,7 +6,7 @@ import { ActivityIndicator, Switch } from 'react-native'
 import RNDateTimePicker, { type DateTimePickerEvent } from '@react-native-community/datetimepicker';
 import BouncyCheckbox from "react-native-bouncy-checkbox";
 import Octicons from '@expo/vector-icons/Octicons';
-import { createVisit } from '@/api/helper/create-visit'
+import { createVisit } from '@/api/helper/visits'
 
 type CreateNewVisit = {
   visible: boolean;
@@ -171,7 +171,7 @@ export function CreateNewVisit({
         }}>
           <Text type="bold" style={{
             fontSize: 20
-          }}>Create Visit</Text>
+          }}>Request Visit</Text>
           <Button variant="icon" onPress={handleClose}>
             <Ionicons name="close-outline" size={22} color={colors.text} />
           </Button>

@@ -37,6 +37,8 @@
     "eslint": "^9.39.2",
     "express-rate-limit": "^8.2.1",
     "globals": "^15.6.0",
+    "imagekit": "^6.0.0",
+    "multer": "^2.0.2",
     "prettier": "3.3.2",
     "tsconfig-paths": "^4.2.0",
     "typescript": "^5.4.5",
@@ -53,13 +55,11 @@
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "drizzle-orm": "^0.31.2",
-    "drizzle-seed": "^0.3.1",
     "express": "^4.19.2",
     "jsonwebtoken": "^9.0.2",
     "postgres": "^3.4.7",
     "tsc-alias": "^1.8.16",
     "tsx": "^4.15.7",
     "vitest": "^1.6.0"
-  },
-  "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e"
+  }
 }

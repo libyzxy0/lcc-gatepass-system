@@ -18,5 +18,6 @@ router.post("/me/update", visitor_auth, controller.updateAccount);
 router.post("/me/check", controller.checkPhoneNumber);
 router.post("/me/create-visit", visitor_auth, controller.createVisit);
 router.get("/me/visits", visitor_auth, controller.visits);
+router.delete("/me/delete-visit/:id", visitor_auth, controller.deleteVisit);
 
 export default router;

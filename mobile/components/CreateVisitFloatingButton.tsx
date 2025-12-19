@@ -11,8 +11,8 @@ export function CreateVisitFloatingButton({ onPress }: { onPress: () => void; })
       style={{
         flex: 1,
         position: 'absolute',
-        bottom: 30,
-        right: 15,
+        bottom: 25,
+        right: 10,
         zIndex: 90,
         height: 54,
         width: 54,

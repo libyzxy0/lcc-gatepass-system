@@ -106,11 +106,11 @@ class VisitorController {
       return res.status(401).json({ error: "Failed to get session, please authenticate first" });
     }
   }
-  
+
   async createVisit(req: VisitorRequest, res: Response) {
     try {
       const { purpose, description, visiting, date, secured } = req.body;
-      
+
       await db.insert(visit).values({
         visitor_id: req.visitor.id,
         purpose,
@@ -119,25 +119,47 @@ class VisitorController {
         schedule_date: date,
         secured
       });
-      
+
       return res.status(200).json({
         message: 'Visit request has been sent to Administrators!'
       })
-      
+
     } catch (error) {
       console.error("[ERROR CREATE VISIT]:", error);
       return res.status(500).json({ error: "Failed to create visit, something went wrong!" });
     }
   }
-  
+
   async visits(req: VisitorRequest, res: Response) {
     try {
       const visits: Visits[] = await db.select().from(visit).where(eq(visit.visitor_id, req.visitor.id)).orderBy(desc(visit.created_at))
-      
+
       return res.status(200).json(visits);
     } catch (error) {
       console.error("[ERROR GET VISIT]:", error);
       return res.status(500).json({ error: "Failed to create visit, something went wrong!" });
+    }
+  }
+
+  async deleteVisit(req: Request, res: Response) {
+    try {
+      const { id } = req.params;
+
+      const visitData = await db.select().from(visit).where(eq(visit.id, id));
+
+      if (visitData.length === 0) {
+        return res.status(404).json({
+          error: "No visit associated with that ID"
+        })
+      }
+      await db.delete(visit)
+        .where(eq(visit.id, visitData[0].id));
+      res.status(200).json({ message: "Your gatepass has been deleted succesfully!" })
+    } catch (error) {
+      console.error("[ERROR VISITOR CONTROLLER]:", error);
+      res.status(500).json({
+        error: "Failed to delete gatepass, something went wrong!"
+      })
     }
   }
 
@@ -170,7 +192,7 @@ class VisitorController {
       })
     }
   }
-  
+
   async checkPhoneNumber(req: Request, res: Response) {
     try {
       const { phone_number } = req.body;
@@ -194,7 +216,7 @@ class VisitorController {
       })
     }
   }
-  
+
   async getVisitor(req: Request, res: Response) {
     try {
       const { id } = req.body;
@@ -212,7 +234,7 @@ class VisitorController {
       })
     }
   }
-  
+
   async getVisitors(req: Request, res: Response) {
     const visitors = await db.select().from(visitor);
     if (visitors.length <= 0) {

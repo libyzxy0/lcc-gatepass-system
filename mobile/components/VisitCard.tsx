@@ -12,9 +12,10 @@ interface VisitorCard {
   secured: boolean;
   status: 'pending' | 'approved' | 'rejected';
   date: string;
+  onDelete: () => void;
 }
 
-export function VisitCard({ id, purpose, description, visiting, secured, status, date }: VisitorCard) {
+export function VisitCard({ id, purpose, description, visiting, secured, status, date, onDelete }: VisitorCard) {
   const colors = useColors();
 
   const colorStatusMap = {
@@ -25,6 +26,8 @@ export function VisitCard({ id, purpose, description, visiting, secured, status,
 }
   return (
     <TouchableOpacity
+      delayLongPress={300}
+      onLongPress={onDelete}
       activeOpacity={0.7}
       style={{
         backgroundColor: colors.card,
