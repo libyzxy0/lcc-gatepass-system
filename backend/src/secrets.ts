@@ -8,6 +8,8 @@ export const CLOUDFLARE_TURNSTILE_SECRET = process.env.CLOUDFLARE_TURNSTILE_SECR
 export const SMS_API_TOKEN = process.env.SMS_API_TOKEN!;
 export const IMAGEKIT_PUBLIC_KEY = process.env.IMAGEKIT_PUBLIC_KEY!;
 export const IMAGEKIT_PRIVATE_KEY = process.env.IMAGEKIT_PRIVATE_KEY!;
+export const MQTT_BRIDGE = process.env.MQTT_BRIDGE!;
+export const MQTT_BRIDGE_SECRET = process.env.MQTT_BRIDGE_SECRET!;
 
 if(!JWT_ACCESS_SECRET) {
   throw new Error("JWT_ACCESS_SECRET cannot be found on Environment Variables")
@@ -32,4 +34,10 @@ if(!IMAGEKIT_PUBLIC_KEY) {
 }
 if(!IMAGEKIT_PRIVATE_KEY) {
   throw new Error("IMAGEKIT_PRIVATE_KEY cannot be found on Environment Variables")
+}
+if(!MQTT_BRIDGE) {
+  throw new Error("MQTT_BRIDGE cannot be found on Environment Variables")
+}
+if(!MQTT_BRIDGE_SECRET) {
+  throw new Error("MQTT_BRIDGE_SECRET cannot be found on Environment Variables")
 }
