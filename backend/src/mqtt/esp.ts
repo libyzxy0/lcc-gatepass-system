@@ -1,4 +1,4 @@
-import { client } from './client';
+import { client } from '@/mqtt/client';
 
 client.on('connect', function () {
     console.log('Connected to MQTT Broker!');
