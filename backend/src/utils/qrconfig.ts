@@ -21,9 +21,9 @@ export const config = {
             bottomLeft: "body"
         },
         eyeball: {
-            topLeft: "rgb(9, 91, 241)",
-            topRight: "rgb(9, 91, 241)",
-            bottomLeft: "rgb(9, 91, 241)"
+            topLeft: "rgb(37,99,235)",
+            topRight: "rgb(235,143,37)",
+            bottomLeft: "rgb(95,228,112)"
         }
     }
 }
