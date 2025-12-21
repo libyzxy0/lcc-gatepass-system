@@ -5,7 +5,6 @@ import notFound from "@/middlewares/not-found";
 import { initializeRoutes } from "@/routes";
 import cookieParser from "cookie-parser";
 import cors from "cors";
-import '@/mqtt/esp';
 
 /*
 * Comment for now, tanginang CloudFlare Turnstile
