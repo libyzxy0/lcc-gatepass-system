@@ -134,7 +134,7 @@ function RootLayoutNav() {
             </Stack.Protected>
 
             <Stack.Screen
-              name="new/[phonenum]"
+              name="register/[phonenum]"
               options={{ headerShown: false, animation: "fade" }}
             />
           </Stack.Protected>

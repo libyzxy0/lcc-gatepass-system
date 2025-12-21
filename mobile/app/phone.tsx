@@ -16,6 +16,7 @@ import React, { useState, useRef } from "react";
 import { checkNumber } from '@/api/helper/check-num'
 import { useRouter } from 'expo-router'
 import { normalize, isValidPHPhoneNumber } from '@/utils/format-ph-number'
+import { useColorScheme } from "@/hooks/useColorScheme";
 
 export default function PhonePage() {
   const router = useRouter();
@@ -60,7 +61,7 @@ export default function PhonePage() {
       if (isValidNumber.valid) {
         setPhoneNumber(phone);
       } else {
-        router.push(`/new/${phone}`);
+        router.push(`/register/${phone}`);
       }
 
     } catch (error: any) {
@@ -78,7 +79,7 @@ export default function PhonePage() {
     <SafeAreaView>
       <View
         style={{
-          marginTop: 30,
+          marginTop: 20,
           alignItems: "center",
           gap: 20
         }}
@@ -90,6 +91,7 @@ export default function PhonePage() {
             height: 100
           }}
           contentFit="contain"
+          tintColor={useColorScheme() === "dark" && 'white'}
         />
 
         <Text type="bold">Enter Mobile Number</Text>

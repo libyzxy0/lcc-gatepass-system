@@ -8,5 +8,6 @@ const router = Router();
 router.post("/rfid", espController.rfid);
 router.post("/qr", espController.qr);
 router.get("/config", espController.config);
+router.post("/event", espController.handleEvent);
 
 export default router;

@@ -8,14 +8,15 @@ import { Image } from "expo-image";
 import { EditProfile } from "@/components/EditProfile";
 import { formatPHNumber } from "@/utils/format-ph-number";
 import { ProfileImage } from "@/components/ProfileImage";
+import { ProfileValidId } from "@/components/ProfileValidId";
 import Octicons from '@expo/vector-icons/Octicons';
-import Ionicons from "@expo/vector-icons/Ionicons";
-import { TouchableOpacity } from 'react-native'
 
 export default function Settings() {
   const colors = useColors();
   const { logout, accessToken, visitor } = useAuthStore();
   const [editProfile, showEditProfile] = useState(false);
+  
+  if(!visitor) return <Text>Something went wrong! Imissyou Renelyn -_^</Text>;
 
   return (
     <SafeAreaView>
@@ -23,7 +24,6 @@ export default function Settings() {
       <EditProfile
         visible={editProfile}
         onClose={() => showEditProfile(false)}
-        visitor={visitor}
       />
       <ScrollView
         showsVerticalScrollIndicator={false}
@@ -202,50 +202,9 @@ export default function Settings() {
               </Text>
             </View>
           </View>
-
-
-          <View style={{
-            flex: 1,
-            marginTop: 20
-          }}>
-            {visitor.valid_id_photo_url ? (
-                <Image
-                  style={{
-                    width: 280,
-                    height: 180,
-                    borderRadius: 12,
-                    borderWidth: 2,
-                    borderColor: colors.border
-                  }}
-                  contentFit="contain"
-                  source={{
-                    uri: visitor.valid_id_photo_url
-                  }}
-                />
-            ) : (
-              <TouchableOpacity
-                activeOpacity={0.7}
-                style={{
-                  width: 280,
-                  height: 180,
-                  borderRadius: 12,
-                  borderWidth: 2,
-                  borderColor: colors.border,
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  borderStyle: 'dotted',
-                  gap: 5
-                }}>
-                <Ionicons
-                  name="cloud-upload-outline"
-                  size={30}
-                  color={colors.textSecondary}
-                />
-                <Text type="secondary">Click here to upload your valid ID</Text>
-              </TouchableOpacity>
-            )}
-
-          </View>
+          
+          <ProfileValidId />
+          
         </View>
       </ScrollView>
     </SafeAreaView>

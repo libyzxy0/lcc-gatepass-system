@@ -3,6 +3,7 @@ import { Image } from 'expo-image'
 import { useColors } from '@/hooks/useColors'
 import logo from "@/assets/images/icon.png";
 import { ActivityIndicator } from 'react-native'
+import { useColorScheme } from "@/hooks/useColorScheme";
 export default function SplashLoading() {
   const colors = useColors()
   return (
@@ -15,8 +16,9 @@ export default function SplashLoading() {
       }}>
         <Image
           source={logo}
-          style={{ width: 300, height: 120 }}
+          style={{ width: 200, height: 200 }}
           contentFit="cover"
+          tintColor={useColorScheme() === "dark" && 'white'}
         />
         <View style={{
           marginTop: 20

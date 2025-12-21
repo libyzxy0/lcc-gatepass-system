@@ -2,7 +2,6 @@ import React, { useState } from 'react'
 import { Text, View, Modal, ModalContent, Input, Button, showToast } from '@/components';
 import { useColors } from '@/hooks/useColors'
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { Visitor } from '@/types/visitor'
 import { useReducer } from 'react'
 import { updateVisitor } from '@/api/helper/update-account'
 import { useAuthStore } from "@/utils/auth-store";
@@ -11,13 +10,13 @@ import { ActivityIndicator } from 'react-native'
 type EditProfileProps = {
   onClose?: () => void;
   visible: boolean;
-  visitor: Visitor;
 }
 
 type ActionType = {
   type: 'email_change' | 'mi_change' | 'firstname_change' | 'lastname_change' | 'address_change';
   value: string | null;
 }
+
 type StateType = {
   firstname: string;
   lastname: string;
@@ -61,9 +60,9 @@ function reducer(state: StateType, action: ActionType) {
   throw Error("Unknown action: " + action.type);
 }
 
-export function EditProfile({ onClose, visible, visitor }: EditProfileProps) {
+export function EditProfile({ onClose, visible }: EditProfileProps) {
   const [loading, setLoading] = useState(false);
-  const { getSession } = useAuthStore();
+  const { visitor, getSession } = useAuthStore();
   const [state, dispatch] = useReducer(reducer, {
     email: visitor.email,
     firstname: visitor.firstname,

@@ -8,6 +8,7 @@ import logo from "@/assets/images/logo.png";
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { ModalDestructive } from '@/components/ui/modals/ModalDestructive'
 import { useRouter } from 'expo-router'
+import { useColorScheme } from "@/hooks/useColorScheme";
 
 export function Header() {
   const colors = useColors();
@@ -39,6 +40,7 @@ export function Header() {
             height: 45
           }}
           contentFit="fill"
+          tintColor={useColorScheme() === "dark" && 'white'}
         />
         <TouchableOpacity onPress={() => setShowLogout(true)} activeOpacity={0.6}>
           <Ionicons name="exit-outline" size={24} color={colors.text} />
@@ -48,7 +50,7 @@ export function Header() {
   )
 }
 
-export function HeaderNav({ label }: { label: string; }) {
+export function HeaderNav({ label, ActionComponent }: { label: string; ActionComponent: React.ReactNode; }) {
   const colors = useColors();
   const router = useRouter();
   return (
@@ -57,12 +59,24 @@ export function HeaderNav({ label }: { label: string; }) {
       paddingVertical: 12,
       flexDirection: 'row',
       alignItems: 'center',
-      gap: 6
+      justifyContent: 'space-between'
     }}>
-      <Button variant={'icon'} onPress={() => router.back()}>
-        <Ionicons name="chevron-back" size={24} color={colors.text} />
-      </Button>
-      <Text type="semibold">{label}</Text>
+      <View style={{
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 6
+      }}>
+        <Button variant={'icon'} onPress={() => router.back()}>
+          <Ionicons name="chevron-back" size={24} color={colors.text} />
+        </Button>
+        <Text type="semibold">{label}</Text>
+      </View>
+      
+      <View style={{
+        marginRight: 6
+      }}>
+        {ActionComponent}
+      </View>
     </View>
   )
 }

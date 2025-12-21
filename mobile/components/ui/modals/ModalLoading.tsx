@@ -12,7 +12,7 @@ export function ModalLoading({ visible }: ModalConfirmProps) {
   return (
     <Modal visible={visible}>
       <ModalContent style={{
-        borderRadius: 0,
+        borderRadius: 6,
       }}>
         <View style={{
           flexDirection: 'row',

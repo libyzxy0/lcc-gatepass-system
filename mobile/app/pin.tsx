@@ -10,6 +10,7 @@ import { useAuthStore } from "@/utils/auth-store";
 import { ModalConfirm } from '@/components/ui/modals/ModalConfirm'
 import { ModalLoading } from '@/components/ui/modals/ModalLoading'
 import { formatPHNumber } from '@/utils/format-ph-number'
+import { useColorScheme } from "@/hooks/useColorScheme";
 
 export default function Pin() {
   const [pin, setPin] = useState<string[]>([]);
@@ -58,7 +59,7 @@ export default function Pin() {
           source={logo}
           style={{ width: 250, height: 100 }}
           contentFit="contain"
-          tintColor={"white"}
+          tintColor={'white'}
         />
         <Text type="bold" style={{
           color: "white",
@@ -94,13 +95,13 @@ export default function Pin() {
           flexDirection: 'row',
           alignItems: 'center',
           gap: 5,
-          shadowColor: colors.text,
+          shadowColor: colors.primary + '5A',
           shadowOffset: { width: 0, height: 1 },
           shadowOpacity: 0.25,
           shadowRadius: 1,
           elevation: 5,
           borderWidth: 1,
-          borderColor: colors.primary + '0A'
+          borderColor: useColorScheme() === "dark" ? colors.border : colors.backgroundPinScreen
         }}>
           <Text style={{
             color: 'white'

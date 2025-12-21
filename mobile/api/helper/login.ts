@@ -1,4 +1,4 @@
-import { api } from '../axios'
+import { api } from '@/api/axios'
 import { normalize } from '@/utils/format-ph-number'
 
 export const visitorLogin = async (phone_number: string, pin: string): Promise<{ access_token: boolean; } | null> => {

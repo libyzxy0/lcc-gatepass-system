@@ -1,4 +1,4 @@
-import { api } from '../axios'
+import { api } from '@/api/axios'
 
 type UpdateVisitor = {
   firstname: string;
@@ -29,6 +29,7 @@ export const updateVisitor = async ({ id, fields }: { id: string; fields: Update
       ...response.data
     };
   } catch (error) {
+    console.error('Failed to update visitor information!')
     return {
       error: error.response ? error.response.data.error : error.message
     };

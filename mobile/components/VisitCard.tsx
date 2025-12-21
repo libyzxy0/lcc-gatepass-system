@@ -25,7 +25,7 @@ export function VisitCard({ id, purpose, description, visiting, secured, status,
     'approved': colors.success,
     'completed': colors.primary,
     'rejected': colors.danger
-}
+  }
   return (
     <TouchableOpacity
       onPress={() => router.push(`/gatepass/${id}`)}
@@ -55,14 +55,6 @@ export function VisitCard({ id, purpose, description, visiting, secured, status,
       <Text type="secondary" style={{ fontSize: 12 }}>
         “{description}”
       </Text>
-      <View style={{
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 5
-      }}>
-      <Ionicons name="calendar-outline" size={12} color={colors.warning} />
-      <Text style={{ fontSize: 12, color: colors.warning }} type="italic">{(new Date(date)).toDateString()}</Text>
-      </View>
 
       <View style={{
         flexDirection: 'row-reverse',
@@ -70,46 +62,23 @@ export function VisitCard({ id, purpose, description, visiting, secured, status,
         alignItems: 'center',
         marginTop: 2
       }}>
-        <View style={{
-          flexDirection: 'row',
-          alignItems: 'center',
-          gap: 5
-        }}>
-          <Text style={{ fontSize: 14, color: colors.primary }}>
-            {visiting}
-          </Text>
-          <View style={{
-            width: 1,
-            height: 10,
-            backgroundColor: colors.border
-          }} />
+  
           <Text style={{ fontSize: 14, color: colorStatusMap[status] }}>
             {`${status[0].toUpperCase()}${status.slice(1)}`}
           </Text>
-        </View>
+  
 
         <View style={{
           flexDirection: 'row',
           alignItems: 'center',
           gap: 5
         }}>
-          {secured ? (
-            <>
-              <Octicons name="shield-check" size={16} color={colors.success} />
-              <Text style={{
-                fontSize: 14,
-                color: colors.success
-              }}>Secured Pass</Text>
-            </>
-          ) : (
-            <>
-              <Octicons name="shield-slash" size={16} color={colors.gray} />
-              <Text style={{
-                fontSize: 14,
-                color: colors.gray
-              }}>Printable Pass</Text>
-            </>
-          )}
+          <Octicons name="shield-check" size={14} color={colors.badges.pink} />
+          <Text style={{
+            fontSize: 14,
+            color: colors.badges.pink
+          }}>Parent Pass</Text>
+
         </View>
       </View>
     </TouchableOpacity>
