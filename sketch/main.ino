@@ -1,5 +1,6 @@
 #include <WiFi.h>
 #include <WiFiClientSecure.h>
+#include <PubSubClient.h>
 #include <ArduinoJson.h>
 #include <SPI.h>
 #include <MFRC522.h>
@@ -18,45 +19,55 @@
 
 const char* ssid = "OrangeCat";
 const char* password = "myorange32";
-const char* SERVER_HOST = "api.lccgatepass.xyz";
 
+const char* mqtt_server   = "37638f32d99b49fa968d88c783e2b03a.s1.eu.hivemq.cloud";
+const int   mqtt_port     = 8883;
+const char* mqtt_user     = "libyzxy0";
+const char* mqtt_password = "Libyzxy0@123_esp32";
+const char* client_id     = "esp_gate01";
+
+const char* ca_cert = R"EOF(
+-----BEGIN CERTIFICATE-----
+MIIFazCCA1OgAwIBAgIRAIIQz7DSQONZRGPgu2OCiwAwDQYJKoZIhvcNAQELBQAw
+TzELMAkGA1UEBhMCVVMxKTAnBgNVBAoTIEludGVybmV0IFNlY3VyaXR5IFJlc2Vh
+cmNoIEdyb3VwMRUwEwYDVQQDEwxJU1JHIFJvb3QgWDEwHhcNMTUwNjA0MTEwNDM4
+WhcNMzUwNjA0MTEwNDM4WjBPMQswCQYDVQQGEwJVUzEpMCcGA1UEChMgSW50ZXJu
+ZXQgU2VjdXJpdHkgUmVzZWFyY2ggR3JvdXAxFTATBgNVBAMTDElTUkcgUm9vdCBY
+MTCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBAK3oJHP0FDfzm54rVygc
+h77ct984kIxuPOZXoHj3dcKi/vVqbvYATyjb3miGbESTtrFj/RQSa78f0uoxmyF+
+0TM8ukj13Xnfs7j/EvEhmkvBioZxaUpmZmyPfjxwv60pIgbz5MDmgK7iS4+3mX6U
+A5/TR5d8mUgjU+g4rk8Kb4Mu0UlXjIB0ttov0DiNewNwIRt18jA8+o+u3dpjq+sW
+T8KOEUt+zwvo/7V3LvSye0rgTBIlDHCNAymg4VMk7BPZ7hm/ELNKjD+Jo2FR3qyH
+B5T0Y3HsLuJvW5iB4YlcNHlsdu87kGJ55tukmi8mxdAQ4Q7e2RCOFvu396j3x+UC
+B5iPNgiV5+I3lg02dZ77DnKxHZu8A/lJBdiB3QW0KtZB6awBdpUKD9jf1b0SHzUv
+KBds0pjBqAlkd25HN7rOrFleaJ1/ctaJxQZBKT5ZPt0m9STJEadao0xAH0ahmbWn
+OlFuhjuefXKnEgV4We0+UXgVCwOPjdAvBbI+e0ocS3MFEvzG6uBQE3xDk3SzynTn
+jh8BCNAw1FtxNrQHusEwMFxIt4I7mKZ9YIqioymCzLq9gwQbooMDQaHWBfEbwrbw
+qHyGO0aoSCqI3Haadr8faqU9GY/rOPNk3sgrDQoo//fb4hVC1CLQJ13hef4Y53CI
+rU7m2Ys6xt0nUW7/vGT1M0NPAgMBAAGjQjBAMA4GA1UdDwEB/wQEAwIBBjAPBgNV
+HRMBAf8EBTADAQH/MB0GA1UdDgQWBBR5tFnme7bl5AFzgAiIyBpY9umbbjANBgkq
+hkiG9w0BAQsFAAOCAgEAVR9YqbyyqFDQDLHYGmkgJykIrGF1XIpu+ILlaS/V9lZL
+ubhzEFnTIZd+50xx+7LSYK05qAvqFyFWhfFQDlnrzuBZ6brJFe+GnY+EgPbk6ZGQ
+3BebYhtF8GaV0nxvwuo77x/Py9auJ/GpsMiu/X1+mvoiBOv/2X/qkSsisRcOj/KK
+NFtY2PwByVS5uCbMiogziUwthDyC3+6WVwW6LLv3xLfHTjuCvjHIInNzktHCgKQ5
+ORAzI4JMPJ+GslWYHb4phowim57iaztXOoJwTdwJx4nLCgdNbOhdjsnvzqvHu7Ur
+TkXWStAmzOVyyghqpZXjFaH3pO3JLF+l+/+sKAIuvtd7u+Nxe5AW0wdeRlN8NwdC
+jNPElpzVmbUq4JUagEiuTDkHzsxHpFKVK7q4+63SM1N95R1NbdWhscdCb+ZAJzVc
+oyi3B43njTOQ5yOf+1CceWxG1bQVs5ZufpsMljq4Ui0/1lvh+wjChP4kqKOJ2qxq
+4RgqsahDYVvTH9w7jXbyLeiNdd8XM2w9U/t7y0Ff/9yi0GE44Za4rF2LN9d11TPA
+mRGunUHBcnWEvgJBQl9nJEiU0Zsnvgc/ubhPgXRR4Xq37Z0j4r7g1SgEEzwxA57d
+emyPxgcYxn/eR44/KJ4EBs+lVDR3veyJm+kXQ99b21/+jh5Xos1AnX5iItreGCc=
+-----END CERTIFICATE-----
+)EOF";
+
+WiFiClientSecure secureClient;
+PubSubClient mqtt(secureClient);
 MFRC522 rfid(SS_PIN, RST_PIN);
 HardwareSerial QRScanner(2);
 
 char qrBuffer[MAX_SCAN_LENGTH];
 uint8_t qrIndex = 0;
 unsigned long lastQrCharTime = 0;
-
-const char* rootCACert = \
-"-----BEGIN CERTIFICATE-----\n"
-"MIIFBjCCAu6gAwIBAgIRAMISMktwqbSRcdxA9+KFJjwwDQYJKoZIhvcNAQELBQAw\n"
-"TzELMAkGA1UEBhMCVVMxKTAnBgNVBAoTIEludGVybmV0IFNlY3VyaXR5IFJlc2Vh\n"
-"cmNoIEdyb3VwMRUwEwYDVQQDEwxJU1JHIFJvb3QgWDEwHhcNMjQwMzEzMDAwMDAw\n"
-"WhcNMjcwMzEyMjM1OTU5WjAzMQswCQYDVQQGEwJVUzEWMBQGA1UEChMNTGV0J3Mg\n"
-"RW5jcnlwdDEMMAoGA1UEAxMDUjEyMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIB\n"
-"CgKCAQEA2pgodK2+lP474B7i5Ut1qywSf+2nAzJ+Npfs6DGPpRONC5kuHs0BUT1M\n"
-"5ShuCVUxqqUiXXL0LQfCTUA83wEjuXg39RplMjTmhnGdBO+ECFu9AhqZ66YBAJpz\n"
-"kG2Pogeg0JfT2kVhgTU9FPnEwF9q3AuWGrCf4yrqvSrWmMebcas7dA8827JgvlpL\n"
-"Thjp2ypzXIlhZZ7+7Tymy05v5J75AEaz/xlNKmOzjmbGGIVwx1Blbzt05UiDDwhY\n"
-"XS0jnV6j/ujbAKHS9OMZTfLuevYnnuXNnC2i8n+cF63vEzc50bTILEHWhsDp7CH4\n"
-"WRt/uTp8n1wBnWIEwii9Cq08yhDsGwIDAQABo4H4MIH1MA4GA1UdDwEB/wQEAwIB\n"
-"hjAdBgNVHSUEFjAUBggrBgEFBQcDAgYIKwYBBQUHAwEwEgYDVR0TAQH/BAgwBgEB\n"
-"/wIBADAdBgNVHQ4EFgQUALUp8i2ObzHom0yteD763OkM0dIwHwYDVR0jBBgwFoAU\n"
-"ebRZ5nu25eQBc4AIiMgaWPbpm24wMgYIKwYBBQUHAQEEJjAkMCIGCCsGAQUFBzAC\n"
-"hhZodHRwOi8veDEuaS5sZW5jci5vcmcvMBMGA1UdIAQMMAowCAYGZ4EMAQIBMCcG\n"
-"A1UdHwQgMB4wHKAaoBiGFmh0dHA6Ly94MS5jLmxlbmNyLm9yZy8wDQYJKoZIhvcN\n"
-"AQELBQADggIBAI910AnPanZIZTKS3rVEyIV29BWEjAK/duuz8eL5boSoVpHhkkv3\n"
-"4eoAeEiPdZLj5EZ7G2ArIK+gzhTlRQ1q4FKGpPPaFBSpqV/xbUb5UlAXQOnkHn3m\n"
-"FVj+qYv87/WeY+Bm4sN3Ox8BhyaU7UAQ3LeZ7N1X01xxQe4wIAAE3JVLUCiHmZL+\n"
-"qoCUtgYIFPgcg350QMUIWgxPXNGEncT921ne7nluI02V8pLUmClqXOsCwULw+PVO\n"
-"ZCB7qOMxxMBoCUeL2Ll4oMpOSr5pJCpLN3tRA2s6P1KLs9TSrVhOk+7LX28NMUlI\n"
-"usQ/nxLJID0RhAeFtPjyOCOscQBA53+NRjSCak7P4A5jX7ppmkcJECL+S0i3kXVU\n"
-"y5Me5BbrU8973jZNv/ax6+ZK6TM8jWmimL6of6OrX7ZU6E2WqazzsFrLG3o2kySb\n"
-"zlhSgJ81Cl4tv3SbYiYXnJExKQvzf83DYotox3f0fwv7xln1A2ZLplCb0O+l/AK0\n"
-"YE0DS2FPxSAHi0iwMfW2nNHJrXcY3LLHD77gRgje4Eveubi2xxa+Nmk/hmhLdIET\n"
-"iVDFanoCrMVIpQ59XWHkzdFmoHXHBV7oibVjGSO7ULSQ7MJ1Nz51phuDJSgAIU7A\n"
-"0zrLnOrAj/dfrlEWRhCvAgbuwLZX1A2sjNjXoPOHbsPiy+lO1KF8/XY7\n"
-"-----END CERTIFICATE-----\n";
 
 class JsonUtil {
   public:
@@ -123,84 +134,6 @@ class JsonUtil {
     return doc[key].as < float > ();
   }
 };
-class HttpUtil {
-  private:
-  const char* host;
-  int port;
-  bool debug;
-  const char* rootCACert;
-
-  public:
-  HttpUtil(const char* _host, const char* _rootCACert, int _port = 443, bool _debug = true): host(_host),
-  port(_port),
-  rootCACert(_rootCACert),
-  debug(_debug) {}
-
-  String get(const String& path) {
-    return request("GET", path, "");
-  }
-
-  String post(const String& path, const String& body, const String& contentType = "application/json") {
-    return request("POST", path, body, contentType);
-  }
-
-  private:
-  String request(const String& method, const String& path, const String& body = "", const String& contentType = "") {
-    WiFiClientSecure client;
-    client.setCACert(rootCACert);
-
-    if (!client.connect(host, port)) {
-      if (debug) Serial.printf("Connection to %s failed\n", host);
-      return "";
-    }
-
-    client.printf("%s %s HTTP/1.1\r\n", method.c_str(), path.c_str());
-    client.printf("Host: %s\r\n", host);
-    if (method == "POST") {
-      client.printf("Content-Type: %s\r\n", contentType.c_str());
-      client.printf("Content-Length: %d\r\n", body.length());
-    }
-    client.print("Connection: close\r\n\r\n");
-
-    if (method == "POST") client.print(body);
-
-    String response;
-    unsigned long timeout = millis();
-    while (client.connected() && millis() - timeout < 5000) {
-      while (client.available()) {
-        response += char(client.read());
-        timeout = millis();
-      }
-    }
-
-    client.stop();
-
-    int bodyIndex = response.indexOf("\r\n\r\n");
-    String headers = (bodyIndex != -1) ? response.substring(0, bodyIndex): "";
-    String responseBody = (bodyIndex != -1) ? response.substring(bodyIndex + 4): response;
-
-    StaticJsonDocument < 512 > doc;
-    DeserializationError error = deserializeJson(doc, responseBody);
-
-    if (error) {
-      if (debug) {
-        Serial.println("HTTP Response Headers:");
-        Serial.println(headers);
-        Serial.println("HTTP Response Body:");
-        Serial.println(responseBody);
-        Serial.print("JSON Parse Error: ");
-        Serial.println(error.c_str());
-      }
-      return "";
-    }
-
-    if (debug) {
-      Serial.println("JSON Response:");
-      Serial.println(responseBody);
-    }
-    return responseBody;
-  }
-};
 class NotificationUtil {
   public:
   static void successTone () {
@@ -241,6 +174,47 @@ class NotificationUtil {
     ledcWriteTone(0, 0);
   }
 };
+
+void connectWiFi() {
+  WiFi.begin(ssid, password);
+  Serial.print("Connecting to WiFi");
+
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(500);
+    Serial.print(".");
+  }
+  
+  NotificationUtil::readyTone();
+  Serial.println("\nWiFi connected");
+}
+
+void connectMQTT() {
+  while (!mqtt.connected()) {
+    Serial.print("Connecting to MQTT...");
+
+    if (mqtt.connect(client_id, mqtt_user, mqtt_password)) {
+      Serial.println("connected");
+      mqtt.subscribe("esp32/topic");
+      NotificationUtil::readyTone();
+    } else {
+      Serial.print("failed, rc=");
+      Serial.print(mqtt.state());
+      Serial.println(" retrying in 5 seconds");
+      delay(5000);
+    }
+  }
+}
+
+void callback(char* topic, byte* payload, unsigned int length) {
+  Serial.print("Message [");
+  Serial.print(topic);
+  Serial.print("]: ");
+
+  for (unsigned int i = 0; i < length; i++) {
+    Serial.print((char)payload[i]);
+  }
+  Serial.println();
+}
 
 bool scanRfid(String &uidOut) {
   if (!rfid.PICC_IsNewCardPresent()) return false;
@@ -285,64 +259,68 @@ void setup() {
   ledcSetup(0, 1000, 8);
   ledcAttachPin(BUZZER_PIN, 0);
   Serial.println("Peripherals Ready");
+
+  connectWiFi();
+  Serial.println("WiFi Ready");
+
+  secureClient.setCACert(ca_cert);
+  mqtt.setServer(mqtt_server, mqtt_port);
+  mqtt.setCallback(callback);
+
+  connectMQTT();
+  Serial.println("MQTT Connected!");
+  
+  Serial.println("Device Ready");
   NotificationUtil::initializedTone();
-
-  int wifiAttempts = 0;
-  WiFi.begin(ssid, password);
-  while (WiFi.status() != WL_CONNECTED && wifiAttempts < 5) {
-    delay(500);
-    wifiAttempts++;
-    Serial.println("Connecting to WiFi...");
-  }
-
-  if (WiFi.status() == WL_CONNECTED) {
-    NotificationUtil::readyTone();
-    Serial.println("System Ready");
-  } else {
-    NotificationUtil::errorTone();
-    Serial.println("Failed to connect to WiFi");
-  }
 }
 
 
 void loop() {
+  if (!mqtt.connected()) {
+    connectMQTT();
+  }
+  
+  mqtt.loop();
+  
   String uid;
   if (scanRfid(uid)) {
     Serial.print("Scanned RFID: ");
     Serial.println(uid);
     
-    if(uid == "67993725") {
-      NotificationUtil::successTone();
-    } else {
-      NotificationUtil::errorTone();
-    }
-    /*
-    HttpUtil http(SERVER_HOST, rootCACert);
     String payload = JsonUtil::create()
-    .add("rfid", uid)
-    .add("apikey", "libypogi")
+    .add("action", "SCAN_RFID")
+    .add("data", uid.c_str())
+    .add("apikey", "libypogi@612345678")
     .add("timestamp", "1766202447")
     .toString();
-    String resPost = http.post("/api/v1/esp-api/rfid", payload);
-    Serial.println("POST result:");
-    Serial.println(resPost);
-    if(resPost == "") {
-      NotificationUtil::errorTone();
-    } else {
+    
+    if (mqtt.publish("esp32/topic", payload.c_str())) {
+      Serial.println("Message published successfully");
       NotificationUtil::successTone();
-      /*
-      String status = JsonUtil::getString(resPost, "status");
-
-      Serial.println("Parsed POST Response:");
-      Serial.println("Status: " + status);
-      */
-   // }
+    } else {
+      Serial.println("Message publish FAILED");
+      NotificationUtil::errorTone();
+    }
   }
 
-  String qr;
-  if (scanQRCode(qr)) {
+  String qr_data;
+  if (scanQRCode(qr_data)) {
     Serial.print("Scanned QR: ");
-    Serial.println(qr);
-    NotificationUtil::successTone();
+    Serial.println(qr_data);
+    
+    String payload = JsonUtil::create()
+    .add("action", "SCAN_QR")
+    .add("data", qr_data.c_str())
+    .add("apikey", "libypogi@612345678")
+    .add("timestamp", "1766202447")
+    .toString();
+    
+    if (mqtt.publish("esp32/topic", payload.c_str())) {
+      Serial.println("Message published successfully");
+      NotificationUtil::successTone();
+    } else {
+      Serial.println("Message publish FAILED");
+      NotificationUtil::errorTone();
+    }
   }
 }

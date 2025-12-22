@@ -1,9 +1,6 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
-import {
-  DarkTheme,
-  DefaultTheme,
-  ThemeProvider
-} from "@react-navigation/native";
+import { DarkTheme, DefaultTheme, ThemeProvider } from "@react-navigation/native";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { useFonts } from "expo-font";
 import { Stack, useRouter } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
@@ -18,7 +15,7 @@ import { Toast } from "@/components";
 import { checkNumber } from "@/api/helper/check-num";
 import { normalize } from "@/utils/format-ph-number";
 import SplashLoading from '@/components/SplashLoading'
-
+import { StatusBar } from 'expo-status-bar';
 export {
   ErrorBoundary,
 } from "expo-router";
@@ -101,6 +98,8 @@ function RootLayoutNav() {
     <ThemeProvider
       value={colorScheme === "dark" ? DarkTheme : DefaultTheme}
     >
+    <StatusBar style="dark" />
+    <GestureHandlerRootView>
       <SafeAreaProvider>
         <Stack>
           <Stack.Protected guard={isLoggedIn}>
@@ -142,6 +141,7 @@ function RootLayoutNav() {
 
         <Toast />
       </SafeAreaProvider>
+      </GestureHandlerRootView>
     </ThemeProvider>
   );
 }

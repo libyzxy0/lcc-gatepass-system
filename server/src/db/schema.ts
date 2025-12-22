@@ -86,27 +86,13 @@ export const visit = pgTable("visit", {
   visitor_id: uuid("visitor_id").references(() => visitor.id),
   purpose: text("purpose").notNull(),
   description: text("description").notNull(),
-  visiting: text("visiting").notNull(),
-  secured: boolean("secured").notNull().default(true),
+  vehicle_type: text("vehicle_type"),
+  vehicle_plate: text("vehicle_plate"),
+  qr_token: text("qr_token").unique(),
   schedule_date: timestamp("schedule_date", { mode: "string" }).notNull(),
   status: statusEnum("status").default("pending"),
   created_at: timestamp("created_at", { mode: "string" }).defaultNow()
 })
-
-export const qr_code = pgTable("qr_code", {
-  id: uuid("id").primaryKey().defaultRandom().notNull(),
-  user_type: userTypeEnum("user_type").notNull(),
-  visit_id: uuid("visit_id").references(() => visit.id),
-  student_id: uuid("student_id").references(() => student.id),
-  staff_id: uuid("staff_id").references(() => staff.id),
-  qr_token: text("qr_token").notNull().unique(),
-  active: boolean("active").default(false),
-  is_one_time: boolean("is_one_time").default(true),
-  secured: boolean("secured").default(false),
-  revoked: boolean("revoked").default(false),
-  expires_at: timestamp("expires_at", { mode: "string" }),
-  created_at: timestamp("created_at", { mode: "string" }).defaultNow()
-});
 
 export const visitor_log = pgTable("visitor_log", {
   id: uuid("id").primaryKey().defaultRandom().notNull(),

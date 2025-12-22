@@ -1,18 +1,18 @@
 import React, { forwardRef } from "react";
-import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet";
+import DefaultBottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet";
 import { useColors } from "@/hooks/useColors";
 
 type Props = {
   children: React.ReactNode;
   containerStyle?: string;
 }
-type Ref = BottomSheet;
+type Ref = DefaultBottomSheet;
 
 export const BottomSheet = forwardRef<Ref, Props>((props, ref) => {
   const colors = useColors();
 
   return (
-    <BottomSheet
+    <DefaultBottomSheet
       ref={ref}
       keyboardBehavior="extend"
       index={-1}
@@ -21,14 +21,17 @@ export const BottomSheet = forwardRef<Ref, Props>((props, ref) => {
       keyboardBlurBehavior="restore"
       android_keyboardInputMode="adjustResize"
       backgroundStyle={{
-        backgroundColor: colors.card
+        backgroundColor: colors.card,
+        borderWidth: 1,
+        borderColor: colors.border
       }}
       handleIndicatorStyle={{
-        backgroundColor: colors.primary['default']
+        backgroundColor: colors.input,
+        borderRadius: 50
       }}
       {...props}
     >
       <BottomSheetView style={props?.containerStyle}>{props.children}</BottomSheetView>
-    </BottomSheet>
+    </DefaultBottomSheet>
   );
 });

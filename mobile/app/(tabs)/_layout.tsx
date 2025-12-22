@@ -1,19 +1,11 @@
 import React from "react";
-import Ionicons from "@expo/vector-icons/Ionicons";
+import Octicons from '@expo/vector-icons/Octicons';
 import { Link, Tabs } from "expo-router";
 import { Platform } from "react-native";
 import { useColors } from "@/hooks/useColors";
 
-function TabBarIcon(props: {
-    name: React.ComponentProps<typeof Ionicons>["name"];
-    color: string;
-}) {
-    return <Ionicons size={24} style={{ marginBottom: -3 }} {...props} />;
-}
-
 export default function TabLayout() {
     const colors = useColors();
-
     return (
         <Tabs
             screenOptions={{
@@ -39,7 +31,7 @@ export default function TabLayout() {
                     title: "Gatepass",
                     headerShown: false,
                     tabBarIcon: ({ color }) => (
-                        <TabBarIcon name="id-card-outline" color={color} />
+                        <Octicons size={22} style={{ marginBottom: -3, color }} name={'id-badge'} />
                     )
                 }}
             />
@@ -49,7 +41,7 @@ export default function TabLayout() {
                     title: "Me",
                     headerShown: false,
                     tabBarIcon: ({ color }) => (
-                        <TabBarIcon name="person-circle-outline" color={color} />
+                        <Octicons size={22} style={{ marginBottom: -3, color }} name={'person'} />
                     )
                 }}
             />

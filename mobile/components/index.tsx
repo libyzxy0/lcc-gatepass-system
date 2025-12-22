@@ -5,4 +5,5 @@ export { Button } from '@/components/ui/Button';
 export { Input } from '@/components/ui/Input';
 export { Toast, showToast } from '@/components/ui/Toast';
 export { Modal, ModalContent } from '@/components/ui/Modal';
+export { Dropdown } from '@/components/ui/Dropdown';
 export { SafeAreaView } from '@/components/ui/SafeAreaView';

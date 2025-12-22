@@ -1,6 +1,10 @@
 import { Request } from "express";
 import jwt from "jsonwebtoken";
-import { JWT_ACCESS_SECRET, JWT_REFRESH_SECRET } from '@/secrets'
+import {
+  JWT_ACCESS_SECRET,
+  JWT_REFRESH_SECRET,
+  JWT_QR_SECRET
+} from '@/secrets'
 
 export const getAccessTokenFromHeaders = (req: Request) => {
   const authHeader = req?.headers['authorization'];
@@ -12,9 +16,9 @@ export const getAccessTokenFromHeaders = (req: Request) => {
 }
 
 export const generateAccessToken = (id: string) => {
-    return jwt.sign({ id }, JWT_ACCESS_SECRET, {
-      expiresIn: "15m",
-    });
+  return jwt.sign({ id }, JWT_ACCESS_SECRET, {
+    expiresIn: "15m",
+  });
 }
 
 export const generateRefreshToken = (id: string) => {
@@ -26,6 +30,12 @@ export const generateRefreshToken = (id: string) => {
 export const generateVisitorToken = (id: string) => {
   return jwt.sign({ id }, JWT_ACCESS_SECRET, {
     expiresIn: "1d",
+  });
+}
+
+export const generateQRToken = (id: string) => {
+  return jwt.sign({ id }, JWT_QR_SECRET, {
+    expiresIn: "7d",
   });
 }
 

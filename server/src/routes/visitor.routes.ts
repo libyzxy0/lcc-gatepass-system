@@ -16,8 +16,8 @@ router.post("/register", controller.register);
 router.post("/login", controller.login);
 router.post("/me/update", visitor_auth, controller.updateAccount);
 router.post("/me/check", controller.checkPhoneNumber);
-router.post("/me/create-visit", visitor_auth, controller.createVisit);
-router.get("/me/visits", visitor_auth, controller.visits);
-router.delete("/me/delete-visit/:id", visitor_auth, controller.deleteVisit);
+router.post("/me/request-gatepass", visitor_auth, controller.requestGatepass);
+router.get("/me/gatepass", visitor_auth, controller.gatepass);
+router.delete("/me/delete-gatepass/:id", visitor_auth, controller.deleteGatepass);
 
 export default router;

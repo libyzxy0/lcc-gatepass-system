@@ -66,7 +66,7 @@ void connectMQTT() {
 
     if (mqtt.connect(client_id, mqtt_user, mqtt_password)) {
       Serial.println("connected");
-      mqtt.subscribe("test/topic");
+      mqtt.subscribe("esp32/topic");
     } else {
       Serial.print("failed, rc=");
       Serial.print(mqtt.state());
@@ -110,7 +110,7 @@ void loop() {
   if (millis() - lastSend > 5000) {
     lastSend = millis();
 
-    if (mqtt.publish("test/topic", "Hello from ESP32 (TLS)")) {
+    if (mqtt.publish("esp32/topic", "Hello from ESP32 (TLS)")) {
       Serial.println("Message published successfully");
     } else {
       Serial.println("Message publish FAILED");

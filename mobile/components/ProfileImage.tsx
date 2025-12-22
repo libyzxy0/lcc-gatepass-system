@@ -7,6 +7,7 @@ import { useColors } from "@/hooks/useColors";
 import { Image } from "expo-image";
 import { uploadImage } from "@/api/helper/upload-api";
 import { updateVisitor } from "@/api/helper/update-account";
+import avatar from '@/assets/images/avatar.png'
 
 export function ProfileImage({ url, id }: { url: string | null; id: string; }) {
     const colors = useColors();
@@ -91,9 +92,7 @@ export function ProfileImage({ url, id }: { url: string | null; id: string; }) {
             }}
         >
             <Image
-                source={{
-                    uri: image ? image : url ? url : `https://http.cat/404`
-                }}
+                source={image || url ? { uri: image ?? url } : avatar}
                 style={{
                     width: 70,
                     height: 70,

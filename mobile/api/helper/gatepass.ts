@@ -16,12 +16,16 @@ interface DeleteVisitResponse {
   message: string;
 }
 
-interface CreateVisit {
+interface IVehicle {
+  type: 'motorcycle' | 'tricycle' | 'car';
+  plate_number: string;
+}
+
+interface IRequestGatepass {
   purpose: string;
   description: string;
-  visiting: string;
-  date: string;
-  secured: boolean;
+  schedule_date: string;
+  vehicle: IVehicle | null;
 }
 
 interface APIResposneType {
@@ -29,19 +33,18 @@ interface APIResposneType {
   error?: string | null;
 }
 
-export const createVisit = async ({ purpose, description, visiting, date, secured }: CreateVisit): Promise<APIResposneType | null> => {
+export const requestGatepass = async ({ purpose, description, schedule_date, vehicle }: IRequestGatepass): Promise<APIResposneType | null> => {
   try {
-    const response = await api.post('/visitor/me/create-visit', {
+    const response = await api.post('/visitor/me/request-gatepass', {
       purpose,
       description,
-      visiting,
-      date,
-      secured
+      schedule_date,
+      vehicle
     });
 
     if (!response.data) {
       return {
-        error: "Cant create visit, something went wrong!"
+        error: "Cant request gatepass, something went wrong!"
       };
     }
     return {
@@ -55,20 +58,20 @@ export const createVisit = async ({ purpose, description, visiting, date, secure
   }
 }
 
-export const getVisits = async (): Promise<Visits | null> => {
+export const getGatepass = async (): Promise<Visits[]> => {
   try {
-    const response = await api.get('/visitor/me/visits');
-    if (!response.data) return null;
+    const response = await api.get('/visitor/me/gatepass');
+    if (!response.data) return [];
     return response.data;
   } catch (error) {
     console.error(error);
-    return null;
+    return [];
   }
 }
 
-export const deleteVisit = async (visitId: string): Promise<DeleteVisitResponse> => {
+export const deleteGatepass = async (visitId: string): Promise<DeleteVisitResponse> => {
   try {
-    const response = await api.delete('/visitor/me/delete-visit/' + visitId);
+    const response = await api.delete('/visitor/me/delete-gatepass/' + visitId);
     if (!response.data) return {
       success: false,
       message: 'Someting went wrong!'

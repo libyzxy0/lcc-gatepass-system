@@ -28,14 +28,6 @@ export function ModalConfirm({ onConfirm, onClose, visible, title, description, 
           <View style={{
             alignItems: 'center',
           }}>
-            <View style={{
-              backgroundColor: colors.primary,
-              padding: 14,
-              borderRadius: 100,
-              marginBottom: 4
-            }}>
-              <Ionicons name="checkmark-done-outline" size={24} color={"white"} />
-            </View>
             <Text type={"bold"} style={{
               color: colors.primary,
               fontSize: 22

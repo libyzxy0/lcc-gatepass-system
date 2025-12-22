@@ -18,7 +18,6 @@ export default function SplashLoading() {
           source={logo}
           style={{ width: 200, height: 200 }}
           contentFit="cover"
-          tintColor={useColorScheme() === "dark" && 'white'}
         />
         <View style={{
           marginTop: 20

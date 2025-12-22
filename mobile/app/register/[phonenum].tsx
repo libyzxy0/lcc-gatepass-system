@@ -17,7 +17,6 @@ import { ScrollView } from 'react-native'
 import { useLocalSearchParams } from 'expo-router';
 import { visitorRegister } from '@/api/helper/register'
 import { useRouter } from 'expo-router'
-import { useColorScheme } from "@/hooks/useColorScheme";
 
 type ActionType = {
   type: 'email_change' | 'pin_change' | 'phone_change' | 'firstname_change' | 'lastname_change';
@@ -167,7 +166,6 @@ export default function NewAccountPage() {
               height: 100
             }}
             contentFit="contain"
-            tintColor={useColorScheme() === "dark" && 'white'}
           />
 
           <Text type="bold">Create new Account</Text>

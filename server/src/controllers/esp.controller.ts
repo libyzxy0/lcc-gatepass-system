@@ -70,11 +70,12 @@ class ESPController {
       })
     }
   }
-  
+
   async handleEvent(req: Request, res: Response) {
     try {
       const event = req.body;
-      console.log(event);
+      console.log(event.topic);
+      console.log(JSON.parse(event.payload));
       res.json({ res: 'OK PRE' })
     } catch (error) {
       console.error("[ERROR ESP CONTROLLER]:", error);

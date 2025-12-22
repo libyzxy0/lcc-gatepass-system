@@ -8,7 +8,6 @@ import logo from "@/assets/images/logo.png";
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { ModalDestructive } from '@/components/ui/modals/ModalDestructive'
 import { useRouter } from 'expo-router'
-import { useColorScheme } from "@/hooks/useColorScheme";
 
 export function Header() {
   const colors = useColors();
@@ -40,7 +39,6 @@ export function Header() {
             height: 45
           }}
           contentFit="fill"
-          tintColor={useColorScheme() === "dark" && 'white'}
         />
         <TouchableOpacity onPress={() => setShowLogout(true)} activeOpacity={0.6}>
           <Ionicons name="exit-outline" size={24} color={colors.text} />

@@ -107,31 +107,37 @@ class VisitorController {
       return res.status(401).json({ error: "Failed to get session, please authenticate first" });
     }
   }
-
-  async createVisit(req: VisitorRequest, res: Response) {
+  async requestGatepass(req: VisitorRequest, res: Response) {
     try {
-      const { purpose, description, visiting, date, secured } = req.body;
+      const { purpose, description, schedule_date, vehicle } = req.body;
 
-      await db.insert(visit).values({
+      const gatepassData = await db.insert(visit).values({
         visitor_id: req.visitor.id,
         purpose,
         description,
-        visiting,
-        schedule_date: date,
-        secured
-      });
+        schedule_date: schedule_date,
+        vehicle_type: vehicle ? vehicle.type : null,
+        vehicle_plate: vehicle ? vehicle.plate_number : null,
+        qr_token: null
+      }).returning();
+      
+      const qr_token = generateVisitorToken(gatepassData[0].id);
+
+      await db.update(visit).set({
+        qr_token
+      }).where(eq(visit.id, gatepassData[0].id))
 
       return res.status(200).json({
-        message: 'Visit request has been sent to Administrators!'
+        message: 'Gatepass request has been sent to Administrators!'
       })
 
     } catch (error) {
-      console.error("[ERROR CREATE VISIT]:", error);
-      return res.status(500).json({ error: "Failed to create visit, something went wrong!" });
+      console.error("[ERROR REQUEST GATEPASS]:", error);
+      return res.status(500).json({ error: "Failed to request gatepass, something went wrong!" });
     }
   }
 
-  async visits(req: VisitorRequest, res: Response) {
+  async gatepass(req: VisitorRequest, res: Response) {
     try {
       const visits: Visits[] = await db.select().from(visit).where(eq(visit.visitor_id, req.visitor.id)).orderBy(desc(visit.created_at))
 
@@ -142,7 +148,7 @@ class VisitorController {
     }
   }
 
-  async deleteVisit(req: Request, res: Response) {
+  async deleteGatepass(req: Request, res: Response) {
     try {
       const { id } = req.params;
 

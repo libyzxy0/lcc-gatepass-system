@@ -3,6 +3,7 @@ import { Image } from "expo-image";
 import { useState } from "react";
 import { Ionicons } from "@expo/vector-icons"
 import logo from "@/assets/images/logo.png";
+import waveBorder from "@/assets/images/wave-border.svg";
 import { TouchableOpacity } from 'react-native'
 import { useColors } from "@/hooks/useColors";
 import Octicons from '@expo/vector-icons/Octicons';
@@ -46,7 +47,7 @@ export default function Pin() {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1, paddingHorizontal: 20, backgroundColor: colors.backgroundPinScreen }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }}>
       <ModalLoading visible={loading} />
       <ModalConfirm
         visible={showConfrim}
@@ -54,19 +55,23 @@ export default function Pin() {
         onClose={() => setShowConfirm(false)}
         title={"Change Number?"}
         description={"Are you sure you want to change your number to login?"} closeAfterConfirm />
-      <View style={{ marginTop: 30, alignItems: "center", gap: 20 }}>
+
+      <View style={{
+        alignItems: "center",
+        marginTop: 30,
+      }}>
+
         <Image
           source={logo}
           style={{ width: 250, height: 100 }}
           contentFit="contain"
-          tintColor={'white'}
         />
         <Text type="bold" style={{
-          color: "white",
+          color: colors.text,
           fontSize: 22
         }}>Enter your PIN</Text>
 
-        <View style={{ flexDirection: "row", gap: 15, marginTop: 10 }}>
+        <View style={{ flexDirection: "row", gap: 20, marginTop: 25 }}>
           {[0, 1, 2, 3].map((i) => (
             <View
               key={i}
@@ -75,46 +80,57 @@ export default function Pin() {
                 height: 15,
                 borderRadius: 999,
                 borderWidth: 2,
-                borderColor: "white",
-                backgroundColor: i < pin.length ? "white" : "transparent",
+                borderColor: colors.text,
+                backgroundColor: i < pin.length ? colors.text : "transparent",
               }}
             />
           ))}
         </View>
-      </View>
 
-      <View style={{
-        alignItems: 'center',
-        marginTop: 50
-      }}>
-        <TouchableOpacity onPress={() => setShowConfirm(true)} activeOpacity={0.8} style={{
-          backgroundColor: colors.backgroundPinScreen,
-          paddingHorizontal: 16,
-          paddingVertical: 8,
-          borderRadius: 50,
-          flexDirection: 'row',
+        <View style={{
           alignItems: 'center',
-          gap: 5,
-          shadowColor: colors.primary + '5A',
-          shadowOffset: { width: 0, height: 1 },
-          shadowOpacity: 0.25,
-          shadowRadius: 1,
-          elevation: 5,
-          borderWidth: 1,
-          borderColor: useColorScheme() === "dark" ? colors.border : colors.backgroundPinScreen
+          marginTop: 30,
         }}>
-          <Text style={{
-            color: 'white'
-          }}>(+63) {formatPHNumber(phoneNumber)}</Text>
-          <Octicons name="arrow-switch" size={16} color={"white"} />
-        </TouchableOpacity>
+          <TouchableOpacity onPress={() => setShowConfirm(true)} activeOpacity={0.8} style={{
+            backgroundColor: colors.primary,
+            paddingHorizontal: 16,
+            paddingVertical: 8,
+            borderRadius: 50,
+            flexDirection: 'row',
+            alignItems: 'center',
+            gap: 5,
+            shadowColor: colors.primary + '5A',
+            shadowOffset: { width: 0, height: 1 },
+            shadowOpacity: 0.25,
+            shadowRadius: 1,
+            elevation: 5,
+            borderWidth: 1,
+            borderColor: colors.border
+          }}>
+            <Text type="bold" style={{
+              color: 'white',
+              fontSize: 16
+            }}>(+63) {formatPHNumber(phoneNumber)}</Text>
+            <Octicons name="arrow-switch" size={16} color={"white"} />
+          </TouchableOpacity>
+        </View>
       </View>
 
+      <Image source={waveBorder} style={{
+        height: 100,
+        width: '100%',
+        marginTop: 40
+      }}/>
       <View style={{
-        flex: 1,
+        position: 'absolute',
+        width: '100%',
+        paddingTop: 10,
+        paddingBottom: 20,
+        bottom: 0,
         justifyContent: "center",
-        gap: 25,
-        marginTop: 10
+        gap: 14,
+        backgroundColor: colors.backgroundPinScreen,
+        paddingHorizontal: 14
       }}>
         {[
           ["1", "2", "3"],
@@ -142,7 +158,7 @@ export default function Pin() {
                       alignItems: "center",
                     }}
                   >
-                    <Ionicons name="backspace-outline" size={36} color={"white"} />
+                    <Ionicons name="backspace-outline" size={34} color={'white'} />
                   </TouchableOpacity>
                 );
               }
@@ -159,7 +175,7 @@ export default function Pin() {
                     alignItems: "center",
                   }}
                 >
-                  <Text style={{ fontSize: 32, color: "white" }}>{item}</Text>
+                  <Text type="bold" style={{ fontSize: 32, color: 'white' }}>{item}</Text>
                 </TouchableOpacity>
               );
             })}
@@ -169,7 +185,7 @@ export default function Pin() {
           alignItems: 'center'
         }}>
           <Text style={{
-            color: 'white'
+            color: '#a7a7a7'
           }}>Project made possible by ICT-12A Group 2.</Text>
         </View>
       </View>

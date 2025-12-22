@@ -1,6 +1,7 @@
 import { Text, View, Modal, ModalContent, Button } from '../../'
 import { useColors } from '@/hooks/useColors'
 import Ionicons from '@expo/vector-icons/Ionicons';
+import { ActivityIndicator } from 'react-native'
 
 type ModalConfirmProps = {
   onConfirm?: () => void;
@@ -10,18 +11,21 @@ type ModalConfirmProps = {
   description: string;
   closeAfterConfirm?: boolean;
   buttonLabel?: string;
+  loading: boolean;
 }
 
-export function ModalDestructive({ onConfirm, onClose, visible, title, description, closeAfterConfirm, buttonLabel }: ModalConfirmProps) {
+export function ModalDestructive({ onConfirm, onClose, visible, title, description, closeAfterConfirm, buttonLabel, loading }: ModalConfirmProps) {
   const colors = useColors();
+
   const handleConfirmation = () => {
-    if(closeAfterConfirm) {
+    if (closeAfterConfirm) {
       onConfirm?.();
       onClose?.();
     } else {
       onConfirm?.();
     }
   }
+
   return (
     <Modal onRequestClose={onClose} visible={visible}>
       <ModalContent style={{
@@ -31,14 +35,6 @@ export function ModalDestructive({ onConfirm, onClose, visible, title, descripti
           <View style={{
             alignItems: 'center',
           }}>
-            <View style={{
-              backgroundColor: colors.danger,
-              padding: 14,
-              borderRadius: 100,
-              marginBottom: 4
-            }}>
-              <Ionicons name="warning-outline" size={24} color={"white"} />
-            </View>
             <Text type={"bold"} style={{
               color: colors.danger,
               fontSize: 22
@@ -50,22 +46,28 @@ export function ModalDestructive({ onConfirm, onClose, visible, title, descripti
           <View style={{
             flexDirection: 'row',
             justifyContent: 'center',
-            gap: 20,
+            gap: 16,
             marginTop: 12
           }}>
-            <Button 
-            variant={"outline"} 
-            onPress={onClose}
-            style={{
-              paddingHorizontal: 38
-            }}
+            <Button
+              variant={"outline"}
+              onPress={onClose}
+              style={{
+                paddingHorizontal: 38,
+                minWidth: 125,
+                minHeight: 38
+              }}
             >Cancel</Button>
             <Button
-            variant={'danger'}
-            onPress={handleConfirmation}
-            style={{
-              paddingHorizontal: 38
-            }}>{buttonLabel ? buttonLabel : 'Delete'}</Button>
+              variant={'danger'}
+              onPress={handleConfirmation}
+              style={{
+                paddingHorizontal: 38,
+                width: 125,
+                minHeight: 38
+              }}>{loading ? (
+                <ActivityIndicator size={'small'} color={'white'} />
+              ) : buttonLabel ? buttonLabel : 'Delete'}</Button>
           </View>
         </View>
       </ModalContent>

@@ -16,7 +16,6 @@ import React, { useState, useRef } from "react";
 import { checkNumber } from '@/api/helper/check-num'
 import { useRouter } from 'expo-router'
 import { normalize, isValidPHPhoneNumber } from '@/utils/format-ph-number'
-import { useColorScheme } from "@/hooks/useColorScheme";
 
 export default function PhonePage() {
   const router = useRouter();
@@ -79,7 +78,7 @@ export default function PhonePage() {
     <SafeAreaView>
       <View
         style={{
-          marginTop: 20,
+          marginTop: 25,
           alignItems: "center",
           gap: 20
         }}
@@ -91,7 +90,6 @@ export default function PhonePage() {
             height: 100
           }}
           contentFit="contain"
-          tintColor={useColorScheme() === "dark" && 'white'}
         />
 
         <Text type="bold">Enter Mobile Number</Text>
@@ -134,6 +132,7 @@ export default function PhonePage() {
               autoCorrect={false}
               inputMode={"numeric"}
               autoComplete={"tel"}
+              autoFocus={true}
               style={{
                 paddingVertical: 14,
                 paddingHorizontal: 14,
@@ -179,7 +178,7 @@ export default function PhonePage() {
               textAlign: 'center'
             }}
           >
-            © Copyright 2025, LCC-ICT-RP Group 2 All rights reserved.
+            © Copyright 2025, La Concepcion College Digital Gatepass System, All rights reserved.
           </Text>
         </View>
       </View>
