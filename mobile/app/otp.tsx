@@ -98,7 +98,7 @@ export default function OTPPage() {
       sendOTP();
       setSent(true);
     }
-  }, [])
+  }, [sent])
 
   return (
     <SafeAreaView style={{ flex: 1, paddingHorizontal: 20 }}>

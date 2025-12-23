@@ -20,7 +20,6 @@ class OTPController {
 
       const now = new Date();
 
-      // 🔒 CHECK ACTIVE OTP (5-MINUTE LOCK)
       const activeOtp = await db
         .select()
         .from(otp)
@@ -38,25 +37,28 @@ class OTPController {
         });
       }
 
-      // ❌ Revoke old OTPs (safety)
-      await db
-        .update(otp)
-        .set({ revoked: true })
-        .where(eq(otp.visitor_id, vst[0].id));
-
-      // ✅ Generate new OTP
       const code = Math.floor(100000 + Math.random() * 900000).toString();
       const expiresAt = new Date(now.getTime() + 5 * 60 * 1000);
 
-      await db.insert(otp).values({
-        user_type: 'visitor',
-        visitor_id: vst[0].id,
-        code,
-        expires_at: expiresAt.toISOString(),
-        revoked: false
-      });
+      await db
+        .insert(otp)
+        .values({
+          user_type: 'visitor',
+          visitor_id: vst[0].id,
+          code,
+          expires_at: expiresAt.toISOString(),
+          revoked: false
+        })
+        .onConflictDoUpdate({
+          target: otp.visitor_id,
+          set: {
+            code,
+            expires_at: expiresAt.toISOString(),
+            revoked: false,
+            updated_at: now.toISOString()
+          }
+        });
 
-      // 📩 SEND SMS ONLY AFTER DB DECISION
       await sendSMSOTP(phone_number, code, vst[0].id);
 
       return res.status(200).json({
@@ -68,6 +70,7 @@ class OTPController {
       res.status(500).json({ error: 'Something went wrong' });
     }
   }
+
 
   async verifyVisitorOTP(req: Request, res: Response) {
     try {
