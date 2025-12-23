@@ -18,28 +18,46 @@ class OTPController {
         return res.status(404).json({ error: 'Visitor not found' });
       }
 
-      const code = Math.floor(100000 + Math.random() * 900000).toString();
-
-      const smsotp = await sendSMSOTP(phone_number, code, vst[0].id);
-
-      const expiresAt = new Date(Date.now() + 5 * 60 * 1000);
       const now = new Date();
-      await db
-        .insert(otp)
-        .values({
-          user_type: 'visitor',
-          visitor_id: vst[0].id,
-          code,
-          expires_at: expiresAt.toISOString()
-        })
-        .onConflictDoUpdate({
-          target: otp.visitor_id,
-          set: {
-            code,
-            expires_at: expiresAt.toISOString(),
-            updated_at: now.toISOString()
-          }
+
+      // 🔒 CHECK ACTIVE OTP (5-MINUTE LOCK)
+      const activeOtp = await db
+        .select()
+        .from(otp)
+        .where(
+          and(
+            eq(otp.visitor_id, vst[0].id),
+            eq(otp.revoked, false),
+            gt(otp.expires_at, now.toISOString())
+          )
+        );
+
+      if (activeOtp.length) {
+        return res.status(200).json({
+          message: 'OTP already sent. Please wait 5 minutes before requesting again.'
         });
+      }
+
+      // ❌ Revoke old OTPs (safety)
+      await db
+        .update(otp)
+        .set({ revoked: true })
+        .where(eq(otp.visitor_id, vst[0].id));
+
+      // ✅ Generate new OTP
+      const code = Math.floor(100000 + Math.random() * 900000).toString();
+      const expiresAt = new Date(now.getTime() + 5 * 60 * 1000);
+
+      await db.insert(otp).values({
+        user_type: 'visitor',
+        visitor_id: vst[0].id,
+        code,
+        expires_at: expiresAt.toISOString(),
+        revoked: false
+      });
+
+      // 📩 SEND SMS ONLY AFTER DB DECISION
+      await sendSMSOTP(phone_number, code, vst[0].id);
 
       return res.status(200).json({
         message: `OTP sent to ${phone_number}`
@@ -50,6 +68,7 @@ class OTPController {
       res.status(500).json({ error: 'Something went wrong' });
     }
   }
+
   async verifyVisitorOTP(req: Request, res: Response) {
     try {
       const { phone_number, code } = req.body;
@@ -62,7 +81,7 @@ class OTPController {
       if (!vst.length) {
         return res.status(404).json({ error: 'Visitor not found' });
       }
-      
+
       const now = new Date();
 
       const validOtp = await db
@@ -72,9 +91,11 @@ class OTPController {
           and(
             eq(otp.visitor_id, vst[0].id),
             eq(otp.code, code),
+            eq(otp.revoked, false),
             gt(otp.expires_at, now.toISOString())
           )
         );
+
 
       if (!validOtp.length) {
         return res.status(400).json({ error: 'Invalid or expired OTP' });
