@@ -49,7 +49,7 @@ export default function OTPPage() {
         if (data?.server_error) {
           showToast({
             type: 'error',
-            text1: '[Server Err] Failed to Verify OTP',
+            text1: "Ohh No! There's an Error!",
             text2: data.message
           });
           setPin([]);
@@ -67,7 +67,7 @@ export default function OTPPage() {
         } else {
           showToast({
             type: 'error',
-            text1: 'Something went wrong!',
+            text1: "Ohh No! There's an Error!",
             text2: data.message
           });
           setPin([]);
@@ -76,8 +76,8 @@ export default function OTPPage() {
       } catch (error) {
         showToast({
           type: 'error',
-          text1: 'Login Failed',
-          text2: error.response ? error.response.data.message : "Something went wrong, try again later"
+          text1: "Ohh No! There's an Error!",
+          text2: error.response ? error.response.data.message : "Maybe the server is busy or sleeping 😅"
         });
         setPin([]);
       } finally {

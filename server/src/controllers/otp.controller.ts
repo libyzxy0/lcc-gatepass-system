@@ -20,7 +20,7 @@ class OTPController {
 
       const code = Math.floor(100000 + Math.random() * 900000).toString();
 
-      const smsotp = await sendSMSOTP(phone_number, code);
+      const smsotp = await sendSMSOTP(phone_number, code, vst[0].id);
 
       const expiresAt = new Date(Date.now() + 5 * 60 * 1000);
       const now = new Date();

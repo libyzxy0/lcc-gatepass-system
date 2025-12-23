@@ -18,6 +18,7 @@ import { useRouter } from 'expo-router'
 import { normalize, isValidPHPhoneNumber } from '@/utils/format-ph-number'
 import waveBorder from "@/assets/images/wave-border.svg";
 import { ActivityIndicator } from 'react-native'
+import { StatusBar } from 'expo-status-bar'
 
 export default function PhonePage() {
   const router = useRouter();
@@ -53,8 +54,8 @@ export default function PhonePage() {
       if (isValidNumber.isServerError) {
         showToast({
           type: "error",
-          text1: "Ohh No, Something went wrong",
-          text2: 'An error occurred while verifying phone number',
+          text1: "Ohh No! There's an Error!",
+          text2: "Maybe the server is busy or sleeping 😅",
         });
         return;
       }
@@ -77,102 +78,114 @@ export default function PhonePage() {
   };
 
   return (
+    <View style={{
+      flex: 1,
+      backgroundColor: colors.backgroundPinScreen
+    }}>
+      <StatusBar style={'light'} />
       <SafeAreaView style={{
-        backgroundColor: colors.background
+        backgroundColor: 'transparent'
       }}>
-        <View
-          style={{
-            alignItems: "center",
-            gap: 20,
-            paddingTop: 40
-          }}
-        >
-          <Image
-            source={logo}
-            style={{
-              width: 250,
-              height: 100
-            }}
-            contentFit="contain"
-          />
-
-          <Text type="bold">Enter Mobile Number</Text>
-          <Text type="secondary" style={{
-            textAlign: 'center',
-            marginHorizontal: 20
-          }}>Please enter your mobile number below to continue, we will use it to verify your identity.</Text>
-        </View>
-
-        <View
-          style={{
-            flex: 1,
-            alignItems: "center",
-            marginTop: 60,
-            marginHorizontal: 30,
-            gap: 14
-          }}
-        >
+        <View style={{
+          flex: 1,
+          backgroundColor: colors.background
+        }}>
+          <Image source={waveBorder} style={{
+            height: 100,
+            width: '100%',
+            transform: [{ rotate: '180deg' }]
+          }} />
           <View
             style={{
-              width: "100%",
-              flexDirection: "column",
-              gap: 5
+              alignItems: "center",
+              gap: 14,
+              paddingTop: 10,
             }}
           >
-            <Text>Mobile Number</Text>
-            <View style={{
-              flexDirection: 'row',
-              gap: 5,
-              alignItems: 'center'
-            }}>
-              <Input
-                onChangeText={value =>
-                  setPhone(value)
-                }
-                value={phone ?? undefined}
-                cursorColor={colors.primary}
-                textContentType={"telephoneNumber"}
-                keyboardType={"numeric"}
-                autoCorrect={false}
-                inputMode={"numeric"}
-                autoComplete={"tel"}
-                autoFocus={true}
-                style={{
-                  paddingVertical: 14,
-                  paddingHorizontal: 14,
-                  borderRadius: 10,
-                  flex: 1
-                }}
-                placeholder="Enter Mobile Number (e.g.: 9937793944)"
-              />
-            </View>
-          </View>
-
-          <View
-            style={{
-              width: "100%",
-              marginTop: 5,
-            }}
-          >
-            <Button
-              onPress={handleLogin}
+            <Image
+              source={logo}
               style={{
-                paddingVertical: 10,
-                alignItems: "center",
-                width: "100%",
-                borderRadius: 10
+                width: 250,
+                height: 90
               }}
-              disabled={loading}
-            >
-              {loading ? (
-                <ActivityIndicator size={22} color={'white'}/>
-              ) : "Continue"}
-            </Button>
+              contentFit="contain"
+            />
+
+            <Text type="bold">Enter Mobile Number</Text>
+            <Text type="secondary" style={{
+              textAlign: 'center',
+              marginHorizontal: 20
+            }}>Please enter your mobile number below to continue, we will use it to verify your identity.</Text>
           </View>
 
-        
-        </View>
-        <View
+          <View
+            style={{
+              flex: 1,
+              alignItems: "center",
+              marginTop: 40,
+              marginHorizontal: 30,
+              gap: 14
+            }}
+          >
+            <View
+              style={{
+                width: "100%",
+                flexDirection: "column",
+                gap: 5
+              }}
+            >
+              <Text>Mobile Number</Text>
+              <View style={{
+                flexDirection: 'row',
+                gap: 5,
+                alignItems: 'center'
+              }}>
+                <Input
+                  onChangeText={setPhone}
+                  value={phone ?? undefined}
+                  cursorColor={colors.primary}
+                  textContentType={"telephoneNumber"}
+                  keyboardType={"numeric"}
+                  autoCorrect={false}
+                  inputMode={"numeric"}
+                  autoComplete={"tel"}
+                  autoFocus={true}
+                  style={{
+                    paddingVertical: 14,
+                    paddingHorizontal: 14,
+                    borderRadius: 10,
+                    flex: 1
+                  }}
+                  placeholder="Enter your mobile number (e.g.: 9937793944)"
+                />
+              </View>
+            </View>
+
+            <View
+              style={{
+                width: "100%",
+                marginTop: 5,
+              }}
+            >
+              <Button
+                onPress={handleLogin}
+                style={{
+                  paddingVertical: 10,
+                  alignItems: "center",
+                  width: "100%",
+                  borderRadius: 10
+                }}
+                disabled={loading}
+              >
+                {loading ? (
+                  <ActivityIndicator size={22} color={'white'} />
+                ) : "Continue"}
+              </Button>
+            </View>
+
+
+          </View>
+          <View
             style={{
               marginHorizontal: 30,
               alignItems: "center",
@@ -189,10 +202,8 @@ export default function PhonePage() {
               © Copyright 2025, La Concepcion College Digital Gatepass System, All rights reserved.
             </Text>
           </View>
-        <Image source={waveBorder} style={{
-          height: 100,
-          width: '100%',
-        }} />
+        </View>
       </SafeAreaView>
+    </View>
   );
 }

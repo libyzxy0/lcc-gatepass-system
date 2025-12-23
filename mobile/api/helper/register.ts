@@ -31,14 +31,13 @@ export const visitorRegister = async ({
     });
     if (!response.data) return {
       success: false,
-      message: "[ERR2007]: Something went wrong!"
+      message: "Maybe the server is busy or sleeping 😅"
     };;
     return {
       success: true,
       message: response.data.message
     };
   } catch (error) {
-    console.error("Error visitor registration:", error.message);
     return {
       success: false,
       message: error.response ? error.response.error : error.message

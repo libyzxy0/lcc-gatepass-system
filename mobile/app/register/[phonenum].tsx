@@ -151,7 +151,7 @@ export default function NewAccountPage() {
     } else {
       showToast({
         type: "error",
-        text1: "Failed to create account",
+        text1: "Ohh No! There's an Error!",
         text2: data.message
       });
     }

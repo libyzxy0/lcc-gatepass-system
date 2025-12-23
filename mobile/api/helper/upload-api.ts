@@ -21,7 +21,7 @@ export const uploadImage = async (uri: string) => {
       }
     );
     
-    if(!response.data) throw new Error("Failed to upload ):");
+    if(!response.data) throw new Error("Error, Maybe the server is busy or sleeping 😅");
 
     return response.data;
 

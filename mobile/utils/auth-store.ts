@@ -36,11 +36,7 @@ export const useAuthStore = create(
       phoneNumber: null,
       login: async (pin: string) => {
         const loginData = await visitorLogin(get().phoneNumber, pin);
-
-        if (!loginData) {
-          throw new Error("Failed to login, something went wrong!");
-        }
-
+        
         set(state => {
           return {
             ...state,

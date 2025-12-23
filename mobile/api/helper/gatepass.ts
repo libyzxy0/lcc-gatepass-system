@@ -74,7 +74,7 @@ export const deleteGatepass = async (visitId: string): Promise<DeleteVisitRespon
     const response = await api.delete('/gatepass/delete-gatepass/' + visitId);
     if (!response.data) return {
       success: false,
-      message: 'Someting went wrong!'
+      message: "Can't delete gatepass, Someting went wrong!"
     };
     return {
       success: true,

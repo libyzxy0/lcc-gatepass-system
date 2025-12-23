@@ -42,8 +42,8 @@ export function ProfileImage({ url, id }: { url: string | null; id: string; }) {
                 if (!uploadData.url) {
                     showToast({
                         type: "error",
-                        text1: "Upload failed",
-                        text2: "Failed to upload profile image!"
+                        text1: "Ohh No! There's an Error!",
+                        text2: "Maybe the server is busy or sleeping 😅"
                     });
                     return;
                 }
@@ -60,7 +60,7 @@ export function ProfileImage({ url, id }: { url: string | null; id: string; }) {
                 if (data.error) {
                     showToast({
                         type: "error",
-                        text1: "Failed to update your account",
+                        text1: "Ohh No! There's an Error!",
                         text2: data.error
                     });
                     return;
@@ -74,7 +74,7 @@ export function ProfileImage({ url, id }: { url: string | null; id: string; }) {
             } catch (error) {
                 showToast({
                     type: "error",
-                    text1: "Upload failed",
+                    text1: "Ohh No! There's an Error!",
                     text2: error.response
                         ? error.response.data.error
                         : error.message

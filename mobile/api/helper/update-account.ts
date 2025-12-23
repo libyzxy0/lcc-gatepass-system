@@ -21,7 +21,7 @@ export const updateVisitor = async ({ id, fields }: { id: string; fields: Update
 
     if (!response.data) {
       return {
-        error: "Cant update user, something went wrong!"
+        error: "Maybe the server is busy or sleeping 😅"
       };
     }
     return {

@@ -21,7 +21,7 @@ export const checkNumber = async (phone_number: string): Promise<CheckPhoneNumbe
       id: null,
       valid: false,
       isServerError: error.response?.status !== 404,
-      error: error.response ? error.response.data.error : "Something went wrong! hays 🙁"
+      error: error.response ? error.response.data.error : "Maybe the server is busy or sleeping 😅"
     };
   }
 }

@@ -22,8 +22,7 @@ export function useSaveImage() {
       await MediaLibrary.createAlbumAsync(albumName, asset, false);
 
       return true;
-    } catch (err: any) {
-      console.error(err);
+    } catch (err) {
       setError(err.message ?? 'Failed to save image');
       return false;
     } finally {

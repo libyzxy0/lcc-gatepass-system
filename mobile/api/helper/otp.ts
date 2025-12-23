@@ -7,7 +7,7 @@ export const generateOTP = async (phone_number: string): Promise<{ success: bool
     if (!response.data) {
       return {
         success: false,
-        message: "Something went wrong!"
+        message: "Maybe the server is busy or sleeping 😅"
       };
     };
 
@@ -31,7 +31,7 @@ export const verifyOTP = async (phone_number: string, otp: string): Promise<{ ve
     if (!response.data) {
       return {
         verified: false,
-        message: "Something went wrong!"
+        message: "Maybe the server is busy or sleeping 😅"
       }
     }
     return {
