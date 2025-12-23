@@ -10,6 +10,7 @@ import { useRef, useEffect, useState } from 'react'
 import { useSaveImage } from '@/hooks/useSaveImage'
 import { useGatepassStore } from '@/utils/gatepass-store'
 import { ScrollView } from 'react-native'
+import { API_BASE } from '@/constants/api-base'
 
 export default function GatePass() {
   const { visitId } = useLocalSearchParams<{ visitId: string }>();
@@ -104,7 +105,7 @@ export default function GatePass() {
           }}>
             <Image
               source={{
-                uri: `http://localhost:3000/api/v1/qr/generate?text=${gpass.qr_token}`
+                uri: `${API_BASE}/qr/generate?text=${encodeURIComponent(gpass.qr_token)}`
               }}
               placeholder={{ blurhash: 'B5Q]?40504~UM}E3' }}
               transition={500}

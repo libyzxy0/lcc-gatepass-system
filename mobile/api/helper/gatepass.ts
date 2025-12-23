@@ -35,7 +35,7 @@ interface APIResposneType {
 
 export const requestGatepass = async ({ purpose, description, schedule_date, vehicle }: IRequestGatepass): Promise<APIResposneType | null> => {
   try {
-    const response = await api.post('/visitor/me/request-gatepass', {
+    const response = await api.post('/gatepass/request-gatepass', {
       purpose,
       description,
       schedule_date,
@@ -60,18 +60,18 @@ export const requestGatepass = async ({ purpose, description, schedule_date, veh
 
 export const getGatepass = async (): Promise<Visits[]> => {
   try {
-    const response = await api.get('/visitor/me/gatepass');
+    const response = await api.get('/gatepass');
     if (!response.data) return [];
     return response.data;
   } catch (error) {
-    console.error(error);
+    console.error(error.response ? error.response.data.error : error.message);
     return [];
   }
 }
 
 export const deleteGatepass = async (visitId: string): Promise<DeleteVisitResponse> => {
   try {
-    const response = await api.delete('/visitor/me/delete-gatepass/' + visitId);
+    const response = await api.delete('/gatepass/delete-gatepass/' + visitId);
     if (!response.data) return {
       success: false,
       message: 'Someting went wrong!'
@@ -81,7 +81,7 @@ export const deleteGatepass = async (visitId: string): Promise<DeleteVisitRespon
       message: response.data.message
     };
   } catch (error) {
-    console.error(error);
+    console.error(error.response ? error.response.data.error : error.message);
     return {
       success: false,
       message: error.response ? error.response.data.error : error.message

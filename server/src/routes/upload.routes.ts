@@ -15,6 +15,7 @@ router.post(
   "/imagekit",
   upload.single("file"),
   async (req: UploadRequest, res: Response) => {
+    console.log('Uploading file:', req.file.originalname);
     try {
       if (!req.file) {
         return res.status(400).json({ message: "No file uploaded" });
@@ -38,8 +39,7 @@ router.post(
         fileId: result.fileId
       });
     } catch (error) {
-      console.error(error);
-
+      console.error("Error Imagekit:", error);
       return res.status(500).json({
         error: error instanceof Error ? error.message : "Upload failed"
       });

@@ -1,34 +1,40 @@
-export function formatPHNumber(input) {
-  const digits = input.replace(/\D/g, "");
+export function formatPHNumber(input: string) {
+  if (!input) return "";
 
-  let cleaned = digits;
-  if (cleaned.startsWith("63")) cleaned = cleaned.slice(2);
-  if (cleaned.startsWith("0")) cleaned = cleaned.slice(1);
+  let digits = input.replace(/\D/g, "");
 
-  if (cleaned.length !== 10) {
-    throw new Error("Invalid PH mobile number");
-  }
-
-  const part1 = cleaned.slice(0, 3);
-  const part2 = cleaned.slice(3, 6);
-  const part3 = cleaned.slice(6);
-
-  return `${part1}-${part2}-${part3}`;
-}
-
-export const normalize = (num: string | null) => {
-  if (!num) return null;
-  let digits = num.replace(/\D/g, "");
   if (digits.startsWith("63")) digits = digits.slice(2);
   if (digits.startsWith("0")) digits = digits.slice(1);
-  return digits.slice(-10);
+
+  digits = digits.slice(0, 10);
+
+  if (digits.length <= 3) return digits;
+  if (digits.length <= 6) return `${digits.slice(0, 3)}-${digits.slice(3)}`;
+
+  return `${digits.slice(0, 3)}-${digits.slice(3, 6)}-${digits.slice(6)}`;
+}
+
+
+export const normalize = (num: string | null): string | null => {
+  if (!num) return null;
+
+  let digits = num.replace(/\D/g, "");
+
+  if (digits.startsWith("63")) digits = digits.slice(2);
+  if (digits.startsWith("0")) digits = digits.slice(1);
+
+  return digits.length === 10 ? digits : null;
 };
 
-export function isValidPHPhoneNumber(phoneNumber) {
-  const cleaned = phoneNumber.replace(/\D/g, ""); 
-  const normalized =
-    cleaned.startsWith("63") ? cleaned.slice(2) :
-    cleaned.startsWith("09") ? cleaned.slice(1) :
-    cleaned;
-  return /^9\d{9}$/.test(normalized);
+
+export function isValidPHPhoneNumber(phoneNumber: string) {
+  if (!phoneNumber) return false;
+
+  let digits = phoneNumber.replace(/\D/g, "");
+
+  if (digits.startsWith("63")) digits = digits.slice(2);
+  if (digits.startsWith("0")) digits = digits.slice(1);
+
+  return /^9\d{9}$/.test(digits);
 }
+

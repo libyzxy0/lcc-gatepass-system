@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Text, View, SafeAreaView, Button } from "@/components";
 import { ScrollView } from "react-native";
 import { useColors } from "@/hooks/useColors";
@@ -13,10 +13,45 @@ import Octicons from '@expo/vector-icons/Octicons';
 
 export default function Settings() {
   const colors = useColors();
-  const { logout, accessToken, visitor } = useAuthStore();
+  const { logout, accessToken, visitor, getSession } = useAuthStore();
   const [editProfile, showEditProfile] = useState(false);
   
-  if(!visitor) return <Text>Something went wrong! Imissyou Renelyn -_^</Text>;
+  useEffect(() => {
+    const restoreSession = async () => {
+      try {
+        await getSession();
+      } catch (e) {
+        console.error(e);
+      }
+    };
+
+    restoreSession();
+  }, []);
+  
+  const accountStatus = (vst) => {
+    if(vst.activated === false) return {
+       label: "Account not activated",
+       color: colors.textSecondary
+     };
+    if(!vst.valid_id_photo_url) return { 
+      label:"Missing Valid ID",
+      color: colors.textSecondary
+    };
+    if(vst.valid_id_photo_url && vst.verified === false) return {
+      label: "Account In Review",
+      color: colors.warning
+    };
+    if(vst.verified === false) return {
+      label: "Not Verified",
+      color: colors.danger
+    }
+    if(vst.verified) return {
+      label: "Verified Account",
+      color: colors.primary
+    }
+  }
+  
+  if(!visitor) return <Text>ERROR[CODE_SUPOT101] Failed to get session!</Text>;
 
   return (
     <SafeAreaView>
@@ -56,11 +91,11 @@ export default function Settings() {
               alignItems: 'center',
               gap: 5
             }}>
-              <Octicons name={visitor.verified && visitor.activated ? 'verified' : 'unverified'} size={12} color={visitor.verified && visitor.activated ? colors.primary : colors.textSecondary} />
+              <Octicons name={visitor.verified ? 'verified' : 'unverified'} size={12} color={accountStatus(visitor).color} />
               <Text style={{
                 fontSize: 12,
-                color: visitor.verified && visitor.activated ? colors.primary : colors.textSecondary
-              }}>{visitor.verified && visitor.activated ? 'Account Verified' : 'Please submit your Valid ID'}</Text>
+                color: accountStatus(visitor).color
+              }}>{accountStatus(visitor).label}</Text>
             </View>
           </View>
         </View>
@@ -202,9 +237,7 @@ export default function Settings() {
               </Text>
             </View>
           </View>
-          
           <ProfileValidId />
-          
         </View>
       </ScrollView>
     </SafeAreaView>

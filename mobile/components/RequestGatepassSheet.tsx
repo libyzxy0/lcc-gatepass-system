@@ -88,6 +88,17 @@ export const RequestGatepassSheet = forwardRef<BottomSheet, any>((props, ref) =>
     }
   };
 
+  const resetState = () => {
+    setSelectedPurpose({ label: '', value: '' })
+    setSelectedVehicleType({ label: '', value: '' })
+    setSelectedVehicleOption({ label: "No, I don't have", value: 'no' })
+    setSubPurpose(null);
+    setDescription(null);
+    setDateISO(null);
+    setVehiclePlateNo(null);
+    setLoading(false);
+  }
+
   const handleRequestGatepass = async () => {
     if (selectedPurpose.value === '') {
       showToast({
@@ -169,17 +180,10 @@ export const RequestGatepassSheet = forwardRef<BottomSheet, any>((props, ref) =>
       });
       return;
     }
-    
+
     await fetchGatepass();
 
-    setSelectedPurpose({ label: '', value: '' })
-    setSelectedVehicleType({ label: '', value: '' })
-    setSelectedVehicleOption({ label: "No, I don't have", value: 'no' })
-    setSubPurpose(null);
-    setDescription(null);
-    setDateISO(null);
-    setVehiclePlateNo(null);
-    setLoading(false);
+    resetState();
     ref.current?.close();
     showToast({
       type: 'success',
@@ -190,6 +194,7 @@ export const RequestGatepassSheet = forwardRef<BottomSheet, any>((props, ref) =>
 
   return (
     <BottomSheet
+      onClose={resetState}
       keyboardBehavior={'extend'}
       containerStyle={{
         paddingHorizontal: 20
@@ -249,9 +254,6 @@ export const RequestGatepassSheet = forwardRef<BottomSheet, any>((props, ref) =>
             }}
             selectedValue={selectedPurpose}
             options={purposeOptions}
-            dropdownStyle={{
-              top: 30
-            }}
           />
           {selectedPurpose.value === 'other' && (
             <BottomSheetTextInput
@@ -375,9 +377,6 @@ export const RequestGatepassSheet = forwardRef<BottomSheet, any>((props, ref) =>
                 value: 'no'
               }
             ]}
-            dropdownStyle={{
-              bottom: 30
-            }}
           />
         </View>
 

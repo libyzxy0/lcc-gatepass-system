@@ -26,7 +26,7 @@ export const uploadImage = async (uri: string) => {
     return response.data;
 
   } catch (error: any) {
-    console.error(error);
+    console.error(error.response ? error.response.data.error : error.message);
     throw error;
   }
 };

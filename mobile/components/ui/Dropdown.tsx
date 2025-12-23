@@ -32,8 +32,8 @@ export const Dropdown: React.FC<DropdownProps> = ({
   const selectorRef = useRef<View>(null);
 
   const selectedLabel =
-  options.find(opt => opt.value === selectedValue?.value)?.label ||
-  placeholder;
+    options.find(opt => opt.value === selectedValue?.value)?.label ||
+    placeholder;
 
   return (
     <View>
@@ -57,9 +57,9 @@ export const Dropdown: React.FC<DropdownProps> = ({
         <Text style={{ color: selectedValue.value === '' ? colors.textSecondary : colors.text, marginRight: 8 }}>
           {selectedLabel}
         </Text>
-        <Ionicons 
-          name={open ? 'chevron-up' : 'chevron-down'} 
-          size={16} 
+        <Ionicons
+          name={open ? 'chevron-up' : 'chevron-down'}
+          size={16}
           color={colors.textSecondary}
         />
       </TouchableOpacity>
@@ -67,8 +67,7 @@ export const Dropdown: React.FC<DropdownProps> = ({
       {open && (
         <View
           style={{
-            position: 'absolute',
-            right: 40,
+            top: 0,
             backgroundColor: colors.card,
             borderWidth: 1,
             borderColor: colors.border,
@@ -98,26 +97,33 @@ export const Dropdown: React.FC<DropdownProps> = ({
                 style={{
                   paddingHorizontal: 14,
                   paddingVertical: 12,
-                  backgroundColor: String(item.value) === String(selectedValue.value) 
-                    ? colors.primary + '15' 
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  backgroundColor: String(item.value) === String(selectedValue.value)
+                    ? colors.primary + '15'
                     : 'transparent',
                   ...itemStyle,
                 }}
                 activeOpacity={0.7}
               >
-                <Text 
-                  style={{ 
-                    color: String(item.value) === String(selectedValue.value) 
-                      ? colors.primary 
+
+                <Text
+                  style={{
+                    color: String(item.value) === String(selectedValue.value)
+                      ? colors.primary
                       : colors.text,
-                    fontFamily: String(item.value) === String(selectedValue.value) 
-                      ? 'NunitoSemiBold' 
+                    fontFamily: String(item.value) === String(selectedValue.value)
+                      ? 'NunitoSemiBold'
                       : 'Nunito',
                     textAlign: 'left',
                   }}
                 >
                   {item.label}
                 </Text>
+                {String(item.value) === String(selectedValue.value) && (
+                  <Ionicons name="checkmark" size={16} color={colors.primary} />
+                )}
               </TouchableOpacity>
             )}
           />

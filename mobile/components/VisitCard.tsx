@@ -137,7 +137,7 @@ export function VisitCard({ id, purpose, description, vehicle, status, schedule_
                 alignItems: 'center',
                 gap: 5
               }}>
-                <Octicons name="clock" size={12} style={{
+                <Octicons name={iconMap[status]} size={12} style={{
                   color: colorStatusMap[status]
                 }} />
                 <Text style={{ fontSize: 12, color: colorStatusMap[status] }}>

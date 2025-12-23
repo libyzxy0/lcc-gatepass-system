@@ -1,11 +1,11 @@
 import { Request, Response } from "express";
 import db from '@/db/drizzle'
-import { visitor, visit } from '@/db/schema'
-import { eq, desc } from 'drizzle-orm'
-import { generateVisitorToken, generateVisitorID } from '@/utils'
+import { visitor } from '@/db/schema'
+import { eq } from 'drizzle-orm'
+import VisitorService from '@/services/visitor.service'
+import AuthService from '@/services/auth.service'
 
 type Visitor = typeof visitor.$inferSelect;
-type Visits = typeof visit.$inferSelect;
 
 type VisitorSession = Omit<Visitor, "pin"> & {
   pin?: string;
@@ -22,155 +22,65 @@ interface VisitorRequest extends Request {
 }
 
 class VisitorController {
-  async register(req: Request, res: Response) {
+  static async register(req: Request, res: Response) {
     try {
-      if (!req.body) {
-        res.status(400).json({
-          error: "Failed to register visitor, missing request body!"
-        })
-      }
-      await db.insert(visitor).values({
-        visitor_id: generateVisitorID(),
-        ...req.body
+      const vst = req.body;
+
+      const { phone_number } = await VisitorService.createVisitor({
+        firstname: vst.firstname,
+        lastname: vst.lastname,
+        middle_initial: vst.middle_initial ?? null,
+        email: vst.email,
+        phone_number: vst.phone_number,
+        pin: vst.pin
       })
+
       res.status(200).json({
-        message: `Account for ${req.body.phone_number} created successfully!`
+        message: `Account for ${phone_number} created successfully!`
       })
     } catch (error) {
-      console.error("[ERROR VISITOR CONTROLLER]:", error);
-      res.status(500).json({
-        error: "Failed to register visitor, something went wrong"
+      res.status(error.status || 500).json({
+        error: error.message
       })
     }
   }
-
-  async login(req: Request, res: Response) {
+  static async login(req: Request, res: Response) {
     try {
       const { phone_number, pin } = req.body;
-      const visitorData: Visitor[] = await db
-        .select()
-        .from(visitor)
-        .where(eq(visitor.phone_number, phone_number));
 
-      if (visitorData.length <= 0) {
-        return res.status(404).json({ error: "Invalid Phone Number" });
-      }
+      if (!phone_number) return res.status(401).json({ error: "Please enter your mobile number" })
+      if (!pin) return res.status(401).json({ error: "Please enter your pin" })
 
-      if (visitorData[0].pin !== pin) {
-        return res.status(400).json({ error: "Incorrect Pin" });
-      }
+      const visitorData = await VisitorService.login({ phone_number, pin });
 
-      const accessToken = generateVisitorToken(visitorData[0].id);
+      const accessToken = AuthService.generateVisitorAccessToken(visitorData.id);
 
       return res.status(200).json({
-        message: "Login successful",
+        message: `Logged in as ${visitorData.phone_number}`,
         access_token: accessToken,
       });
+
     } catch (error) {
-      console.error("[ERROR VISITOR CONTROLLER]:", error.message);
-      return res.status(500).json({ error: "Something went wrong" });
+      return res.status(error.status || 500).json({ error: error.message });
     }
   }
-
-  async getSession(req: VisitorRequest, res: Response) {
+  static async getSession(req: VisitorRequest, res: Response) {
     try {
       if (!req.visitor) {
         return res.status(401).json({ error: "Unauthorized access!" });
       }
 
-      const visitorData: VisitorSession[] = await db
-        .select({
-          id: visitor.id,
-          visitor_id: visitor.visitor_id,
-          firstname: visitor.firstname,
-          lastname: visitor.lastname,
-          middle_initial: visitor.middle_initial,
-          address: visitor.address,
-          email: visitor.email,
-          phone_number: visitor.phone_number,
-          verified: visitor.verified,
-          activated: visitor.activated,
-          valid_id_type: visitor.valid_id_type,
-          valid_id_photo_url: visitor.valid_id_photo_url,
-          photo_url: visitor.photo_url,
-          created_at: visitor.created_at,
-        })
-        .from(visitor)
-        .where(eq(visitor.id, req.visitor.id));
+      const visitorData = await VisitorService.getVisitor(req.visitor.id);
 
       return res.json({
-        ...visitorData[0],
-        middle_initial: visitorData[0].middle_initial === '' ? null : visitorData[0].middle_initial
+        ...visitorData,
+        middle_initial: visitorData.middle_initial === '' ? null : visitorData.middle_initial
       });
     } catch (error) {
-      console.error("[ERROR GET SESSION]:", error);
       return res.status(401).json({ error: "Failed to get session, please authenticate first" });
     }
   }
-  async requestGatepass(req: VisitorRequest, res: Response) {
-    try {
-      const { purpose, description, schedule_date, vehicle } = req.body;
-
-      const gatepassData = await db.insert(visit).values({
-        visitor_id: req.visitor.id,
-        purpose,
-        description,
-        schedule_date: schedule_date,
-        vehicle_type: vehicle ? vehicle.type : null,
-        vehicle_plate: vehicle ? vehicle.plate_number : null,
-        qr_token: null
-      }).returning();
-      
-      const qr_token = generateVisitorToken(gatepassData[0].id);
-
-      await db.update(visit).set({
-        qr_token
-      }).where(eq(visit.id, gatepassData[0].id))
-
-      return res.status(200).json({
-        message: 'Gatepass request has been sent to Administrators!'
-      })
-
-    } catch (error) {
-      console.error("[ERROR REQUEST GATEPASS]:", error);
-      return res.status(500).json({ error: "Failed to request gatepass, something went wrong!" });
-    }
-  }
-
-  async gatepass(req: VisitorRequest, res: Response) {
-    try {
-      const visits: Visits[] = await db.select().from(visit).where(eq(visit.visitor_id, req.visitor.id)).orderBy(desc(visit.created_at))
-
-      return res.status(200).json(visits);
-    } catch (error) {
-      console.error("[ERROR GET VISIT]:", error);
-      return res.status(500).json({ error: "Failed to create visit, something went wrong!" });
-    }
-  }
-
-  async deleteGatepass(req: Request, res: Response) {
-    try {
-      const { id } = req.params;
-
-      const visitData = await db.select().from(visit).where(eq(visit.id, id));
-
-      if (visitData.length === 0) {
-        return res.status(404).json({
-          error: "No visit associated with that ID"
-        })
-      }
-      await db.delete(visit)
-        .where(eq(visit.id, visitData[0].id));
-      res.status(200).json({ message: "Your gatepass has been deleted succesfully!" })
-    } catch (error) {
-      console.error("[ERROR VISITOR CONTROLLER]:", error);
-      res.status(500).json({
-        error: "Failed to delete gatepass, something went wrong!"
-      })
-    }
-  }
-
-  async updateAccount(req: Request, res: Response) {
+  static async updateAccount(req: Request, res: Response) {
     try {
       const { id, fields } = req.body;
 
@@ -180,99 +90,29 @@ class VisitorController {
         })
       }
 
-      const visitorData = await db.select().from(visitor).where(eq(visitor.id, id));
-      if (visitorData.length <= 0) {
-        return res.status(404).json({
-          error: "No visitor associated with that ID"
-        })
-      }
-
-      await db.update(visitor)
-        .set(fields)
-        .where(eq(visitor.id, visitorData[0].id));
+      await VisitorService.updateVisitor({ id, fields })
 
       res.status(200).json({ message: "Successfully updated your account information" })
     } catch (error) {
-      console.error("[ERROR VISITOR CONTROLLER]:", error);
-      res.status(500).json({
-        error: "Failed to update account information, something went wrong"
+      res.status(error.status || 500).json({
+        error: error.message
       })
     }
   }
-
-  async checkPhoneNumber(req: Request, res: Response) {
+  static async checkPhoneNumber(req: Request, res: Response) {
     try {
       const { phone_number } = req.body;
 
-      const visitorData = await db.select({ id: visitor.id }).from(visitor).where(eq(visitor.phone_number, phone_number)) ?? null;
+      const visitorData = await VisitorService.isThereVisitorWithNumber(phone_number);
 
-      if (visitorData.length === 0) {
-        res.status(404).json({
-          error: "Phone number not signed!"
-        });
-      }
-
-      console.log(visitorData[0]);
-
-      res.status(200).json(visitorData[0]);
+      res.status(200).json(visitorData);
 
     } catch (error) {
-      console.error("[ERROR VISITOR CONTROLLER]:", error);
-      res.status(500).json({
-        error: "Failed to get visitor, something went wrong"
-      })
-    }
-  }
-
-  async getVisitor(req: Request, res: Response) {
-    try {
-      const { id } = req.body;
-      const visitorData = await db.select().from(visitor).where(eq(visitor.id, id));
-      if (visitorData.length <= 0) {
-        return res.status(404).json({
-          error: "No visitor associated with that ID"
-        })
-      }
-      res.status(200).json(visitorData[0])
-    } catch (error) {
-      console.error("[ERROR VISITOR CONTROLLER]:", error);
-      res.status(500).json({
-        error: "Failed to get visitor, something went wrong"
-      })
-    }
-  }
-
-  async getVisitors(req: Request, res: Response) {
-    const visitors = await db.select().from(visitor);
-    if (visitors.length <= 0) {
-      return res.status(404).json({
-        error: "No visitor added on the database yet."
-      })
-    }
-    res.status(200).json(visitors)
-  }
-
-  async deleteVisitor(req: Request, res: Response) {
-    try {
-      const { id } = req.params;
-      const visitorData = await db.select().from(visitor).where(eq(visitor.id, id));
-      if (visitorData.length <= 0) {
-        return res.status(404).json({
-          error: "No visitor associated with that ID"
-        })
-      }
-
-      await db.delete(visitor)
-        .where(eq(visitor.id, visitorData[0].id));
-
-      res.status(200).json({ message: "Visitor deleted successfully" })
-    } catch (error) {
-      console.error("[ERROR VISITOR CONTROLLER]:", error);
-      res.status(500).json({
-        error: "Failed to delete visitor, something went wrong"
+      res.status(error.status || 500).json({
+        error: error.message
       })
     }
   }
 }
 
-export default new VisitorController();
+export default VisitorController;

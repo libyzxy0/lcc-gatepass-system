@@ -16,6 +16,8 @@ import React, { useState, useRef } from "react";
 import { checkNumber } from '@/api/helper/check-num'
 import { useRouter } from 'expo-router'
 import { normalize, isValidPHPhoneNumber } from '@/utils/format-ph-number'
+import waveBorder from "@/assets/images/wave-border.svg";
+import { ActivityIndicator } from 'react-native'
 
 export default function PhonePage() {
   const router = useRouter();
@@ -58,7 +60,7 @@ export default function PhonePage() {
       }
 
       if (isValidNumber.valid) {
-        setPhoneNumber(phone);
+        setPhoneNumber(normalize(phone));
       } else {
         router.push(`/register/${phone}`);
       }
@@ -75,113 +77,122 @@ export default function PhonePage() {
   };
 
   return (
-    <SafeAreaView>
-      <View
-        style={{
-          marginTop: 25,
-          alignItems: "center",
-          gap: 20
-        }}
-      >
-        <Image
-          source={logo}
-          style={{
-            width: 250,
-            height: 100
-          }}
-          contentFit="contain"
-        />
-
-        <Text type="bold">Enter Mobile Number</Text>
-        <Text type="secondary" style={{
-          textAlign: 'center',
-          marginHorizontal: 20
-        }}>Please enter your mobile number below to continue, we will use it to verify your identity.</Text>
-      </View>
-
-      <View
-        style={{
-          flex: 1,
-          alignItems: "center",
-          marginTop: 60,
-          marginHorizontal: 30,
-          gap: 14
-        }}
-      >
+      <SafeAreaView style={{
+        backgroundColor: colors.background
+      }}>
         <View
           style={{
-            width: "100%",
-            flexDirection: "column",
-            gap: 5
+            alignItems: "center",
+            gap: 20,
+            paddingTop: 40
           }}
         >
-          <Text>Mobile Number</Text>
-          <View style={{
-            flexDirection: 'row',
-            gap: 5,
-            alignItems: 'center'
-          }}>
-            <Input
-              onChangeText={value =>
-                setPhone(value)
-              }
-              value={phone ?? undefined}
-              cursorColor={colors.primary}
-              textContentType={"telephoneNumber"}
-              keyboardType={"numeric"}
-              autoCorrect={false}
-              inputMode={"numeric"}
-              autoComplete={"tel"}
-              autoFocus={true}
-              style={{
-                paddingVertical: 14,
-                paddingHorizontal: 14,
-                borderRadius: 10,
-                flex: 1
-              }}
-              placeholder="Enter Mobile Number (e.g.: 9937793944)"
-            />
-          </View>
+          <Image
+            source={logo}
+            style={{
+              width: 250,
+              height: 100
+            }}
+            contentFit="contain"
+          />
+
+          <Text type="bold">Enter Mobile Number</Text>
+          <Text type="secondary" style={{
+            textAlign: 'center',
+            marginHorizontal: 20
+          }}>Please enter your mobile number below to continue, we will use it to verify your identity.</Text>
         </View>
 
         <View
           style={{
-            width: "100%",
-            marginTop: 5
+            flex: 1,
+            alignItems: "center",
+            marginTop: 60,
+            marginHorizontal: 30,
+            gap: 14
           }}
         >
-          <Button
-            onPress={handleLogin}
+          <View
             style={{
-              paddingVertical: 10,
-              alignItems: "center",
               width: "100%",
-              borderRadius: 10
+              flexDirection: "column",
+              gap: 5
             }}
-            disabled={loading}
           >
-            {loading ? "Loading..." : "Continue"}
-          </Button>
-        </View>
+            <Text>Mobile Number</Text>
+            <View style={{
+              flexDirection: 'row',
+              gap: 5,
+              alignItems: 'center'
+            }}>
+              <Input
+                onChangeText={value =>
+                  setPhone(value)
+                }
+                value={phone ?? undefined}
+                cursorColor={colors.primary}
+                textContentType={"telephoneNumber"}
+                keyboardType={"numeric"}
+                autoCorrect={false}
+                inputMode={"numeric"}
+                autoComplete={"tel"}
+                autoFocus={true}
+                style={{
+                  paddingVertical: 14,
+                  paddingHorizontal: 14,
+                  borderRadius: 10,
+                  flex: 1
+                }}
+                placeholder="Enter Mobile Number (e.g.: 9937793944)"
+              />
+            </View>
+          </View>
 
-        <View
-          style={{
-            marginTop: 28,
-            gap: 120,
-            alignItems: "center"
-          }}
-        >
-          <Text
-            type="secondary"
+          <View
             style={{
-              fontSize: 12,
-              textAlign: 'center'
+              width: "100%",
+              marginTop: 5,
             }}
           >
-            © Copyright 2025, La Concepcion College Digital Gatepass System, All rights reserved.
-          </Text>
+            <Button
+              onPress={handleLogin}
+              style={{
+                paddingVertical: 10,
+                alignItems: "center",
+                width: "100%",
+                borderRadius: 10
+              }}
+              disabled={loading}
+            >
+              {loading ? (
+                <ActivityIndicator size={22} color={'white'}/>
+              ) : "Continue"}
+            </Button>
+          </View>
+
+        
         </View>
-      </View>
-    </SafeAreaView>
+        <View
+            style={{
+              marginHorizontal: 30,
+              alignItems: "center",
+              marginBottom: 40
+            }}
+          >
+            <Text
+              type="secondary"
+              style={{
+                fontSize: 12,
+                textAlign: 'center'
+              }}
+            >
+              © Copyright 2025, La Concepcion College Digital Gatepass System, All rights reserved.
+            </Text>
+          </View>
+        <Image source={waveBorder} style={{
+          height: 100,
+          width: '100%',
+        }} />
+      </SafeAreaView>
   );
 }

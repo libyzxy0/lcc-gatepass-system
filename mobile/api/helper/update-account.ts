@@ -29,7 +29,7 @@ export const updateVisitor = async ({ id, fields }: { id: string; fields: Update
       ...response.data
     };
   } catch (error) {
-    console.error('Failed to update visitor information!')
+    console.error(error.response ? error.response.data.error : error.message);
     return {
       error: error.response ? error.response.data.error : error.message
     };

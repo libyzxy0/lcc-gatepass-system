@@ -92,7 +92,7 @@ export default function Pin() {
           marginTop: 30,
         }}>
           <TouchableOpacity onPress={() => setShowConfirm(true)} activeOpacity={0.8} style={{
-            backgroundColor: colors.primary,
+            backgroundColor: colors.backgroundPinScreen,
             paddingHorizontal: 16,
             paddingVertical: 8,
             borderRadius: 50,
@@ -116,77 +116,78 @@ export default function Pin() {
         </View>
       </View>
 
-      <Image source={waveBorder} style={{
-        height: 100,
-        width: '100%',
-        marginTop: 40
-      }}/>
       <View style={{
         position: 'absolute',
         width: '100%',
-        paddingTop: 10,
-        paddingBottom: 20,
         bottom: 0,
-        justifyContent: "center",
-        gap: 14,
-        backgroundColor: colors.backgroundPinScreen,
-        paddingHorizontal: 14
       }}>
-        {[
-          ["1", "2", "3"],
-          ["4", "5", "6"],
-          ["7", "8", "9"],
-          ["", "0", "back"]
-        ].map((row, rowIndex) => (
-          <View
-            key={rowIndex}
-            style={{ flexDirection: "row", justifyContent: "space-around" }}
-          >
-            {row.map((item, index) => {
-              if (item === "") return <View key={index} style={{ width: 70 }} />;
+        <Image source={waveBorder} style={{
+          height: 100,
+          width: '100%',
+        }} />
+        <View style={{
+          justifyContent: "center",
+          gap: 14,
+          backgroundColor: colors.backgroundPinScreen,
+          paddingHorizontal: 14,
+          paddingBottom: 25,
+        }}>
+          {[
+            ["1", "2", "3"],
+            ["4", "5", "6"],
+            ["7", "8", "9"],
+            ["", "0", "back"]
+          ].map((row, rowIndex) => (
+            <View
+              key={rowIndex}
+              style={{ flexDirection: "row", justifyContent: "space-around" }}
+            >
+              {row.map((item, index) => {
+                if (item === "") return <View key={index} style={{ width: 70 }} />;
 
-              if (item === "back") {
+                if (item === "back") {
+                  return (
+                    <TouchableOpacity
+                      key={index}
+                      onPress={handleBackspace}
+                      activeOpacity={0.8}
+                      style={{
+                        width: 70,
+                        height: 70,
+                        justifyContent: "center",
+                        alignItems: "center",
+                      }}
+                    >
+                      <Ionicons name="backspace-outline" size={34} color={'white'} />
+                    </TouchableOpacity>
+                  );
+                }
+
                 return (
                   <TouchableOpacity
                     key={index}
-                    onPress={handleBackspace}
+                    onPress={() => handlePress(item)}
                     activeOpacity={0.8}
                     style={{
-                      width: 70,
-                      height: 70,
+                      width: 60,
+                      height: 60,
                       justifyContent: "center",
                       alignItems: "center",
                     }}
                   >
-                    <Ionicons name="backspace-outline" size={34} color={'white'} />
+                    <Text type="bold" style={{ fontSize: 32, color: 'white' }}>{item}</Text>
                   </TouchableOpacity>
                 );
-              }
-
-              return (
-                <TouchableOpacity
-                  key={index}
-                  onPress={() => handlePress(item)}
-                  activeOpacity={0.8}
-                  style={{
-                    width: 60,
-                    height: 60,
-                    justifyContent: "center",
-                    alignItems: "center",
-                  }}
-                >
-                  <Text type="bold" style={{ fontSize: 32, color: 'white' }}>{item}</Text>
-                </TouchableOpacity>
-              );
-            })}
+              })}
+            </View>
+          ))}
+          <View style={{
+            alignItems: 'center'
+          }}>
+            <Text style={{
+              color: '#a7a7a7'
+            }}>Project made possible by ICT-12A Group 2.</Text>
           </View>
-        ))}
-        <View style={{
-          alignItems: 'center'
-        }}>
-          <Text style={{
-            color: '#a7a7a7'
-          }}>Project made possible by ICT-12A Group 2.</Text>
         </View>
       </View>
 

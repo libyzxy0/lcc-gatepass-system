@@ -77,12 +77,12 @@ function RootLayoutNav() {
 
     restoreSession();
   }, []);
-
+  
   useEffect(() => {
-    if (isLoggedIn && visitor?.activated === false) {
+    if (visitor && visitor.activated === false) {
       router.replace('/otp');
     }
-  }, [isLoggedIn])
+  }, [visitor])
 
   useEffect(() => {
     if (sessionReady) {

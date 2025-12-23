@@ -17,6 +17,8 @@ import { ScrollView } from 'react-native'
 import { useLocalSearchParams } from 'expo-router';
 import { visitorRegister } from '@/api/helper/register'
 import { useRouter } from 'expo-router'
+import { normalize } from '@/utils/format-ph-number'
+import { ActivityIndicator } from 'react-native'
 
 type ActionType = {
   type: 'email_change' | 'pin_change' | 'phone_change' | 'firstname_change' | 'lastname_change';
@@ -85,12 +87,14 @@ export default function NewAccountPage() {
 
   const handleCreateAccount = async () => {
     setLoading(true);
+    
     if (!state.firstname) {
       showToast({
         type: "warning",
         text1: "Failed to create account!",
         text2: `Please enter your firstname.`
       });
+      setLoading(false);
       return;
     }
     if (!state.lastname) {
@@ -99,6 +103,7 @@ export default function NewAccountPage() {
         text1: "Failed to create account!",
         text2: `Please enter your lastname.`
       });
+      setLoading(false);
       return;
     }
     if (!state.email) {
@@ -107,6 +112,7 @@ export default function NewAccountPage() {
         text1: "Failed to create account!",
         text2: `Please enter your email.`
       });
+      setLoading(false);
       return;
     }
 
@@ -116,6 +122,7 @@ export default function NewAccountPage() {
         text1: "Failed to create account!",
         text2: `Please enter your phone number.`
       });
+      setLoading(false);
       return;
     }
 
@@ -125,6 +132,7 @@ export default function NewAccountPage() {
         text1: "Failed to create account!",
         text2: `Please enter your desired pin!`
       });
+      setLoading(false);
       return;
     }
 
@@ -136,8 +144,9 @@ export default function NewAccountPage() {
         text1: "Account Created",
         text2: data.message
       });
-      setPhoneNumber(phonenum);
+      setPhoneNumber(normalize(phonenum));
       await login(state.pin);
+      setLoading(false);
       router.push('/otp');
     } else {
       showToast({
@@ -358,7 +367,9 @@ export default function NewAccountPage() {
               }}
               disabled={loading}
             >
-              {loading ? 'Loading...' : 'Create Account'}
+              {loading ? (
+                <ActivityIndicator size={22} color={'white'}/>
+                ) : 'Create Account'}
             </Button>
           </View>
 

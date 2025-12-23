@@ -1,63 +1,44 @@
 import { Request, Response } from "express";
-import db from "@/db/drizzle";
-import jwt from "jsonwebtoken";
-import bcrypt from "bcryptjs";
-import { admin } from "@/db/schema";
-import { eq } from "drizzle-orm";
+import AdminService from '@/services/admin.service'
+import AuthService from '@/services/auth.service'
 import { verifyTurnstile } from '@/utils/verify-cf-turnstile'
-import { generateAccessToken, generateRefreshToken } from '@/utils'
-import { JWT_REFRESH_SECRET } from '@/secrets'
 
-type Admin = typeof admin.$inferSelect;
-
-type AdminSession = Omit<Admin, "password"> & {
-  password?: string;
-};
-
-interface TokenDecodedType {
+interface ITokenDecodedType {
   id: string;
   iat: number;
   exp: number;
 }
-
-interface AdminRequest extends Request {
-  admin?: TokenDecodedType;
+interface IAdminRequest extends Request {
+  admin?: ITokenDecodedType;
 }
 
 class AdminController {
-  async newAdmin(req: Request, res: Response) {
+  static async newAdmin(req: Request, res: Response) {
     try {
-      const {
-        firstname,
-        lastname,
-        role,
-        email,
-        phone_number,
-        password,
-        photo_url
-      } = req.body;
+      const adm = req.body;
 
-      const hashedPassword = await bcrypt.hash(password, 10);
-
-      await db.insert(admin).values({
-        firstname,
-        lastname,
-        role,
-        email,
-        phone_number,
-        password: hashedPassword,
-        photo_url
+      const newAdmin = await AdminService.createAdmin({
+        firstname: adm.firstname,
+        lastname: adm.lastname,
+        role: adm.role,
+        email: adm.email,
+        phone_number: adm.phone_number,
+        password: adm.password,
+        photo_url: adm.photo_url ?? null
       });
+
       res.status(200).json({
         message: "Admin created successfully",
+        data: {
+          id: newAdmin.id,
+          email: newAdmin.email
+        }
       });
     } catch (error) {
-      console.error("[ERROR ADMIN CONTROLLER]:", error);
-      res.status(500).send({ message: "Something went wrong" });
+      res.status(500).send({ message: error.message });
     }
   }
-
-  async login(req: Request, res: Response) {
+  static async login(req: Request, res: Response) {
     try {
       const { email, password, cloudflare_token } = req.body;
 
@@ -69,24 +50,10 @@ class AdminController {
         }
       }
 
+      const adminData = await AdminService.adminLogin({ email, password })
 
-      const adminData: Admin[] = await db
-        .select()
-        .from(admin)
-        .where(eq(admin.email, email));
-
-      if (adminData.length <= 0) {
-        return res.status(404).json({ message: "No admin associated with that email" });
-      }
-
-      const isValidPassword = await bcrypt.compare(password, adminData[0].password);
-
-      if (!isValidPassword) {
-        return res.status(400).json({ message: "Please enter the correct password" });
-      }
-
-      const accessToken = generateAccessToken(adminData[0].id);
-      const refreshToken = generateRefreshToken(adminData[0].id);
+      const accessToken = AuthService.generateAdminAccessToken(adminData.id);
+      const refreshToken = AuthService.generateAdminRefreshToken(adminData.id);
 
       res.cookie("refreshToken", refreshToken, {
         httpOnly: true,
@@ -96,16 +63,15 @@ class AdminController {
       });
 
       return res.status(200).json({
-        message: "Login successful",
+        message: `You're currently logged in as ${adminData.email}`,
         access_token: accessToken,
       });
+      
     } catch (error) {
-      console.error("[ERROR ADMIN CONTROLLER]:", error);
-      return res.status(500).json({ message: "Something went wrong" });
+      return res.status(500).json({ message: error.message });
     }
   }
-
-  async refresh(req: Request, res: Response) {
+  static async refresh(req: Request, res: Response) {
     try {
       const refreshToken = req.cookies?.refreshToken;
 
@@ -113,13 +79,8 @@ class AdminController {
         return res.status(401).json({ message: "Refresh token missing" });
       }
 
-      const decoded = jwt.verify(
-        refreshToken,
-        JWT_REFRESH_SECRET
-      ) as TokenDecodedType;
-
-      const newAccessToken = generateAccessToken(decoded.id);
-      
+      const decoded = AuthService.verifyAdminRefreshToken(refreshToken)
+      const newAccessToken = AuthService.generateAdminAccessToken(decoded.id);
       return res.status(200).json({
         access_token: newAccessToken,
       });
@@ -128,39 +89,21 @@ class AdminController {
       return res.status(403).json({ message: "Invalid refresh token" });
     }
   }
-
-  async logout(req: Request, res: Response) {
+  static async logout(req: Request, res: Response) {
     res.clearCookie("refreshToken");
     return res.status(200).json({ message: "Logged out successfully" });
   }
-
-  async getSession(req: AdminRequest, res: Response) {
+  static async getSession(req: IAdminRequest, res: Response) {
     try {
       if (!req.admin) {
         return res.status(401).json({ message: "Unauthorized access!" });
       }
-
-      const adminData: AdminSession[] = await db
-        .select({
-          id: admin.id,
-          firstname: admin.firstname,
-          lastname: admin.lastname,
-          email: admin.email,
-          phone_number: admin.phone_number,
-          role: admin.role,
-          is_super_admin: admin.is_super_admin,
-          photo_url: admin.photo_url,
-          created_at: admin.created_at
-        })
-        .from(admin)
-        .where(eq(admin.id, req.admin.id));
-
-      return res.json(adminData[0]);
+      const adminData = await AdminService.getAdmin(req.admin.id)
+      return res.json(adminData);
     } catch (error) {
-      console.error("[ERROR ADMIN CONTROLLER]:", error);
       return res.status(401).json({ message: "invalid or expired token" });
     }
   }
 }
 
-export default new AdminController();
+export default AdminController;

@@ -51,7 +51,6 @@ export const useAuthStore = create(
         await get().getSession();
       },
       logout: () => {
-        console.log("Logging out!");
         set(state => {
           return {
             ...state,
