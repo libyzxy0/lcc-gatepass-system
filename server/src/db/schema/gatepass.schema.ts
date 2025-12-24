@@ -11,12 +11,13 @@ import { visitor } from './visitor.schema'
 export const statusEnum = pgEnum("status", [
   "pending",
   "approved",
-  "rejected"
+  "rejected",
+  "expired"
 ]);
 
 export const gatepass = pgTable("gatepass", {
   id: uuid("id").primaryKey().defaultRandom().notNull(),
-  visitor_id: uuid("visitor_id").references(() => visitor.id),
+  visitor_id: uuid("visitor_id").references(() => visitor.id).notNull(),
   purpose: text("purpose").notNull(),
   description: text("description").notNull(),
   vehicle_type: text("vehicle_type"),

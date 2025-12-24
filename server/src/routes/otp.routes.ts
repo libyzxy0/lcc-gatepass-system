@@ -1,18 +1,15 @@
-import { Router } from "express";
+import { Router, Request } from "express";
 import controller from "@/controllers/otp.controller";
-
-import rateLimit from "express-rate-limit";
-import { Request } from "express";
+import rateLimit, { ipKeyGenerator } from "express-rate-limit";
 
 export const otpRateLimit = rateLimit({
-  windowMs: 5 * 60 * 1000,
-  max: 1, 
+  windowMs: 5 * 60 * 1000, 
+  max: 1,
   standardHeaders: true,
   legacyHeaders: false,
   keyGenerator: (req: Request) => {
-    return req.body.phone_number || req.ip;
+    return req.body.phone_number || ipKeyGenerator(req.ip);
   },
-
   handler: (req, res) => {
     res.status(429).json({
       error: "OTP already sent. Please wait 5 minutes before requesting again."

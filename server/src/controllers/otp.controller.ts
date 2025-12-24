@@ -115,7 +115,7 @@ class OTPController {
         .where(eq(visitor.id, validOtp[0].visitor_id));
 
       return res.status(200).json({
-        message: 'OTP verified successfully',
+        message: 'Account successfully activated!',
       });
 
     } catch (error) {

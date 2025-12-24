@@ -33,6 +33,14 @@ class AuthService {
     });
   }
 
+  static verifyQRToken(token: string) {
+    const decoded = jwt.verify(
+      token,
+      JWT_QR_SECRET
+    ) as TokenDecodedType;
+    return decoded;
+  }
+
   static verifyAdminRefreshToken(token: string) {
     const decoded = jwt.verify(
       token,
@@ -40,7 +48,7 @@ class AuthService {
     ) as TokenDecodedType;
     return decoded;
   }
-  
+
 }
 
 export default AuthService;
