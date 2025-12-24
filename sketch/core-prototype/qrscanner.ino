@@ -3,14 +3,9 @@
 #define QR_RX 16
 #define QR_TX 17
 #define LED_PIN 2
-#define MAX_SCAN_LENGTH 128
-#define CHAR_TIMEOUT 100
 
 HardwareSerial QRScanner(2);
-
-char scannedData[MAX_SCAN_LENGTH];
-uint8_t scanIndex = 0;
-unsigned long lastCharTime = 0;
+String barcode = "";  // dynamic string buffer
 
 void setup() {
   Serial.begin(115200);
@@ -21,18 +16,17 @@ void setup() {
 void loop() {
   while (QRScanner.available()) {
     char c = QRScanner.read();
-    digitalWrite(LED_PIN, HIGH);
-    if (scanIndex < MAX_SCAN_LENGTH - 1) {
-      scannedData[scanIndex++] = c;
-    }
-    lastCharTime = millis();
-  }
+    digitalWrite(LED_PIN, HIGH);  
 
-  if (scanIndex > 0 && millis() - lastCharTime > CHAR_TIMEOUT) {
-    scannedData[scanIndex] = '\0';
-    
-    Serial.print("DATA: "); Serial.println(scannedData);
-    scanIndex = 0;
-    digitalWrite(LED_PIN, LOW);
+    if (c == '\n' || c == '\r') {  
+      if (barcode.length() > 0) {
+        Serial.println("Scanned barcode: " + barcode);
+        barcode = ""; 
+        digitalWrite(LED_PIN, LOW);
+      }
+    } else {
+      Serial.print(c); 
+      barcode += c;
+    }
   }
 }

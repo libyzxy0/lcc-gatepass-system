@@ -5,6 +5,7 @@
 #include <SPI.h>
 #include <MFRC522.h>
 #include <HardwareSerial.h>
+#include <time.h>
 
 #define SS_PIN 5
 #define RST_PIN 22
@@ -12,13 +13,15 @@
 #define QR_RX 16
 #define QR_TX 17
 
-#define MAX_SCAN_LENGTH 128
-#define CHAR_TIMEOUT 50
+#define MAX_SCAN_LENGTH 512
 
 #define BUZZER_PIN 4
 
-const char* ssid = "OrangeCat";
-const char* password = "myorange32";
+const char* ssid = "Strawberry";
+const char* password = "pogiko123";
+
+const char* ntpServer = "pool.ntp.org";
+const char* time_zone = "PST-8";
 
 const char* mqtt_server   = "37638f32d99b49fa968d88c783e2b03a.s1.eu.hivemq.cloud";
 const int   mqtt_port     = 8883;
@@ -183,8 +186,7 @@ void connectWiFi() {
     delay(500);
     Serial.print(".");
   }
-  
-  NotificationUtil::readyTone();
+
   Serial.println("\nWiFi connected");
 }
 
@@ -200,6 +202,7 @@ void connectMQTT() {
       Serial.print("failed, rc=");
       Serial.print(mqtt.state());
       Serial.println(" retrying in 5 seconds");
+      NotificationUtil::errorTone();
       delay(5000);
     }
   }
@@ -231,24 +234,44 @@ bool scanRfid(String &uidOut) {
 }
 
 bool scanQRCode(String &qrOut) {
-  while (QRScanner.available()) {
-    char c = QRScanner.read();
-
-    if (qrIndex < MAX_SCAN_LENGTH - 1) {
-      qrBuffer[qrIndex++] = c;
+    static String barcode = "";
+    while (QRScanner.available()) {
+        char c = QRScanner.read();
+        if (c == '\n' || c == '\r') { 
+            if (barcode.length() > 0) {
+                qrOut = barcode;
+                barcode = ""; 
+                return true; 
+            }
+        } else {
+            Serial.print(c); 
+            barcode += c;
+        }
     }
 
-    lastQrCharTime = millis();
-  }
+    return false; 
+}
 
-  if (qrIndex > 0 && millis() - lastQrCharTime > CHAR_TIMEOUT) {
-    qrBuffer[qrIndex] = '\0';
-    qrOut = String(qrBuffer);
-    qrIndex = 0;
-    return true;
-  }
 
-  return false;
+
+void setup_time() {
+  configTime(28800, 0, ntpServer);
+  Serial.print("Waiting for NTP time sync: ");
+  time_t now = time(nullptr);
+  while (now < 24 * 3600) {
+    delay(100);
+    Serial.print(".");
+    now = time(nullptr);
+  }
+  Serial.println("\nTime synchronized.");
+}
+
+void getISOTime(char* buffer, size_t bufferSize) {
+  time_t now = time(nullptr);
+  struct tm timeinfo;
+  localtime_r(&now, &timeinfo);
+
+  strftime(buffer, bufferSize, "%Y-%m-%dT%H:%M:%S+08:00", &timeinfo);
 }
 
 void setup() {
@@ -261,15 +284,22 @@ void setup() {
   Serial.println("Peripherals Ready");
 
   connectWiFi();
-  Serial.println("WiFi Ready");
+  setup_time();
+  if(WiFi.status() == WL_CONNECTED) {
+    NotificationUtil::readyTone();
+  } else {
+    NotificationUtil::errorTone();
+  }
+  Serial.println("WiFi and Time Ready");
 
   secureClient.setCACert(ca_cert);
   mqtt.setServer(mqtt_server, mqtt_port);
   mqtt.setCallback(callback);
-
+  mqtt.setBufferSize(512);
+  
   connectMQTT();
   Serial.println("MQTT Connected!");
-  
+  delay(500);
   Serial.println("Device Ready");
   NotificationUtil::initializedTone();
 }
@@ -279,6 +309,9 @@ void loop() {
   if (!mqtt.connected()) {
     connectMQTT();
   }
+  
+  char isoTime[40];
+  getISOTime(isoTime, sizeof(isoTime));
   
   mqtt.loop();
   
@@ -290,8 +323,8 @@ void loop() {
     String payload = JsonUtil::create()
     .add("action", "SCAN_RFID")
     .add("data", uid.c_str())
-    .add("apikey", "libypogi@612345678")
-    .add("timestamp", "1766202447")
+    .add("secret_key", "8d70ccda-2e57-416b-94db-8b24136fb27b")
+    .add("time", isoTime)
     .toString();
     
     if (mqtt.publish("esp32/topic", payload.c_str())) {
@@ -311,8 +344,8 @@ void loop() {
     String payload = JsonUtil::create()
     .add("action", "SCAN_QR")
     .add("data", qr_data.c_str())
-    .add("apikey", "libypogi@612345678")
-    .add("timestamp", "1766202447")
+    .add("secret_key", "8d70ccda-2e57-416b-94db-8b24136fb27b")
+    .add("time", isoTime)
     .toString();
     
     if (mqtt.publish("esp32/topic", payload.c_str())) {
