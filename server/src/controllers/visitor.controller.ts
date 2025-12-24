@@ -7,6 +7,18 @@ import AuthService from '@/services/auth.service'
 
 type Visitor = typeof visitor.$inferSelect;
 
+export const normalize = (num: string | null): string | null => {
+  if (!num) return null;
+
+  let digits = num.replace(/\D/g, "");
+
+  if (digits.startsWith("63")) digits = digits.slice(2);
+  if (digits.startsWith("0")) digits = digits.slice(1);
+
+  return digits.length === 10 ? digits : null;
+};
+
+
 type VisitorSession = Omit<Visitor, "pin"> & {
   pin?: string;
 };
@@ -31,7 +43,7 @@ class VisitorController {
         lastname: vst.lastname,
         middle_initial: vst.middle_initial ?? null,
         email: vst.email,
-        phone_number: vst.phone_number,
+        phone_number: normalize(vst.phone_number),
         pin: vst.pin
       })
 
