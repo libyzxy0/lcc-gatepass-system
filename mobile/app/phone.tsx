@@ -63,7 +63,7 @@ export default function PhonePage() {
       if (isValidNumber.valid) {
         setPhoneNumber(normalize(phone));
       } else {
-        router.push(`/register/${phone}`);
+        router.push(`/register/${normalize(phone)}`);
       }
 
     } catch (error: any) {

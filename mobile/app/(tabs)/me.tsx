@@ -133,7 +133,7 @@ export default function Settings() {
                   fontSize: 12
                 }}
               >
-                {visitor.firstname}
+                First Name
               </Text>
               <Text
                 type="semibold"

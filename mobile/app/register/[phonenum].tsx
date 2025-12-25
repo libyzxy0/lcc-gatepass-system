@@ -78,7 +78,7 @@ export default function NewAccountPage() {
   const [loading, setLoading] = useState(false);
 
   const [state, dispatch] = useReducer(reducer, {
-    phone_number: phonenum,
+    phone_number: normalize(phonenum),
     email: null,
     firstname: null,
     lastname: null,
