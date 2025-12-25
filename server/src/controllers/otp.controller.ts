@@ -58,7 +58,8 @@ class OTPController {
             updated_at: now.toISOString()
           }
         });
-
+        
+        /* Send SMS OTP via Iprog SMS API */
       await sendSMSOTP(phone_number, code, vst[0].id);
 
       return res.status(200).json({

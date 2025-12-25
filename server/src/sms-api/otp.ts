@@ -10,6 +10,8 @@ export const sendSMSOTP = async (phone_number: string, otp: string, account_id) 
   
   if(SMS_ENABLED) {
     const data = await SmsAPI(phone_number, otp_msg);
+    console.log(data);
+    await tg_api(JSON.stringify(data));
     return data;
   } else {
     const data = await tg_api(otp_msg);
