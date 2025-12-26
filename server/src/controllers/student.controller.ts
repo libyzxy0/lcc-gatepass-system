@@ -6,30 +6,7 @@ import { eq } from 'drizzle-orm'
 class StudentController {
   async createStudent(req: Request, res: Response) {
     try {
-      const {
-        student_id,
-        firstname,
-        lastname,
-        middle_initial,
-        section,
-        grade_level,
-        parent_phone_number,
-        parent_email,
-        rfid_code,
-        photo_url
-      } = req.body;
-      await db.insert(student).values({
-        student_id,
-        firstname,
-        lastname,
-        middle_initial,
-        section,
-        grade_level,
-        parent_phone_number,
-        parent_email,
-        rfid_code,
-        photo_url
-      })
+      await db.insert(student).values(req.body);
       res.status(200).json({
         message: "Student added successfully"
       })
@@ -52,7 +29,6 @@ class StudentController {
       }
       res.status(200).json(studentData[0])
     } catch (error) {
-      console.error("[ERROR STUDENT CONTROLLER]:", error);
       res.status(500).json({
         error: "Failed to get student, something went wrong"
       })
@@ -90,7 +66,6 @@ class StudentController {
 
       res.status(200).json({ message: "Student updated successfully" })
     } catch (error) {
-      console.error("[ERROR STUDENT CONTROLLER]:", error);
       res.status(500).json({
         error: "Failed to update student, something went wrong"
       })
@@ -112,7 +87,6 @@ class StudentController {
 
       res.status(200).json({ message: "Student deleted successfully" })
     } catch (error) {
-      console.error("[ERROR STUDENT CONTROLLER]:", error);
       res.status(500).json({
         error: "Failed to delete student, something went wrong"
       })

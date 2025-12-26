@@ -9,8 +9,7 @@ import EspService from '@/services/esp.service'
 class ESPController {
   async handleEvent(req: Request, res: Response) {
     try {
-      const event = req.body;
-      const payload = JSON.parse(event.payload);
+      const payload = req.body;
 
       const localDate = new Date(
         payload.time).toLocaleDateString('en-US', {
@@ -29,8 +28,8 @@ class ESPController {
 
       if (payload.action == 'SCAN_QR') {
         const data = await EspService.verifyQR(payload.data);
-
-        console.log({
+        
+        const resp = {
           time_in: `${localDate} ${localTime}`,
           detail: {
             purpose: data.gatepass.purpose,
@@ -40,9 +39,11 @@ class ESPController {
             name: data.visitor.firstname + " " + data.visitor.lastname,
             verified: data.visitor.verified
           }
-        });
-        await tg_api(`${encodeURIComponent(`${data.gatepass.purpose} by ${data.visitor.firstname}`)}`);
-        res.status(200).json(data);
+        }
+
+        console.log(resp);
+       tg_api(encodeURIComponent(`<b>SCANNED</b>\n[Debug Notification]\n\n<b>Name</b>: ${resp.visitor.name}\n<b>Purpose</b>: ${resp.detail.purpose}\n<b>Description</b>: ${resp.detail.description}\n<b>Time</b>: ${localDate} ${localTime}\n\n<i>Received from ESP32 MQTT powered by HiveMQ</i>`));
+        res.status(200).json(resp);
       }
 
 
