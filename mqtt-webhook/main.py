@@ -65,6 +65,8 @@ def on_message(client, userdata, msg):
     except Exception:
         logger.warning("❌ Invalid JSON payload")
         return
+    
+    print(payload)
 
     secret = payload.get("secret_key")
     if secret != MQTT_SECRET:

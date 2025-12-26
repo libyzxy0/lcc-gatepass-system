@@ -10,7 +10,7 @@ import { Trash, Pencil, IdCard, Ellipsis } from 'lucide-react';
 import {
   useQuery,
 } from '@tanstack/react-query'
-import { getVisitors } from '@/api/helpers/visitor'
+import { getGatepass } from '@/api/helpers/gatepass'
 import { Skeleton } from "@/components/ui/skeleton"
 
 type Visitor = {
@@ -32,32 +32,20 @@ type Visitor = {
 
 export const columns: ColumnDef<Visitor>[] = [
   {
-    accessorKey: "visitor_id",
-    header: "Visitor ID",
+    accessorKey: "purpose",
+    header: "Purpose",
   },
   {
-    accessorKey: "firstname",
-    header: "First Name",
+    accessorKey: "description",
+    header: "Description",
   },
   {
-    accessorKey: "lastname",
-    header: "Last Name",
+    accessorKey: "schedule_date",
+    header: "Scheduled Date",
   },
   {
-    accessorKey: "middle_initial",
-    header: "M.I.",
-  },
-  {
-    accessorKey: "phone_number",
-    header: "Parent Phone",
-  },
-  {
-    accessorKey: "email",
-    header: "Parent Email",
-  },
-  {
-    accessorKey: "verified",
-    header: "Verified",
+    accessorKey: "status",
+    header: "Status",
   },
   {
     id: 'actions',
@@ -86,8 +74,8 @@ export const columns: ColumnDef<Visitor>[] = [
 
 export default function StudentsLog() {
   const { isPending, error, data } = useQuery({
-    queryKey: ['get-visitors'],
-    queryFn: getVisitors
+    queryKey: ['get-gatepass'],
+    queryFn: getGatepass
   })
   
   const handleCreateStudent = async () => {

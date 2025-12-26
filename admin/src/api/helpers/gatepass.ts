@@ -24,8 +24,8 @@ export const createVisitor = async (): Promise<{ message: string; }> => {
   return response.data;
 }
 
-export const getVisitors = async (): Promise<Visitor[]> => {
-  const response = await api.get('/visitor/get-visitors');
+export const getGatepass = async (): Promise<Visitor[]> => {
+  const response = await api.get('/gatepass/get-all');
   return response.data;
 }
 

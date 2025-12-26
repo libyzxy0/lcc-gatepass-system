@@ -51,6 +51,7 @@ class AdminController {
       }
 
       const adminData = await AdminService.adminLogin({ email, password })
+      console.log(adminData)
 
       const accessToken = AuthService.generateAdminAccessToken(adminData.id);
       const refreshToken = AuthService.generateAdminRefreshToken(adminData.id);

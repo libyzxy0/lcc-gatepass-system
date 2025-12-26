@@ -43,19 +43,21 @@ class AdminService {
   }
   static async adminLogin({ email, password }) {
     try {
-      const [adminData] = await db
-        .select()
+      console.log(email, password)
+
+      const [adminData] = await db.select()
         .from(admin)
         .where(eq(admin.email, email));
 
       if (!adminData) throw new NotFoundError('Invalid email address');
 
-      const isValidPassword = await bcrypt.compare(password, adminData[0].password);
+      const isValidPassword = await bcrypt.compare(password, adminData.password);
 
       if (!isValidPassword) throw new UnauthorizedError('Incorrect password');
 
       return adminData;
     } catch (error) {
+      console.log(error)
       throw error;
     }
   }

@@ -45,17 +45,17 @@ const data = {
       icon: IdCard,
     },
     {
-      title: "Visitors",
+      title: "Gatepass",
       icon: Users,
       url: '#',
       items: [
         {
-          title: 'Visits',
-          url: '/dashboard/visitors'
+          title: 'Gatepass',
+          url: '/dashboard/gatepass'
         },
         {
           title: 'Pending',
-          url: '/dashboard/visitors/pending'
+          url: '/dashboard/gatepass/pending'
         }
       ]
     },

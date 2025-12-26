@@ -3,6 +3,7 @@ import db from '@/db/drizzle'
 import { visitor, gatepass } from '@/db/schema'
 import { eq, desc } from 'drizzle-orm'
 import GatepassService from '@/services/gatepass.service'
+import { R } from 'vitest/dist/reporters-w_64AS5f'
 
 interface TokenDecodedType {
   id: string;
@@ -28,6 +29,11 @@ class GatepassController {
     } catch (error) {
       return res.status(500).json({ error: error });
     }
+  }
+
+  static async getGatepass(req: Request, res: Response) {
+    const allGatepass = await GatepassService.getAll();
+    res.status(200).json(allGatepass);
   }
 
   static async gatepass(req: VisitorRequest, res: Response) {

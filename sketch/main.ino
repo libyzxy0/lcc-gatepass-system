@@ -17,8 +17,8 @@
 
 #define BUZZER_PIN 4
 
-const char* ssid = "Strawberry";
-const char* password = "pogiko123";
+const char* ssid = "AieSheNel_DITO";
+const char* password = "aie081501";
 
 const char* ntpServer = "pool.ntp.org";
 const char* time_zone = "PST-8";
