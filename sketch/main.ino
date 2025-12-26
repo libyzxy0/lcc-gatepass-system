@@ -29,6 +29,9 @@ const char* mqtt_user     = "libyzxy0";
 const char* mqtt_password = "Libyzxy0@123_esp32";
 const char* client_id     = "esp_gate01";
 
+bool PRODUCTION = false;
+bool SCANNING = false;
+
 const char* ca_cert = R"EOF(
 -----BEGIN CERTIFICATE-----
 MIIFazCCA1OgAwIBAgIRAIIQz7DSQONZRGPgu2OCiwAwDQYJKoZIhvcNAQELBQAw
@@ -196,7 +199,7 @@ void connectMQTT() {
 
     if (mqtt.connect(client_id, mqtt_user, mqtt_password)) {
       Serial.println("connected");
-      mqtt.subscribe("esp32/topic");
+      mqtt.subscribe("dev/scan/#");
       NotificationUtil::readyTone();
     } else {
       Serial.print("failed, rc=");
@@ -206,17 +209,6 @@ void connectMQTT() {
       delay(5000);
     }
   }
-}
-
-void callback(char* topic, byte* payload, unsigned int length) {
-  Serial.print("Message [");
-  Serial.print(topic);
-  Serial.print("]: ");
-
-  for (unsigned int i = 0; i < length; i++) {
-    Serial.print((char)payload[i]);
-  }
-  Serial.println();
 }
 
 bool scanRfid(String &uidOut) {
@@ -252,8 +244,6 @@ bool scanQRCode(String &qrOut) {
     return false; 
 }
 
-
-
 void setup_time() {
   configTime(28800, 0, ntpServer);
   Serial.print("Waiting for NTP time sync: ");
@@ -274,6 +264,17 @@ void getISOTime(char* buffer, size_t bufferSize) {
   strftime(buffer, bufferSize, "%Y-%m-%dT%H:%M:%S+08:00", &timeinfo);
 }
 
+void mqtt_callback(char* topic, byte* payload, unsigned int length) {
+  Serial.print("Message [");
+  Serial.print(topic);
+  Serial.print("]: ");
+
+  for (unsigned int i = 0; i < length; i++) {
+    Serial.print((char)payload[i]);
+  }
+  Serial.println();
+}
+
 void setup() {
   Serial.begin(115200);
   SPI.begin();
@@ -282,6 +283,7 @@ void setup() {
   ledcSetup(0, 1000, 8);
   ledcAttachPin(BUZZER_PIN, 0);
   Serial.println("Peripherals Ready");
+  NotificationUtil::readyTone();
 
   connectWiFi();
   setup_time();
@@ -294,7 +296,7 @@ void setup() {
 
   secureClient.setCACert(ca_cert);
   mqtt.setServer(mqtt_server, mqtt_port);
-  mqtt.setCallback(callback);
+  mqtt.setCallback(mqtt_callback);
   mqtt.setBufferSize(512);
   
   connectMQTT();
@@ -316,7 +318,8 @@ void loop() {
   mqtt.loop();
   
   String uid;
-  if (scanRfid(uid)) {
+  if (scanRfid(uid) && !SCANNING) {
+    SCANNING = true;
     Serial.print("Scanned RFID: ");
     Serial.println(uid);
     
@@ -327,7 +330,7 @@ void loop() {
     .add("time", isoTime)
     .toString();
     
-    if (mqtt.publish("esp32/topic", payload.c_str())) {
+    if (mqtt.publish(PRODUCTION ? "scan/rfid" : "dev/scan/rfid", payload.c_str())) {
       Serial.println("Message published successfully");
       NotificationUtil::successTone();
     } else {
@@ -337,7 +340,8 @@ void loop() {
   }
 
   String qr_data;
-  if (scanQRCode(qr_data)) {
+  if (scanQRCode(qr_data) && !SCANNING) {
+    SCANNING = true;
     Serial.print("Scanned QR: ");
     Serial.println(qr_data);
     
@@ -348,7 +352,7 @@ void loop() {
     .add("time", isoTime)
     .toString();
     
-    if (mqtt.publish("esp32/topic", payload.c_str())) {
+    if (mqtt.publish(PRODUCTION ? "scan/qr" : "dev/scan/qr", payload.c_str())) {
       Serial.println("Message published successfully");
       NotificationUtil::successTone();
     } else {
