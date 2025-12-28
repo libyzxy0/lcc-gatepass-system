@@ -19,31 +19,36 @@ const visitors = [
     id: "1",
     name: "Jan Liby Dela Costa",
     time_out: null,
-    time_in: "8:24 AM"
+    time_in: "8:24 AM",
+    type: 'student'
   },
   {
     id: "2",
     name: "Krisha Sophia De Peralta",
     time_out: "3:30 PM",
     time_in: "9:21 AM",
+    type: 'student'
   },
   {
     id: "3",
     name: "Aiesha Jaden Dacallos",
     time_out: "N/A",
     time_in: "11:17 AM",
+    type: 'student'
   },
   {
     id: "4",
     name: "Rose Marie Indic",
     time_out: "7:00 PM",
     time_in: "4:33 PM",
+    type: 'student'
   },
   {
     id: "5",
     name: "Rhonyl Caballes",
     time_out: "11:00 AM",
     time_in: "N/A",
+    type: 'student'
   },
 ]
 
@@ -61,6 +66,7 @@ export function RecentLogs() {
               <TableHead className="w-[100px]">Name</TableHead>
               <TableHead>TIME IN</TableHead>
               <TableHead>TIME OUT</TableHead>
+              <TableHead>Type</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -69,6 +75,7 @@ export function RecentLogs() {
                 <TableCell className="font-medium">{visitors.name}</TableCell>
                 <TableCell>{visitors.time_in}</TableCell>
                 <TableCell className="text-wrap">{visitors?.time_out ?? "N/A"}</TableCell>
+                <TableCell className="text-wrap capitalize">{visitors?.type}</TableCell>
               </TableRow>
             ))}
           </TableBody>

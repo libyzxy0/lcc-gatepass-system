@@ -3,8 +3,8 @@ import {
 } from '@/components/overview/dashboard-counts'
 
 import {
-  PendingVisitors
-} from '@/components/overview/pending-visitors'
+  PendingGatepass
+} from '@/components/overview/pending-gatepass'
 import {
   RecentLogs
 } from '@/components/overview/recent-logs'
@@ -16,7 +16,7 @@ export default function Overview() {
       <Counts />
       <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-4">
         <RecentLogs />
-        <PendingVisitors />
+        <PendingGatepass />
       </div>
     </div>
   )

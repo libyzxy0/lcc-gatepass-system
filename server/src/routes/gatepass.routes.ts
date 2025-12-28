@@ -9,4 +9,7 @@ router.get("/", visitor_auth, GatepassController.gatepass);
 router.post("/request-gatepass", visitor_auth, GatepassController.requestGatepass);
 router.delete("/delete-gatepass/:id", visitor_auth, GatepassController.deleteGatepass);
 
+/* Admin Data */
+router.get('/all', admin_auth, GatepassController.getAllGatepassData);
+
 export default router;

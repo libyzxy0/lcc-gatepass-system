@@ -83,31 +83,6 @@ class AdminService {
       throw error;
     }
   }
-
-  /* Gatepass Data Services */
-
-  static async getAllGatepassData() {
-    try {
-      const allGAtepass = await db.select().from(gatepass).leftJoin(visitor, eq(visitor.id, gatepass.visitor_id));
-      if(allGAtepass.length === 0) throw new NotFoundError("No gatepass data yet.")
-      console.log(allGAtepass);
-      
-      const good = allGAtepass.map((gpass) => {
-        return {
-          ...gpass.gatepass,
-          visitor_fullname: gpass.visitor.firstname + ' ' + gpass.visitor.lastname,
-          visitor_firstname: gpass.visitor.firstname,
-          visitor_lastname: gpass.visitor.lastname,
-          visitor_mi: gpass.visitor.middle_initial,
-          visitor_id: gpass.visitor.id
-        }
-      })
-      console.log(good)
-      return good;
-    } catch (error) {
-      throw error;
-    }
-  }
 }
 
 export default AdminService;

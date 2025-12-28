@@ -1,4 +1,4 @@
-import { StudentTable } from '@/components/students/student-table'
+import { MyTable } from '@/components/table'
 import type { ColumnDef } from "@tanstack/react-table"
 import {
   DropdownMenu,
@@ -342,7 +342,7 @@ export default function StudentsLog() {
       <header className="mb-8">
         <h1 className="font-semibold text-2xl">Students Log</h1>
       </header>
-      <StudentTable 
+      <MyTable 
       columns={columns} 
       data={data} 
       filterSelect={[

@@ -46,7 +46,7 @@ type FilterSelectType = {
   id: string;
 }
 
-interface StudentTableProps<TData, TValue> {
+interface MyTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
   tableActionLabel?: string;
@@ -54,13 +54,13 @@ interface StudentTableProps<TData, TValue> {
   filterSelect: FilterSelectType[];
 }
 
-export function StudentTable<TData, TValue>({
+export function MyTable<TData, TValue>({
   columns,
   data,
   tableActionLabel,
   onTableActionClick,
   filterSelect
-}: StudentTableProps<TData, TValue>) {
+}: MyTableProps<TData, TValue>) {
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>(
     []
   )

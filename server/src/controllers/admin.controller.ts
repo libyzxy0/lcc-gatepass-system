@@ -105,15 +105,6 @@ class AdminController {
       return res.status(401).json({ message: "invalid or expired token" });
     }
   }
-  /* Gatepass Data Controllers */
-  static async getAllGatepassData(req: Request, res: Response) {
-    try {
-    const allGatepass = await AdminService.getAllGatepassData();
-    res.status(200).json(allGatepass);
-    } catch (error) {
-      res.status(error.status || 500).json({ error: error.message });
-    }
-  }
 }
 
 export default AdminController;

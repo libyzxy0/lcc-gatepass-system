@@ -4,17 +4,20 @@ import { visitor, otp } from '@/db/schema'
 import { eq, and, gt } from 'drizzle-orm'
 import { sendSMSOTP } from '@/sms-api/otp'
 
+type Visitor = typeof visitor.$inferSelect;
+type OTP = typeof otp.$inferSelect;
+
 class OTPController {
   async generateVisitorOTP(req: Request, res: Response) {
     try {
       const { phone_number } = req.body;
 
-      const vst = await db
-        .select({ id: visitor.id })
+      const [vst] = await db
+        .select({ id: visitor.id, phone_number: visitor.phone_number })
         .from(visitor)
         .where(eq(visitor.phone_number, phone_number));
 
-      if (!vst.length) {
+      if (!vst) {
         return res.status(404).json({ error: 'Visitor not found' });
       }
 
@@ -25,13 +28,13 @@ class OTPController {
         .from(otp)
         .where(
           and(
-            eq(otp.visitor_id, vst[0].id),
+            eq(otp.visitor_id, vst.id),
             eq(otp.revoked, false),
             gt(otp.expires_at, now.toISOString())
           )
         );
 
-      if (activeOtp.length) {
+      if (activeOtp) {
         return res.status(200).json({
           message: 'OTP already sent. Please wait 5 minutes before requesting again.'
         });
@@ -44,7 +47,7 @@ class OTPController {
         .insert(otp)
         .values({
           user_type: 'visitor',
-          visitor_id: vst[0].id,
+          visitor_id: vst.id,
           code,
           expires_at: expiresAt.toISOString(),
           revoked: false
@@ -60,7 +63,7 @@ class OTPController {
         });
         
         /* Send SMS OTP via Iprog SMS API */
-      await sendSMSOTP(phone_number, code, vst[0].id);
+      await sendSMSOTP(vst.phone_number, code, vst.id);
 
       return res.status(200).json({
         message: `OTP sent to ${phone_number}`
@@ -77,23 +80,23 @@ class OTPController {
     try {
       const { phone_number, code } = req.body;
 
-      const vst = await db
+      const [vst] = await db
         .select({ id: visitor.id })
         .from(visitor)
         .where(eq(visitor.phone_number, phone_number));
 
-      if (!vst.length) {
+      if (!vst) {
         return res.status(404).json({ error: 'Visitor not found' });
       }
 
       const now = new Date();
 
-      const validOtp = await db
+      const [validOtp] = await db
         .select()
         .from(otp)
         .where(
           and(
-            eq(otp.visitor_id, vst[0].id),
+            eq(otp.visitor_id, vst.id),
             eq(otp.code, code),
             eq(otp.revoked, false),
             gt(otp.expires_at, now.toISOString())
@@ -101,19 +104,19 @@ class OTPController {
         );
 
 
-      if (!validOtp.length) {
+      if (!validOtp) {
         return res.status(400).json({ error: 'Invalid or expired OTP' });
       }
 
       await db
         .update(otp)
         .set({ revoked: true })
-        .where(eq(otp.id, validOtp[0].id));
+        .where(eq(otp.id, validOtp.id));
 
       await db
         .update(visitor)
         .set({ activated: true })
-        .where(eq(visitor.id, validOtp[0].visitor_id));
+        .where(eq(visitor.id, validOtp.visitor_id));
 
       return res.status(200).json({
         message: 'Account successfully activated!',

@@ -7,6 +7,10 @@
 #include <HardwareSerial.h>
 #include <time.h>
 
+#define BUZZER_CHANNEL 0
+#define BUZZER_RESOLUTION 8
+#define BUZZER_DUTY 255
+
 #define SS_PIN 5
 #define RST_PIN 22
 
@@ -75,6 +79,26 @@ char qrBuffer[MAX_SCAN_LENGTH];
 uint8_t qrIndex = 0;
 unsigned long lastQrCharTime = 0;
 
+void buzzerTone(uint32_t freq) {
+  if (freq == 0) {
+    digitalWrite(BUZZER_PIN, LOW);
+    return;
+  }
+
+  uint32_t periodUs = 1000000UL / freq;
+  uint32_t halfPeriod = periodUs / 2;
+
+  unsigned long start = millis();
+  while (millis() - start < 120) {
+    digitalWrite(BUZZER_PIN, HIGH);
+    delayMicroseconds(halfPeriod);
+    digitalWrite(BUZZER_PIN, LOW);
+    delayMicroseconds(halfPeriod);
+  }
+}
+
+
+
 class JsonUtil {
   public:
   class Builder {
@@ -140,44 +164,41 @@ class JsonUtil {
     return doc[key].as < float > ();
   }
 };
+
 class NotificationUtil {
-  public:
+public:
   static void successTone () {
-    ledcWriteTone(0, 880);
-    ledcWrite(0, 204);
+    buzzerTone(880);
     delay(150);
-    ledcWriteTone(0, 0);
+    buzzerTone(0);
     delay(50);
-    ledcWriteTone(0, 988);
+    buzzerTone(988);
     delay(150);
-    ledcWriteTone(0, 0);
+    buzzerTone(0);
   }
+
   static void errorTone() {
-    ledcWriteTone(0, 220);
-    ledcWrite(0, 204);
+    buzzerTone(220);
     delay(400);
-    ledcWriteTone(0, 0);
+    buzzerTone(0);
   }
+
   static void readyTone() {
-    ledcWriteTone(0, 523);
-    ledcWrite(0, 204);
+    buzzerTone(523);
     delay(100);
-    ledcWriteTone(0, 659);
-    ledcWrite(0, 204);
+    buzzerTone(659);
     delay(100);
-    ledcWriteTone(0, 0);
+    buzzerTone(0);
   }
+
   static void initializedTone() {
-    ledcWriteTone(0, 1319);
-    ledcWrite(0, 204);
+    buzzerTone(1319);
     delay(100);
-    ledcWriteTone(0, 1568);
-    ledcWrite(0, 204);
+    buzzerTone(1568);
     delay(100);
-    ledcWriteTone(0, 1760);
-    ledcWrite(0, 204);
+    buzzerTone(1760);
     delay(100);
-    ledcWriteTone(0, 0);
+    buzzerTone(0);
   }
 };
 
@@ -280,8 +301,8 @@ void setup() {
   SPI.begin();
   rfid.PCD_Init();
   QRScanner.begin(9600, SERIAL_8N1, QR_RX, QR_TX);
-  ledcSetup(0, 1000, 8);
-  ledcAttachPin(BUZZER_PIN, 0);
+  pinMode(BUZZER_PIN, OUTPUT);
+  digitalWrite(BUZZER_PIN, LOW);
   Serial.println("Peripherals Ready");
   NotificationUtil::readyTone();
 

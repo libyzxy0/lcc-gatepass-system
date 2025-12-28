@@ -61,6 +61,16 @@ export function LoginForm({
       navigate('/dashboard');
       turnstile.reset();
     } catch (error: any) {
+      
+      if(!error.response) {
+        alert('Somthing went wrong!');
+        return;
+      }
+      
+      if(error.response) {
+        alert(error.response.data.error);
+        return;
+      }
 
       if (error.response.status === 404) {
         form.setError("email", {

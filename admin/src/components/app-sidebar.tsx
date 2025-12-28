@@ -5,8 +5,7 @@ import {
   ClipboardClock,
   Users,
   IdCard,
-  BookUser,
-  BriefcaseBusiness
+  BookUser
 } from "lucide-react"
 import { NavData } from "@/components/nav-data"
 import { NavOverview } from "@/components/nav-overview"
@@ -45,24 +44,19 @@ const data = {
       icon: IdCard,
     },
     {
-      title: "Gatepass",
+      title: "Visitors",
       icon: Users,
       url: '#',
       items: [
         {
-          title: 'Gatepass',
-          url: '/dashboard/gatepass'
+          title: 'Visitors',
+          url: '/dashboard/visitors'
         },
         {
-          title: 'Pending',
-          url: '/dashboard/gatepass/pending'
+          title: 'Gatepass',
+          url: '/dashboard/gatepass'
         }
       ]
-    },
-    {
-      title: "Offices",
-      url: "/dashboard/offices",
-      icon: BriefcaseBusiness ,
     },
     {
       title: "Settings",

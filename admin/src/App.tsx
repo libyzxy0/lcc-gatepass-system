@@ -1,16 +1,15 @@
 import { Routes, Route, Navigate } from "react-router";
 import AdminLayout from '@/layouts/admin';
-import Overview from '@/routes/admin/overview';
-import StudentsLog from '@/routes/admin/students-log';
-import Students from '@/routes/admin/students';
-import VisitorsLog from '@/routes/admin/visitors-log';
-import Visitors from '@/routes/admin/gatepass';
-import ProtectedRoute from '@/routes/protected-route';
-import Login from '@/routes/admin/login';
-import NotFound from '@/routes/not-found';
-import Settings from '@/routes/admin/settings';
-import SettingsAdmins from '@/routes/admin/settings-admins';
-import Offices from '@/routes/admin/offices';
+import Overview from '@/pages/overview';
+import StudentsLog from '@/pages/students-log';
+import Students from '@/pages/students';
+import VisitorsLog from '@/pages/visitors-log';
+import Visitors from '@/pages/gatepass';
+import ProtectedRoute from '@/pages/protected-route';
+import Login from '@/pages/login';
+import NotFound from '@/pages/not-found';
+import Settings from '@/pages/settings';
+import SettingsAdmins from '@/pages/settings-admins';
 import {
   QueryClient,
   QueryClientProvider,
@@ -35,8 +34,6 @@ export default function App() {
 
             <Route path="gatepass" element={<Visitors />} />
             <Route path="gatepass/logs" element={<VisitorsLog />} />
-
-            <Route path="offices" element={<Offices />} />
 
             <Route path="settings" element={<Settings />} />
             <Route path="settings/admins" element={<SettingsAdmins />} />

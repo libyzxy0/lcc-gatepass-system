@@ -55,6 +55,16 @@ class GatepassController {
       })
     }
   }
+  
+  /* Gatepass Data Controllers */
+  static async getAllGatepassData(req: Request, res: Response) {
+    try {
+    const allGatepass = await GatepassService.getAllGatepassData();
+    res.status(200).json(allGatepass);
+    } catch (error) {
+      res.status(error.status || 500).json({ error: error.message });
+    }
+  }
 }
 
 export default GatepassController;

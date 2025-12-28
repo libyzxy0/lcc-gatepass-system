@@ -30,42 +30,21 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
-import { Input } from '@/components/ui/input'
-import { Button } from '@/components/ui/button'
 import { useState } from 'react'
 
-type FilterSelectType = {
-  label: string;
-  id: string;
-}
-
-interface StudentTableProps<TData, TValue> {
+interface GatepassTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
-  tableActionLabel?: string;
-  onTableActionClick?: () => void;
-  filterSelect: FilterSelectType[];
 }
 
-export function StudentTable<TData, TValue>({
+export function GatepassTable<TData, TValue>({
   columns,
-  data,
-  tableActionLabel,
-  onTableActionClick,
-  filterSelect
-}: StudentTableProps<TData, TValue>) {
+  data
+}: GatepassTableProps<TData, TValue>) {
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>(
     []
   )
   const [sorting, setSorting] = useState<SortingState>([])
-  const [filterType, setFilterType] = useState('');
 
   const table = useReactTable({
     data,
@@ -86,32 +65,8 @@ export function StudentTable<TData, TValue>({
     <div>
       <div className="flex justify-between py-4 gap-2 md:gap-0">
         <div className="flex flex-row gap-2">
-          <Select value={filterType} onValueChange={setFilterType}>
-            <SelectTrigger>
-              <SelectValue placeholder="Filter" />
-            </SelectTrigger>
-            <SelectContent>
-              {filterSelect.map((item) => (
-                <SelectItem value={item.id} key={item.id}>
-                  {item.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          <Input
-            placeholder={`Filter by ${filterType}...`}
-            value={(table.getColumn(filterType)?.getFilterValue() as string) ?? ""}
-            onChange={(event) =>
-              table.getColumn(filterType)?.setFilterValue(event.target.value)
-            }
-            className="max-w-sm"
-          />
+          
         </div>
-        {tableActionLabel && (
-          <div>
-            <Button onClick={onTableActionClick}>{tableActionLabel}</Button>
-          </div>
-        )}
       </div>
       <Card>
         <CardContent>

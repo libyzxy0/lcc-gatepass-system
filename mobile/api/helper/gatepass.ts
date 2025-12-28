@@ -1,15 +1,17 @@
 import { api } from '@/api/axios'
 
-interface Visits {
+type Gatepass = {
   id: string;
   visitor_id: string;
   purpose: string;
   description: string;
-  visiting: string;
+  vehicle_type: string | null;
+  vehicle_plate: string | null;
+  qr_token: string;
   schedule_date: string;
-  secured: boolean;
-  status: 'pending' | 'approved' | 'rejected';
-}
+  status: 'approved' | 'pending' | 'expired' | 'rejected';
+  created_at: string;
+};
 
 interface DeleteVisitResponse {
   success: boolean;
@@ -58,7 +60,7 @@ export const requestGatepass = async ({ purpose, description, schedule_date, veh
   }
 }
 
-export const getGatepass = async (): Promise<Visits[]> => {
+export const getGatepass = async (): Promise<Gatepass[]> => {
   try {
     const response = await api.get('/gatepass');
     if (!response.data) return [];
