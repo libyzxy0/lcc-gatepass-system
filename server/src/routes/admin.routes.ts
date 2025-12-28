@@ -10,4 +10,8 @@ router.post("/refresh", AdminController.refresh);
 router.post("/logout", admin_auth, AdminController.logout);
 router.get("/session", admin_auth, AdminController.getSession);
 
+/* Data Routes */
+
+router.get('/gatepass-all', admin_auth, AdminController.getAllGatepassData);
+
 export default router;

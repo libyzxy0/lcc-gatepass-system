@@ -31,11 +31,6 @@ class GatepassController {
     }
   }
 
-  static async getGatepass(req: Request, res: Response) {
-    const allGatepass = await GatepassService.getAll();
-    res.status(200).json(allGatepass);
-  }
-
   static async gatepass(req: VisitorRequest, res: Response) {
     try {
       const allGatepass = await GatepassService.getAllGatepass(req.visitor.id)

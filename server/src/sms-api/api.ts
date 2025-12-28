@@ -13,7 +13,7 @@ export const SmsAPI = async (phone_number: string, message: string): Promise<SMS
       {
         api_token: SMS_API_TOKEN,
         message,
-        phone_number
+        phone_number: '63' + phone_number
       });
     return response.data;
   } catch (error) {

@@ -1,15 +1,15 @@
 import { eq } from "drizzle-orm";
 import db from "@/db/drizzle";
-import { admin } from "@/db/schema";
+import { admin, gatepass, visitor } from "@/db/schema";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
 import {
   generateAccessToken,
   generateRefreshToken
 } from '@/utils';
-import { 
+import {
   BadRequestError,
-  UnauthorizedError, 
+  UnauthorizedError,
   NotFoundError
 } from '@/errors'
 
@@ -79,6 +79,31 @@ class AdminService {
         .where(eq(admin.id, id));
       if (!adminData) throw new NotFoundError('No admin with that ID')
       return adminData;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  /* Gatepass Data Services */
+
+  static async getAllGatepassData() {
+    try {
+      const allGAtepass = await db.select().from(gatepass).leftJoin(visitor, eq(visitor.id, gatepass.visitor_id));
+      if(allGAtepass.length === 0) throw new NotFoundError("No gatepass data yet.")
+      console.log(allGAtepass);
+      
+      const good = allGAtepass.map((gpass) => {
+        return {
+          ...gpass.gatepass,
+          visitor_fullname: gpass.visitor.firstname + ' ' + gpass.visitor.lastname,
+          visitor_firstname: gpass.visitor.firstname,
+          visitor_lastname: gpass.visitor.lastname,
+          visitor_mi: gpass.visitor.middle_initial,
+          visitor_id: gpass.visitor.id
+        }
+      })
+      console.log(good)
+      return good;
     } catch (error) {
       throw error;
     }

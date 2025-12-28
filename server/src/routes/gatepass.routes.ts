@@ -6,7 +6,6 @@ import GatepassController from "@/controllers/gatepass.controller";
 const router = Router();
 
 router.get("/", visitor_auth, GatepassController.gatepass);
-router.get('/get-all', GatepassController.getGatepass)
 router.post("/request-gatepass", visitor_auth, GatepassController.requestGatepass);
 router.delete("/delete-gatepass/:id", visitor_auth, GatepassController.deleteGatepass);
 

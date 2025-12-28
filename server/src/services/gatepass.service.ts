@@ -11,11 +11,6 @@ import AuthService from '@/services/auth.service'
 type Gatepass = typeof gatepass.$inferSelect;
 
 class GatepassService {
-  static async getAll() {
-    const allGAtepass = await db.select().from(gatepass);
-    console.log(allGAtepass);
-    return allGAtepass;
-  }
   static async createGatepass({
     visitor_id,
     purpose,
