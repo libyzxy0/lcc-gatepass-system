@@ -3,15 +3,14 @@ import json
 import threading
 import ssl
 import logging
-from datetime import datetime, UTC
 
 import paho.mqtt.client as mqtt
 import requests
 from dotenv import load_dotenv
 from colorama import Fore, Style, init
+from fastapi import FastAPI
 
 init(autoreset=True)
-
 load_dotenv()
 
 MQTT_BROKER = os.getenv("MQTT_BROKER")
@@ -75,7 +74,7 @@ def on_message(client, userdata, msg):
 
     payload.pop("secret_key", None)
     payload["topic"] = msg.topic
-    payload["received_at"] = payload.get('time')
+    payload["received_at"] = payload.get("time")
 
     def post_webhook(data, topic):
         try:
@@ -88,16 +87,23 @@ def on_message(client, userdata, msg):
 
     threading.Thread(target=post_webhook, args=(payload, msg.topic), daemon=True).start()
 
-def main():
-    client = mqtt.Client() 
-    client.username_pw_set(MQTT_USERNAME, MQTT_PASSWORD)
-    client.tls_set(cert_reqs=ssl.CERT_NONE)
-    client.tls_insecure_set(True)
-    client.on_connect = on_connect
-    client.on_message = on_message
+client = mqtt.Client()
+client.username_pw_set(MQTT_USERNAME, MQTT_PASSWORD)
+client.tls_set(cert_reqs=ssl.CERT_NONE)
+client.tls_insecure_set(True)
+client.on_connect = on_connect
+client.on_message = on_message
 
+def mqtt_worker():
     client.connect(MQTT_BROKER, MQTT_PORT, keepalive=60)
     client.loop_forever()
 
-if __name__ == "__main__":
-    main()
+app = FastAPI()
+
+@app.get("/")
+def root():
+    return {"status": "running", "mqtt_topics": TOPICS}
+
+mqtt_thread = threading.Thread(target=mqtt_worker, daemon=True)
+mqtt_thread.start()
+logger.info("🚀 MQTT worker started in background")
