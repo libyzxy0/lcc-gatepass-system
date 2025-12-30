@@ -1,3 +1,4 @@
+import React, { useState} from 'react'
 import {
   type ColumnDef,
   type ColumnFiltersState,
@@ -38,8 +39,6 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Input } from '@/components/ui/input'
-import { Button } from '@/components/ui/button'
-import { useState } from 'react'
 
 type FilterSelectType = {
   label: string;
@@ -49,17 +48,17 @@ type FilterSelectType = {
 interface MyTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
-  tableActionLabel?: string;
-  onTableActionClick?: () => void;
+  TableAction?: React.ReactNode;
   filterSelect: FilterSelectType[];
+  emptyMessage: string;
 }
 
 export function MyTable<TData, TValue>({
   columns,
   data,
-  tableActionLabel,
-  onTableActionClick,
-  filterSelect
+  TableAction,
+  filterSelect,
+  emptyMessage
 }: MyTableProps<TData, TValue>) {
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>(
     []
@@ -107,11 +106,7 @@ export function MyTable<TData, TValue>({
             className="max-w-sm"
           />
         </div>
-        {tableActionLabel && (
-          <div>
-            <Button onClick={onTableActionClick}>{tableActionLabel}</Button>
-          </div>
-        )}
+        {TableAction}
       </div>
       <Card>
         <CardContent>
@@ -152,7 +147,7 @@ export function MyTable<TData, TValue>({
               ) : (
                 <TableRow>
                   <TableCell colSpan={columns.length} className="h-24 text-center">
-                    No student logs yet.
+                    {emptyMessage}
                   </TableCell>
                 </TableRow>
               )}

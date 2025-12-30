@@ -108,6 +108,7 @@ export default function StudentsLog() {
         <h1 className="font-semibold text-2xl">Visits Log</h1>
       </header>
       <MyTable
+      emptyMessage={"No visitor logs yet."}
       columns={columns} 
       data={data} 
       filterSelect={[

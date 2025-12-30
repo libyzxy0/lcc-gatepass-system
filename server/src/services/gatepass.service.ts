@@ -90,7 +90,6 @@ class GatepassService {
           visitor_id: gpass.visitor.id
         }
       })
-      console.log(good)
       return good;
     } catch (error) {
       throw error;

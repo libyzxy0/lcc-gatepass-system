@@ -14,6 +14,7 @@ import {
   QueryClient,
   QueryClientProvider,
 } from '@tanstack/react-query'
+import { Toaster } from "@/components/ui/sonner"
 
 const queryClient = new QueryClient();
 
@@ -42,6 +43,7 @@ export default function App() {
         </Route>
         <Route path="*" element={<NotFound />} />
       </Routes>
+      <Toaster />
     </QueryClientProvider>
   );
 }

@@ -343,6 +343,7 @@ export default function StudentsLog() {
         <h1 className="font-semibold text-2xl">Students Log</h1>
       </header>
       <MyTable 
+      emptyMessage={"No student logs yet."}
       columns={columns} 
       data={data} 
       filterSelect={[

@@ -13,7 +13,7 @@ class StudentController {
     } catch (error) {
       console.error("[ERROR STUDENT CONTROLLER]:", error);
       res.status(500).json({
-        message: "Failed to add product, something went wrong"
+        error: "Failed to add product, something went wrong"
       })
     }
   }
