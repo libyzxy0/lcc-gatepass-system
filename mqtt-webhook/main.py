@@ -10,6 +10,7 @@ from dotenv import load_dotenv
 from colorama import Fore, Style, init
 from fastapi import FastAPI
 
+# Initialize colorama and load .env
 init(autoreset=True)
 load_dotenv()
 
@@ -45,9 +46,11 @@ class ColoredFormatter(logging.Formatter):
 handler = logging.StreamHandler()
 formatter = ColoredFormatter("%(asctime)s [%(levelname)s] %(message)s")
 handler.setFormatter(formatter)
-logger = logging.getLogger()
+logger = logging.getLogger("mqtt_fastapi")
 logger.setLevel(logging.DEBUG)
 logger.addHandler(handler)
+
+client = mqtt.Client()
 
 def on_connect(client, userdata, flags, rc):
     if rc == 0:
@@ -65,8 +68,6 @@ def on_message(client, userdata, msg):
         logger.warning("❌ Invalid JSON payload")
         return
     
-    print(payload)
-
     secret = payload.get("secret_key")
     if secret != MQTT_SECRET:
         logger.warning(f"❌ Invalid secret key from topic: {msg.topic}")
@@ -87,7 +88,6 @@ def on_message(client, userdata, msg):
 
     threading.Thread(target=post_webhook, args=(payload, msg.topic), daemon=True).start()
 
-client = mqtt.Client()
 client.username_pw_set(MQTT_USERNAME, MQTT_PASSWORD)
 client.tls_set(cert_reqs=ssl.CERT_NONE)
 client.tls_insecure_set(True)
@@ -95,8 +95,11 @@ client.on_connect = on_connect
 client.on_message = on_message
 
 def mqtt_worker():
-    client.connect(MQTT_BROKER, MQTT_PORT, keepalive=60)
-    client.loop_forever()
+    try:
+        client.connect(MQTT_BROKER, MQTT_PORT, keepalive=60)
+        client.loop_forever()
+    except Exception as e:
+        logger.error(f"MQTT worker failed: {e}")
 
 app = FastAPI()
 
@@ -104,6 +107,8 @@ app = FastAPI()
 def root():
     return {"status": "running", "mqtt_topics": TOPICS}
 
-mqtt_thread = threading.Thread(target=mqtt_worker, daemon=True)
-mqtt_thread.start()
-logger.info("🚀 MQTT worker started in background")
+@app.on_event("startup")
+def start_mqtt_thread():
+    thread = threading.Thread(target=mqtt_worker, daemon=True)
+    thread.start()
+    logger.info("🚀 MQTT worker started in background")
