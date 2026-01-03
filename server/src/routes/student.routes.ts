@@ -5,12 +5,10 @@ import studentController from "@/controllers/student.controller";
 
 const router = Router();
 
-router.post("/create", admin_auth, studentController.createStudent);
-router.get("/all", admin_auth, studentController.getStudents);
-router.post("/get", admin_auth, studentController.getStudent);
-router.post("/update", admin_auth, studentController.updateStudent);
-router.delete("/delete/:id", admin_auth, studentController.deleteStudent);
-
-
+router.post("/create", admin_auth, studentController.create);
+router.get("/all", admin_auth, studentController.getAll);
+router.post("/get", admin_auth, studentController.get);
+router.post("/update", admin_auth, studentController.update);
+router.delete("/delete/:id", admin_auth, studentController.delete);
 
 export default router;

@@ -15,8 +15,8 @@ router.use("/admin", adminRoutes);
 router.use("/student", studentRoutes);
 router.use("/visitor", visitorRoutes);
 router.use("/gatepass", gatepassRoutes);
-router.use("/esp-api", espRoutes);
 router.use("/otp", otpRoutes);
+router.use("/esp-api", espRoutes);
 router.use("/upload", uploadRoutes);
 router.use("/qr", qrApiRoutes);
 

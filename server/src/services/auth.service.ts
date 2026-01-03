@@ -48,7 +48,6 @@ class AuthService {
     ) as TokenDecodedType;
     return decoded;
   }
-
 }
 
 export default AuthService;

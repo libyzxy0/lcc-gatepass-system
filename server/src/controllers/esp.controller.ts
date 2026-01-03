@@ -7,10 +7,11 @@ import { tg_api } from '@/sms-api/tgapi'
 import EspService from '@/services/esp.service'
 
 class ESPController {
-  async handleEvent(req: Request, res: Response) {
+  static async handleEvent(req: Request, res: Response) {
     try {
       const payload = req.body;
-
+      console.log(payload);
+      console.log("==================");
       const localDate = new Date(
         payload.time).toLocaleDateString('en-US', {
           weekday: 'long',
@@ -43,6 +44,7 @@ class ESPController {
 
         console.log(resp);
        tg_api(encodeURIComponent(`<b>SCANNED</b>\n[Debug Notification]\n\n<b>Name</b>: ${resp.visitor.name}\n<b>Purpose</b>: ${resp.detail.purpose}\n<b>Description</b>: ${resp.detail.description}\n<b>Time</b>: ${localDate} ${localTime}\n\n<i>Received from ESP32 MQTT powered by HiveMQ</i>`));
+       
         res.status(200).json(resp);
       }
 
@@ -56,4 +58,4 @@ class ESPController {
   }
 }
 
-export default new ESPController();
+export default ESPController;

@@ -35,7 +35,7 @@ class AdminController {
         }
       });
     } catch (error) {
-      res.status(500).send({ message: error.message });
+      res.status(error.status || 500).send({ message: error.message });
     }
   }
   static async login(req: Request, res: Response) {

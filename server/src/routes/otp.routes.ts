@@ -1,9 +1,9 @@
 import { Router, Request } from "express";
-import controller from "@/controllers/otp.controller";
+import OTPController from "@/controllers/otp.controller";
 import rateLimit, { ipKeyGenerator } from "express-rate-limit";
 
 export const otpRateLimit = rateLimit({
-  windowMs: 5 * 60 * 1000, 
+  windowMs: 5 * 60 * 1000,
   max: 1,
   standardHeaders: true,
   legacyHeaders: false,
@@ -19,7 +19,7 @@ export const otpRateLimit = rateLimit({
 
 const router = Router();
 
-router.post("/vst/new", otpRateLimit, controller.generateVisitorOTP);
-router.post("/vst/chk", controller.verifyVisitorOTP);
+router.post("/vst/new", otpRateLimit, OTPController.generateVisitorOTP);
+router.post("/vst/chk", OTPController.verifyVisitorOTP);
 
 export default router;

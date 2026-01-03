@@ -2,7 +2,7 @@ import express, { Application } from "express";
 import Bootstrap from "@/bootstrap";
 import errorHandler from "@/middlewares/error-handler";
 import notFound from "@/middlewares/not-found";
-import { initializeRoutes } from "@/routes/main.routes";
+import { initializeRoutes } from "@/routes/index.routes";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 
@@ -46,4 +46,7 @@ app.use(
 
 Bootstrap(app);
 initializeRoutes(app);
+app.get('/', (_req, res) => {
+  res.json({ message: 'Hello, server is currently working!' });
+})
 app.use(notFound);

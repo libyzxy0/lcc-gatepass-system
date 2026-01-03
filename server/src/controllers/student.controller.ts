@@ -1,98 +1,72 @@
 import { Request, Response } from "express";
-import db from '@/db/drizzle'
-import { student } from '@/db/schema'
-import { eq } from 'drizzle-orm'
+import StudentService from '@/services/student.service'
 
 class StudentController {
-  async createStudent(req: Request, res: Response) {
+  static async create(req: Request, res: Response) {
     try {
-      await db.insert(student).values(req.body);
+      await StudentService.create(req.body);
       res.status(200).json({
         message: "Student added successfully"
       })
     } catch (error) {
-      console.error("[ERROR STUDENT CONTROLLER]:", error);
-      res.status(500).json({
-        error: "Failed to add product, something went wrong"
+      res.status(error.status || 500).json({
+        error: error.message
       })
     }
   }
 
-  async getStudent(req: Request, res: Response) {
+  static async getAll(req: Request, res: Response) {
+    try {
+      const students = await StudentService.getAll();
+      res.status(200).json(students);
+    } catch (error) {
+      res.status(error.status || 500).json({
+        error: error.message
+      })
+    }
+  }
+
+  static async get(req: Request, res: Response) {
     try {
       const { id } = req.body;
-      const studentData = await db.select().from(student).where(eq(student.id, id));
-      if (studentData.length <= 0) {
-        return res.status(404).json({
-          error: "No student associated with that ID"
-        })
-      }
-      res.status(200).json(studentData[0])
+      const studentData = await StudentService.get(id);
+      res.status(200).json(studentData)
     } catch (error) {
-      res.status(500).json({
-        error: "Failed to get student, something went wrong"
+      res.status(error.status || 500).json({
+        error: error.message
       })
     }
   }
 
-  async getStudents(req: Request, res: Response) {
-    const students = await db.select().from(student);
-    if (students.length <= 0) {
-      return res.status(404).json({
-        error: "No student added on the database yet."
-      })
-    }
-    res.status(200).json(students)
-  }
-
-  async updateStudent(req: Request, res: Response) {
+  static async update(req: Request, res: Response) {
     try {
       const { id, fields } = req.body;
-      if (!fields) {
-        return res.status(400).json({
-          error: "Specify a fields to be updated"
-        })
-      }
-      const studentData = await db.select().from(student).where(eq(student.id, id));
-      if (studentData.length <= 0) {
-        return res.status(404).json({
-          error: "No student associated with that ID"
-        })
-      }
-
-      await db.update(student)
-        .set(fields)
-        .where(eq(student.id, student[0].id));
-
+      
+      await StudentService.update({ id, fields });
+      
       res.status(200).json({ message: "Student updated successfully" })
     } catch (error) {
-      res.status(500).json({
-        error: "Failed to update student, something went wrong"
+      res.status(error.status || 500).json({
+        error: error.message
       })
     }
   }
 
-  async deleteStudent(req: Request, res: Response) {
+  static async delete(req: Request, res: Response) {
     try {
       const { id } = req.params;
-      const studentData = await db.select().from(student).where(eq(student.id, id));
-      if (studentData.length <= 0) {
-        return res.status(404).json({
-          error: "No student associated with that ID"
-        })
-      }
-
-      await db.delete(student)
-        .where(eq(student.id, student[0].id));
-
+      await StudentService.delete(id);
+      
       res.status(200).json({ message: "Student deleted successfully" })
     } catch (error) {
-      res.status(500).json({
-        error: "Failed to delete student, something went wrong"
+      res.status(error.status || 500).json({
+        error: error.message
       })
     }
   }
-  
 }
 
-export default new StudentController();
+export default StudentController;
+
+
+/* Code ends with 69 HAHA*/
