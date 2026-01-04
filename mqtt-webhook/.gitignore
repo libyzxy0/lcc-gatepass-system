@@ -5,4 +5,4 @@
 .env.production
 .env.local
 
-__pycache__
+__pycache__/

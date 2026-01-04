@@ -12,15 +12,14 @@ class ESPController {
       const payload = req.body;
       console.log(payload);
       console.log("==================");
-      const localDate = new Date(
-        payload.time).toLocaleDateString('en-US', {
-          weekday: 'long',
-          year: 'numeric',
-          day: 'numeric',
-          month: 'long'
-        });
+      const localDate = new Date().toLocaleDateString('en-US', {
+        weekday: 'long',
+        year: 'numeric',
+        day: 'numeric',
+        month: 'long'
+      });
 
-      const localTime = new Date(payload.time).toLocaleTimeString('en-US', {
+      const localTime = new Date().toLocaleTimeString('en-US', {
         hour: '2-digit',
         minute: '2-digit',
         second: '2-digit',
@@ -29,23 +28,27 @@ class ESPController {
 
       if (payload.action == 'SCAN_QR') {
         const data = await EspService.verifyQR(payload.data);
-        
-        const resp = {
-          time_in: `${localDate} ${localTime}`,
-          detail: {
-            purpose: data.gatepass.purpose,
-            description: data.gatepass.description
-          },
-          visitor: {
-            name: data.visitor.firstname + " " + data.visitor.lastname,
-            verified: data.visitor.verified
-          }
-        }
 
-        console.log(resp);
-       tg_api(encodeURIComponent(`<b>SCANNED</b>\n[Debug Notification]\n\n<b>Name</b>: ${resp.visitor.name}\n<b>Purpose</b>: ${resp.detail.purpose}\n<b>Description</b>: ${resp.detail.description}\n<b>Time</b>: ${localDate} ${localTime}\n\n<i>Received from ESP32 MQTT powered by HiveMQ</i>`));
-       
-        res.status(200).json(resp);
+        tg_api(encodeURIComponent(`<b>SCANNED</b>\n[Debug Notification]\n\n<b>Name</b>: ${data.visitor.firstname + " " + data.visitor.lastname}\n<b>Purpose</b>: ${data.gatepass.purpose}\n<b>Description</b>: ${data.gatepass.description}\n<b>Time</b>: ${localDate} ${localTime}\n\n<i>Received from ${process.env.NODE_ENV === 'production' ? "Production Server" : "Development Server"}</i>`));
+
+        res.status(200).json({
+          verified: true,
+          reply_to_action: payload.action,
+          data: {
+            id: data.visitor.id
+          }
+        });
+      } else if (payload.action === 'SCAN_RFID') {
+        const rfid_verification = await EspService.verifyRFID(payload.data);
+        console.log(rfid_verification)
+        tg_api(encodeURIComponent(`<b>SCANNED</b>\n[Debug Notification]\n\n<b>Name</b>: ${rfid_verification.firstname + " " + rfid_verification.lastname}\n<b>Section</b>: ${rfid_verification.section}\n<b>Student ID:RFID</b>: ${rfid_verification.student_id}:${rfid_verification.rfid_code}\n<b>Time</b>: ${localDate} ${localTime}\n\n<i>Received from ${process.env.NODE_ENV === 'production' ? "Production Server" : "Development Server"}</i>`));
+        return res.json({
+          verified: true,
+          reply_to_action: payload.action,
+          data: {
+            id: rfid_verification.id
+          }
+        })
       }
 
 
