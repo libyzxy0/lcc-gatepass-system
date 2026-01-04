@@ -1,5 +1,10 @@
+import React, { useState } from 'react'
+import { useNavigate } from "react-router";
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Spinner } from "@/components/ui/spinner"
+import Turnstile, { useTurnstile } from "react-turnstile"
 import {
   Card,
   CardContent,
@@ -18,16 +23,11 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
-import { Spinner } from "@/components/ui/spinner"
-import { useAuthStore } from "@/stores/useAuthStore";
-import { useNavigate } from "react-router";
-import Turnstile, { useTurnstile } from "react-turnstile";
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
-import { useState } from 'react'
 import lccBackground from '@/assets/lcc.webp'
+import { useAuthStore } from "@/stores/useAuthStore";
 
 const formSchema = z.object({
   email: z.string().email().min(1, "Email required!"),
@@ -56,7 +56,6 @@ export function LoginForm({
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
       setLoading(true);
-      console.log(values);
       await login(values.email, values.password, values.captcha);
       navigate('/dashboard');
       turnstile.reset();
@@ -99,10 +98,10 @@ export function LoginForm({
   }
 
   return (
-    <div className={cn("w-[90%] md:w-[420px] z-20", className)} {...props}>
-      <Card className="rounded-xl">
+    <div className={cn("w-[90%] md:w-[430px] z-20", className)} {...props}>
+      <Card className="rounded-xl text-center">
         <CardHeader>
-          <CardTitle className="text-2xl font-bold text-blue-700">Login As Admin</CardTitle>
+          <CardTitle className="text-2xl font-bold">Login as Admin</CardTitle>
           <CardDescription>
             Enter your email and password below to login to admin dashboard.
           </CardDescription>
@@ -131,7 +130,7 @@ export function LoginForm({
                     <FormItem>
                       <FormLabel>Password</FormLabel>
                       <FormControl>
-                        <Input className="py-6" type="password" placeholder="mypassword123" {...field} />
+                        <Input className="py-6" type="password" placeholder="aieshaJaden@2626" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -164,7 +163,6 @@ export function LoginForm({
                   </>
                 )}</Button>
               </FieldGroup>
-
             </form>
           </Form>
         </CardContent>

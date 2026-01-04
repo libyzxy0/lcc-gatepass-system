@@ -75,13 +75,13 @@ export const columns: ColumnDef<StudentLogType>[] = [
           <DropdownMenuContent>
             <DropdownMenuItem>
               <IdCard />
-              View Student</DropdownMenuItem>
+              View</DropdownMenuItem>
             <DropdownMenuItem>
               <Pencil />
-              Edit Log</DropdownMenuItem>
+              Edit</DropdownMenuItem>
             <DropdownMenuItem variant="destructive">
               <Trash />
-              Delete Log</DropdownMenuItem>
+              Delete</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       )

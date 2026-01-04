@@ -66,7 +66,4 @@ class StudentController {
   }
 }
 
-export default StudentController;
-
-
-/* Code ends with 69 HAHA*/
+export default StudentController; /* Code ends with 69 HAHA*/

@@ -20,13 +20,13 @@ export default function NotFound() {
         </EmptyMedia>
         <EmptyTitle>404 Page Not Found</EmptyTitle>
         <EmptyDescription>
-          The page you want to visit seems that dosent exist in our website, please go home baby.
+          The page you want to visit seems that dosent exist in our website, please go home.
         </EmptyDescription>
       </EmptyHeader>
       <EmptyContent>
         <div className="flex gap-2">
           <Button asChild className="py-5">
-            <Link to="/">Go Home With Me</Link>
+            <Link to="/">Go Home</Link>
           </Button>
         </div>
       </EmptyContent>

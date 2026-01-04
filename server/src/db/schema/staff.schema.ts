@@ -28,12 +28,3 @@ export const staff = pgTable("staff", {
   photo_url: text("photo_url"),
   created_at: timestamp("created_at", { mode: "string" }).defaultNow()
 });
-
-export const staff_log = pgTable("staff_log", {
-  id: uuid("id").primaryKey().defaultRandom().notNull(),
-  staff_id: uuid("staff_id").references(() => staff.id),
-  device_id: text("device_id"),
-  time_in: timestamp("time_in", { mode: "string" }).defaultNow(),
-  time_out: timestamp("time_out", { mode: "string" }),
-  created_at: timestamp("created_at", { mode: "string" }).defaultNow()
-});

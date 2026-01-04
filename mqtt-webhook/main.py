@@ -10,7 +10,6 @@ from dotenv import load_dotenv
 from colorama import Fore, Style, init
 from fastapi import FastAPI
 
-# Initialize colorama and load .env
 init(autoreset=True)
 load_dotenv()
 

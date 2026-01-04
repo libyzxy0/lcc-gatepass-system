@@ -26,20 +26,20 @@ class GatepassService {
         schedule_date,
         vehicle_type: vehicle ? vehicle.type : null,
         vehicle_plate: vehicle ? vehicle.plate_number : null
-      }).returning({ 
+      }).returning({
         id: gatepass.id
       });
 
-      if(!gatepassData) throw new BadRequestError('Unable to create gatepass!');
+      if (!gatepassData) throw new BadRequestError('Unable to create gatepass!');
 
       const qr_token = AuthService.generateQRToken(gatepassData.id);
-      
+
       const [gatePassWithToken] = await db.update(gatepass).set({
         qr_token
       }).where(eq(gatepass.id, gatepassData.id)).returning({
         id: gatepass.id
       });
-      
+
       return gatePassWithToken;
     } catch (error) {
       throw error;
@@ -48,9 +48,9 @@ class GatepassService {
   static async getAllGatepass(visitor_id: string) {
     try {
       const allGatepass: Gatepass[] = await db.select().from(gatepass).where(eq(gatepass.visitor_id, visitor_id)).orderBy(desc(gatepass.created_at));
-      
-      if(allGatepass.length === 0) throw new NotFoundError('No gatepass yet!')
-      
+
+      if (allGatepass.length === 0) throw new NotFoundError('No gatepass yet!')
+
       return allGatepass;
     } catch (error) {
       throw error;
@@ -61,26 +61,25 @@ class GatepassService {
       const [gatepassData] = await db.select().from(gatepass).where(eq(gatepass.id, id));
 
       if (!gatepassData) throw new NotFoundError('No gatepass with that ID')
-      
+
       const [deletedGatepass] = await db.delete(gatepass)
         .where(eq(gatepass.id, gatepassData.id)).returning({
           id: gatepass.id
         });
-        
-        return deletedGatepass;
+
+      return deletedGatepass;
     } catch (error) {
       throw error;
     }
   }
-  
-    /* Gatepass Data Services */
 
+  /* Gatepass Data Services */
   static async getAllGatepassData() {
     try {
       const allGAtepass = await db.select().from(gatepass).leftJoin(visitor, eq(visitor.id, gatepass.visitor_id));
-      if(allGAtepass.length === 0) throw new NotFoundError("No gatepass data yet.")
-      
-      const good = allGAtepass.map((gpass) => {
+      if (allGAtepass.length === 0) throw new NotFoundError("No gatepass data yet.")
+
+      return allGAtepass.map((gpass) => {
         return {
           ...gpass.gatepass,
           visitor_fullname: gpass.visitor.firstname + ' ' + gpass.visitor.lastname,
@@ -90,7 +89,6 @@ class GatepassService {
           visitor_id: gpass.visitor.id
         }
       })
-      return good;
     } catch (error) {
       throw error;
     }

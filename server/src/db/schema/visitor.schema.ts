@@ -24,14 +24,3 @@ export const visitor = pgTable("visitor", {
   photo_url: text("photo_url"),
   created_at: timestamp("created_at", { mode: "string" }).defaultNow()
 });
-
-export const visitor_log = pgTable("visitor_log", {
-  id: uuid("id").primaryKey().defaultRandom().notNull(),
-  visitor_id: uuid("visitor_id").references(() => visitor.id),
-  device_id: text("device_id"),
-  visiting: text("visiting"),
-  purpose: text("purpose"),
-  time_in: timestamp("time_in", { mode: "string" }).defaultNow(),
-  time_out: timestamp("time_out", { mode: "string" }),
-  created_at: timestamp("created_at", { mode: "string" }).defaultNow()
-});

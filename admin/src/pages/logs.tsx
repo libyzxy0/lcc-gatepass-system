@@ -6,23 +6,21 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { Trash, Pencil, IdCard, Ellipsis, ArrowUpDown } from 'lucide-react';
+import { Trash, IdCard, Ellipsis, ArrowUpDown } from 'lucide-react';
 import { Button } from '@/components/ui/button'
 
-export type VisitorLogType = {
+export type LogsType = {
   id: string;
-  visitor_id: string;
   name: string;
-  section: string;
-  grade_level: string;
+  type: string;
   time_in: string;
   time_out: string;
 }
 
-export const columns: ColumnDef<VisitorLogType>[] = [
+export const columns: ColumnDef<LogsType>[] = [
   {
-    accessorKey: "student_id",
-    header: "Visitor ID",
+    accessorKey: "id",
+    header: "ID",
   },
   {
     accessorKey: "name",
@@ -57,12 +55,8 @@ export const columns: ColumnDef<VisitorLogType>[] = [
     },
   },
   {
-    accessorKey: "section",
-    header: "Section",
-  },
-  {
-    accessorKey: "grade_level",
-    header: "Level",
+    accessorKey: "type",
+    header: "Type",
   },
   {
     id: 'actions',
@@ -75,13 +69,10 @@ export const columns: ColumnDef<VisitorLogType>[] = [
           <DropdownMenuContent>
             <DropdownMenuItem>
               <IdCard />
-              View Visitor</DropdownMenuItem>
-            <DropdownMenuItem>
-              <Pencil />
-              Edit Log</DropdownMenuItem>
+              View</DropdownMenuItem>
             <DropdownMenuItem variant="destructive">
               <Trash />
-              Delete Log</DropdownMenuItem>
+              Delete</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       )
@@ -89,23 +80,21 @@ export const columns: ColumnDef<VisitorLogType>[] = [
   }
 ]
 
-const data: VisitorLogType[] = [
+const data: LogsType[] = [
   {
     id: "STU20250327",
-    visitor_id: "STU20250327",
     name: "Jan Liby Dela Costa",
-    section: "ICT-12A",
-    grade_level: "SHS-G12",
+    type: "Staff",
     time_in: "7:46 AM",
     time_out: "4:12 PM",
   },
 ];
 
-export default function StudentsLog() {
+export default function Logs() {
   return (
     <div>
       <header className="mb-8">
-        <h1 className="font-semibold text-2xl">Visits Log</h1>
+        <h1 className="font-semibold text-2xl">Logs</h1>
       </header>
       <MyTable
       emptyMessage={"No visitor logs yet."}

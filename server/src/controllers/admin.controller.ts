@@ -99,7 +99,7 @@ class AdminController {
       if (!req.admin) {
         return res.status(401).json({ message: "Unauthorized access!" });
       }
-      const adminData = await AdminService.getAdmin(req.admin.id)
+      const adminData = await AdminService.getAdmin(req.admin.id);
       return res.json(adminData);
     } catch (error) {
       return res.status(401).json({ message: "invalid or expired token" });

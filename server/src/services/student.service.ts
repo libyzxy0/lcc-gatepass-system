@@ -1,5 +1,5 @@
 import db from '@/db/drizzle'
-import { student } from '@/db/schema'
+import { student, guardian } from '@/db/schema'
 import { eq } from 'drizzle-orm'
 import {
   BadRequestError,
@@ -8,10 +8,52 @@ import {
 import { type CreateStudentType } from '@/types'
 
 class StudentService {
-  static async create(values: CreateStudentType) {
+  static async create({
+    student_id,
+    firstname,
+    lastname,
+    middle_name,
+    section,
+    grade_level,
+    address,
+    rfid_code,
+    photo_url,
+    guardian_photo_url,
+    guardian_phone_number,
+    guardian_firstname,
+    guardian_lastname,
+    guardian_middle_name,
+    guardian_rfid_code,
+    relationship
+  }: CreateStudentType) {
     try {
-      const newStudent = await db.insert(student).values(values).returning({ id: student.id });
-      if (!newStudent) throw new BadRequestError('No student data yet.');
+      const [newGuardian] = await db.insert(guardian).values({
+        firstname: guardian_firstname,
+        lastname: guardian_lastname,
+        middle_name: guardian_middle_name,
+        phone_number: guardian_phone_number,
+        address,
+        rfid_code: guardian_rfid_code,
+        photo_url: guardian_photo_url,
+        relationship
+      }).returning({ id: guardian.id });
+
+      if (!newGuardian) throw new BadRequestError('Failed to create guardian!');
+
+      const [newStudent] = await db.insert(student).values({
+        student_id,
+        firstname,
+        lastname,
+        middle_name,
+        section,
+        grade_level,
+        address,
+        rfid_code,
+        photo_url,
+        guardian_id: newGuardian.id
+      }).returning({ id: student.id });
+
+      if (!newStudent) throw new BadRequestError('Failed to create student!');
 
       return newStudent;
     } catch (error) {
@@ -20,9 +62,14 @@ class StudentService {
   }
   static async getAll() {
     try {
-      const students = await db.select().from(student);
+      const students = await db.select().from(guardian).leftJoin(student, eq(student.guardian_id, guardian.id));
       if (students.length === 0) throw new NotFoundError('No students added to the database yet');
-      return students;
+      return students.map((data) => {
+        return {
+          ...data.student,
+          parent_fullname: data.guardian.firstname + " " + data.guardian.lastname
+        }
+      });
     } catch (error) {
       throw error;
     }

@@ -1,12 +1,6 @@
 import { MyTable } from '@/components/table'
 import type { ColumnDef } from "@tanstack/react-table"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { Trash, Pencil, IdCard, Ellipsis, Import, Plus } from 'lucide-react';
+import { Import, Plus } from 'lucide-react';
 import {
   useQuery,
 } from '@tanstack/react-query'
@@ -14,8 +8,9 @@ import { getStudents } from '@/api/helpers/student'
 import { Skeleton } from "@/components/ui/skeleton"
 import { Button } from "@/components/ui/button"
 import { AddStudentDialog } from '@/components/AddStudentDialog'
+import { StudentTableActions } from '@/components/StudentTableActions'
 
-type Student = {
+interface Student {
   id: string;
   student_id: string;
   firstname: string;
@@ -23,8 +18,8 @@ type Student = {
   middle_name: string | null;
   section: string;
   grade_level: string;
+  parent_fullname: string;
   parent_phone_number: string;
-  parent_name: string | null;
   rfid_code: string;
   photo_url: string;
   address: string;
@@ -46,23 +41,35 @@ export const columns: ColumnDef<Student>[] = [
   },
   {
     accessorKey: "middle_name",
-    header: "Middle Name"
+    header: "Middle Name",
+    cell: (info) => {
+      const value = info.getValue<string | null>()
+      return <div className="text-wrap">{value ? value : "N/A"}</div>
+    },
   },
   {
     accessorKey: "section",
     header: "Section",
+    cell: (info) => {
+      const value = info.getValue<string | null>()
+      return <div className="text-wrap">{value ?? "N/A"}</div>
+    },
   },
   {
     accessorKey: "grade_level",
     header: "Level",
   },
   {
-    accessorKey: "parent_name",
+    accessorKey: "parent_fullname",
     header: "Parent Name",
   },
   {
-    accessorKey: "parent_phone_number",
-    header: "Parent Phone",
+    accessorKey: "address",
+    header: "Address",
+    cell: (info) => {
+      const value = info.getValue<string | null>()
+      return <div className="text-wrap">{value ?? "N/A"}</div>
+    },
   },
   {
     accessorKey: "rfid_code",
@@ -70,30 +77,11 @@ export const columns: ColumnDef<Student>[] = [
   },
   {
     id: 'actions',
-    cell: () => {
-      return (
-        <DropdownMenu>
-          <DropdownMenuTrigger>
-            <Ellipsis />
-          </DropdownMenuTrigger>
-          <DropdownMenuContent>
-            <DropdownMenuItem>
-              <IdCard />
-              View</DropdownMenuItem>
-            <DropdownMenuItem>
-              <Pencil />
-              Edit</DropdownMenuItem>
-            <DropdownMenuItem variant="destructive">
-              <Trash />
-              Delete</DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      )
-    }
+    cell: (info) => <StudentTableActions id={info.row.original.id} />
   }
 ]
 
-export default function StudentsLog() {
+export default function Students() {
   const { isPending, error, data, refetch } = useQuery({
     queryKey: ['get-students'],
     queryFn: getStudents
@@ -159,9 +147,12 @@ export default function StudentsLog() {
             id: 'grade_level',
             label: "Grade Level"
           },
+          {
+            id: 'address',
+            label: "Address"
+          },
         ]}
       />
     </div>
-
   )
 }

@@ -3,7 +3,7 @@ import AdminLayout from '@/layouts/admin';
 import Overview from '@/pages/overview';
 import StudentsLog from '@/pages/students-log';
 import Students from '@/pages/students';
-import VisitorsLog from '@/pages/visitors-log';
+import Logs from '@/pages/logs';
 import Visitors from '@/pages/gatepass';
 import ProtectedRoute from '@/pages/protected-route';
 import Login from '@/pages/login';
@@ -34,7 +34,7 @@ export default function App() {
             <Route path="students/logs" element={<StudentsLog />} />
 
             <Route path="gatepass" element={<Visitors />} />
-            <Route path="gatepass/logs" element={<VisitorsLog />} />
+            <Route path="logs" element={<Logs />} />
 
             <Route path="settings" element={<Settings />} />
             <Route path="settings/admins" element={<SettingsAdmins />} />

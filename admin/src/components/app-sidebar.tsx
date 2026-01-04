@@ -7,7 +7,7 @@ import {
   IdCard,
   BookUser
 } from "lucide-react"
-import { NavData } from "@/components/nav-data"
+import { NavManage } from "@/components/nav-manage"
 import { NavOverview } from "@/components/nav-overview"
 import { NavUser } from "@/components/nav-user"
 import { NavHeader } from "@/components/nav-header"
@@ -22,26 +22,36 @@ import {
 const data = {
   overview: [
     {
-      name: "Overview",
+      title: "Overview",
       url: "/dashboard",
       icon: LayoutDashboard,
     },
     {
-      name: "Students Log",
-      url: "/dashboard/students/logs",
-      icon: BookUser,
-    },
-    {
-      name: "Visitors Log",
-      url: "/dashboard/visitors/logs",
+      title: "Logs",
       icon: ClipboardClock,
+      url: "#",
+      items: [
+        {
+          title: 'Logs',
+          url: '/dashboard/logs'
+        },
+        {
+          title: 'Students',
+          url: '/dashboard/students/logs'
+        }
+      ]
     },
   ],
-  navData: [
+  manage: [
     {
       title: "Students",
       url: "/dashboard/students",
       icon: IdCard,
+    },
+    {
+      title: "Staffs",
+      url: "/dashboard/staffs",
+      icon: BookUser,
     },
     {
       title: "Visitors",
@@ -53,15 +63,15 @@ const data = {
           url: '/dashboard/visitors'
         },
         {
-          title: 'Gatepass',
+          title: 'QRPass',
           url: '/dashboard/gatepass'
         }
       ]
     },
     {
       title: "Settings",
-      url: "#",
       icon: Settings2,
+      url: "#",
       items: [
         {
           title: "General",
@@ -83,8 +93,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <NavHeader />
       </SidebarHeader>
       <SidebarContent>
-        <NavOverview overview={data.overview} />
-        <NavData items={data.navData} />
+        <NavOverview items={data.overview} />
+        <NavManage items={data.manage} />
       </SidebarContent>
       <SidebarFooter>
         <NavUser />

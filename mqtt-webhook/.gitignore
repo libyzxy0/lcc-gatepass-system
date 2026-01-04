@@ -4,3 +4,5 @@
 .env.test
 .env.production
 .env.local
+
+__pycache__

@@ -21,21 +21,46 @@
 
 #define BUZZER_PIN 4
 
+#define RELAY_PIN = 2;
+
+/* Choose which server to communicate with, production(true) or development(false) */
+bool PRODUCTION = false;
+
+/* ——————————————————————————————— */
+
+/*
+* WiFi Configurations (Important)
+* @ssid - WiFi SSID;
+* @password - WiFi Password;
+*/
 const char* ssid = "AieSheNel_DITO";
 const char* password = "aie081501";
 
-const char* ntpServer = "pool.ntp.org";
-const char* time_zone = "PST-8";
+/* ——————————————————————————————— */
 
+/* Server Authorization Configuration */
+const char* SECRET_KEY = "79408c3e-6c50-4fb0-98cb-98db70596411";
+
+/* ——————————————————————————————— */
+
+/* MQTT HiveMQ Configuration 
+* Please dont take screenshots/pictures at this part, as it may cause security issues!
+*/
 const char* mqtt_server   = "37638f32d99b49fa968d88c783e2b03a.s1.eu.hivemq.cloud";
 const int   mqtt_port     = 8883;
 const char* mqtt_user     = "libyzxy0";
 const char* mqtt_password = "Libyzxy0@123_esp32";
 const char* client_id     = "esp_gate01";
 
-bool PRODUCTION = false;
-bool SCANNING = false;
+/* ——————————————————————————————— */
 
+/* NTP Server Time Configuration */
+const char* ntpServer = "pool.ntp.org";
+const char* time_zone = "PST-8";
+
+/* ——————————————————————————————— */
+
+/* SSL Certificate Issued by Let's Encrypt */
 const char* ca_cert = R"EOF(
 -----BEGIN CERTIFICATE-----
 MIIFazCCA1OgAwIBAgIRAIIQz7DSQONZRGPgu2OCiwAwDQYJKoZIhvcNAQELBQAw
@@ -70,15 +95,25 @@ emyPxgcYxn/eR44/KJ4EBs+lVDR3veyJm+kXQ99b21/+jh5Xos1AnX5iItreGCc=
 -----END CERTIFICATE-----
 )EOF";
 
+/* ——————————————————————————————— */
+
+/* Library Configurations */
 WiFiClientSecure secureClient;
 PubSubClient mqtt(secureClient);
 MFRC522 rfid(SS_PIN, RST_PIN);
 HardwareSerial QRScanner(2);
 
+/* ——————————————————————————————— */
+
+/* Global Needed States */
+bool SCANNING = false;
 char qrBuffer[MAX_SCAN_LENGTH];
 uint8_t qrIndex = 0;
 unsigned long lastQrCharTime = 0;
 
+/* ——————————————————————————————— */
+
+/* Utility Functions */
 void buzzerTone(uint32_t freq) {
   if (freq == 0) {
     digitalWrite(BUZZER_PIN, LOW);
@@ -96,8 +131,6 @@ void buzzerTone(uint32_t freq) {
     delayMicroseconds(halfPeriod);
   }
 }
-
-
 
 class JsonUtil {
   public:
@@ -164,7 +197,6 @@ class JsonUtil {
     return doc[key].as < float > ();
   }
 };
-
 class NotificationUtil {
 public:
   static void successTone () {
@@ -202,6 +234,9 @@ public:
   }
 };
 
+/* ——————————————————————————————— */
+
+/* Setup Functions */
 void connectWiFi() {
   WiFi.begin(ssid, password);
   Serial.print("Connecting to WiFi");
@@ -271,7 +306,7 @@ void setup_time() {
   time_t now = time(nullptr);
   while (now < 24 * 3600) {
     delay(100);
-    Serial.print(".");
+    Serial.print("_");
     now = time(nullptr);
   }
   Serial.println("\nTime synchronized.");
@@ -286,6 +321,7 @@ void getISOTime(char* buffer, size_t bufferSize) {
 }
 
 void mqtt_callback(char* topic, byte* payload, unsigned int length) {
+  SCANNING = false;
   Serial.print("Message [");
   Serial.print(topic);
   Serial.print("]: ");
@@ -314,6 +350,8 @@ void setup() {
     NotificationUtil::errorTone();
   }
   Serial.println("WiFi and Time Ready");
+  char isoTime[40];
+  getISOTime(isoTime, sizeof(isoTime));
 
   secureClient.setCACert(ca_cert);
   mqtt.setServer(mqtt_server, mqtt_port);
@@ -322,19 +360,28 @@ void setup() {
   
   connectMQTT();
   Serial.println("MQTT Connected!");
-  delay(500);
-  Serial.println("Device Ready");
+  Serial.println("Device Ready, See Configs:");
+  Serial.println("[=========================]");
+  Serial.print("TIME: ");
+  Serial.println(isoTime);
+  Serial.print("ENVIRONMENT: ");
+  Serial.println(PRODUCTION ? "PRODUCTION" : "DEVELOPMENT");
+  Serial.print("WIFI CRED: ");
+  Serial.println(String(ssid) + ":" + String(password));
+  Serial.print("SECRET KEY: ");
+  Serial.println(SECRET_KEY);
+  
+  Serial.println("[=========================]");
   NotificationUtil::initializedTone();
 }
 
+/* ——————————————————————————————— */
 
+/* Main Functions */
 void loop() {
   if (!mqtt.connected()) {
     connectMQTT();
   }
-  
-  char isoTime[40];
-  getISOTime(isoTime, sizeof(isoTime));
   
   mqtt.loop();
   
@@ -345,10 +392,8 @@ void loop() {
     Serial.println(uid);
     
     String payload = JsonUtil::create()
-    .add("action", "SCAN_RFID")
     .add("data", uid.c_str())
-    .add("secret_key", "8d70ccda-2e57-416b-94db-8b24136fb27b")
-    .add("time", isoTime)
+    .add("secret_key", SECRET_KEY)
     .toString();
     
     if (mqtt.publish(PRODUCTION ? "scan/rfid" : "dev/scan/rfid", payload.c_str())) {
@@ -367,10 +412,8 @@ void loop() {
     Serial.println(qr_data);
     
     String payload = JsonUtil::create()
-    .add("action", "SCAN_QR")
     .add("data", qr_data.c_str())
-    .add("secret_key", "8d70ccda-2e57-416b-94db-8b24136fb27b")
-    .add("time", isoTime)
+    .add("secret_key", SECRET_KEY)
     .toString();
     
     if (mqtt.publish(PRODUCTION ? "scan/qr" : "dev/scan/qr", payload.c_str())) {
