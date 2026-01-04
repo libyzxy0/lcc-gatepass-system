@@ -6,8 +6,9 @@ class OTPController {
   static async generateVisitorOTP(req: Request, res: Response) {
     try {
       const { phone_number } = req.body;
-
       const { vst, code } = await OTPService.generateVisitorOTP(phone_number);
+      
+      console.log(vst, code);
         
         /* Send SMS OTP via Iprog SMS API */
       await sendSMSOTP(vst.phone_number, code, vst.id);

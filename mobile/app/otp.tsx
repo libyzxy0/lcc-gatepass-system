@@ -1,40 +1,26 @@
-import { Text, View, SafeAreaView, showToast, Button } from '@/components'
-import { Image } from "expo-image";
-import { useState, useEffect } from "react";
+import { Text, View, SafeAreaView, showToast } from '@/components'
+import { useState, useEffect, useCallback } from "react";
 import { Ionicons } from "@expo/vector-icons"
-import logo from "@/assets/images/logo.png";
 import { TouchableOpacity } from 'react-native'
 import { useColors } from "@/hooks/useColors";
-import Octicons from '@expo/vector-icons/Octicons';
 import { useAuthStore } from "@/utils/auth-store";
 import { ModalConfirm } from '@/components/ui/modals/ModalConfirm'
 import { ModalLoading } from '@/components/ui/modals/ModalLoading'
 import { formatPHNumber } from '@/utils/format-ph-number'
 import { generateOTP, verifyOTP } from '@/api/helper/otp'
 import { useRouter } from 'expo-router';
+import { useFocusEffect } from '@react-navigation/native';
 
 export default function OTPPage() {
   const router = useRouter();
   const [pin, setPin] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
   const [showConfrim, setShowConfirm] = useState(false);
-  const { login, phoneNumber, setPhoneNumber, getSession } = useAuthStore();
+  const { phoneNumber, setPhoneNumber, getSession } = useAuthStore();
   const colors = useColors();
-  const [sent, setSent] = useState(false);
-  const [time, setTime] = useState(5 * 60);
 
-  useEffect(() => {
-    if (time === 0) return;
-
-    const interval = setInterval(() => {
-      setTime((prev) => prev - 1);
-    }, 1000);
-
-    return () => clearInterval(interval);
-  }, [time]);
-
-  const minutes = Math.floor(time / 60);
-  const seconds = time % 60;
+  const [expiresAt, setExpiresAt] = useState<number | null>(null);
+  const [remainingTime, setRemainingTime] = useState(0);
 
   const handlePress = async (num: string) => {
     if (pin.length >= 6) return;
@@ -45,39 +31,35 @@ export default function OTPPage() {
     if (updatedPin.length === 6) {
       try {
         setLoading(true);
-        const data = await verifyOTP(phoneNumber, updatedPin.join(""))
+        const data = await verifyOTP(phoneNumber, updatedPin.join(""));
+
         if (data?.server_error) {
-          showToast({
-            type: 'error',
-            text1: "Ohh No! There's an Error!",
-            text2: data.message
-          });
+          showToast({ type: "error", text1: "Error", text2: data.message });
           setPin([]);
           return;
         }
+
         if (data.verified === true) {
           showToast({
-            type: 'success',
-            text1: 'Account Successfully activated!',
+            type: "success",
+            text1: "Account Activated!",
             text2: data.message
           });
+
           await getSession();
           router.replace('/');
           setPin([]);
         } else {
-          showToast({
-            type: 'error',
-            text1: "Ohh No! There's an Error!",
-            text2: data.message
-          });
+          showToast({ type: "error", text1: "Invalid OTP", text2: data.message });
           setPin([]);
         }
-
       } catch (error) {
         showToast({
-          type: 'error',
-          text1: "Ohh No! There's an Error!",
-          text2: error.response ? error.response.data.message : "Maybe the server is busy or sleeping 😅"
+          type: "error",
+          text1: "Error",
+          text2: error.response
+            ? error.response.data.message
+            : "Server might be sleeping 😅"
         });
         setPin([]);
       } finally {
@@ -90,39 +72,67 @@ export default function OTPPage() {
     setPin(pin.slice(0, -1));
   };
 
+  const sendOTP = async () => {
+    await generateOTP(phoneNumber);
+
+    const newExpiry = Date.now() + 5 * 60 * 1000;
+    setExpiresAt(newExpiry);
+  };
+
   useEffect(() => {
-    if (!sent) {
-      const sendOTP = async () => {
-        await generateOTP(phoneNumber);
-      }
-      sendOTP();
-      setSent(true);
-    }
-  }, [sent])
+    sendOTP();
+  }, []);
+
+  useFocusEffect(
+    useCallback(() => {
+      const interval = setInterval(() => {
+        if (!expiresAt) return;
+
+        const diff = expiresAt - Date.now();
+
+        if (diff <= 0) {
+          setRemainingTime(0);
+        } else {
+          setRemainingTime(Math.floor(diff / 1000));
+        }
+      }, 1000);
+
+      return () => clearInterval(interval);
+    }, [expiresAt])
+  );
+
+  const minutes = Math.floor(remainingTime / 60);
+  const seconds = String(remainingTime % 60).padStart(2, "0");
 
   return (
     <SafeAreaView style={{ flex: 1, paddingHorizontal: 20 }}>
       <ModalLoading visible={loading} />
+
       <ModalConfirm
         visible={showConfrim}
         onConfirm={() => setPhoneNumber(null)}
         onClose={() => setShowConfirm(false)}
         title={"Change Number?"}
-        description={"Are you sure you want to change your number to login?"} closeAfterConfirm />
+        description={"Are you sure you want to change your number to login?"}
+        closeAfterConfirm
+      />
+
       <View style={{ marginTop: 80, marginHorizontal: 12, gap: 10 }}>
-        <Text type="bold" style={{
-          color: colors.text,
-          fontSize: 22
-        }}>Enter your One Time Pin (OTP)</Text>
-        <Text>Please enter the One Time Pin (OTP) we've sent to your phone number <Text onPress={() => setShowConfirm(true)} type="link">(+63) {formatPHNumber(phoneNumber)}</Text>.</Text>
+        <Text type="bold" style={{ color: colors.text, fontSize: 22 }}>
+          Enter your One Time Pin (OTP)
+        </Text>
+
+        <Text>
+          Please enter the One Time Pin (OTP) we've sent to your phone number{" "}
+          <Text onPress={() => setShowConfirm(true)} type="link">
+            (+63) {formatPHNumber(phoneNumber)}
+          </Text>.
+        </Text>
       </View>
 
-      <View style={{
-        alignItems: 'center',
-        marginBottom: 20
-      }}>
+      <View style={{ alignItems: 'center', marginBottom: 20 }}>
         <View style={{ flexDirection: "row", gap: 8, marginTop: 40 }}>
-          {[0, 1, 2, 3, 4, 5].map((i) => (
+          {[0, 1, 2, 3, 4, 5].map(i => (
             <View
               key={i}
               style={{
@@ -134,28 +144,25 @@ export default function OTPPage() {
                 justifyContent: 'center'
               }}
             >
-              <Text style={{
-                fontSize: 24
-              }}>{pin[i]}</Text>
+              <Text style={{ fontSize: 24 }}>{pin[i]}</Text>
             </View>
           ))}
         </View>
       </View>
 
-      <View style={{
-        justifyContent: 'center',
-        marginBottom: 20
-      }}>
-        <Text type={'secondary'} style={{
-          textAlign: 'center'
-        }}>Resend after {minutes}:{seconds}</Text>
+      <View style={{ justifyContent: 'center', marginBottom: 20 }}>
+        {remainingTime <= 0 ? (
+          <Text type="secondary" style={{ textAlign: 'center' }}>
+            Resend OTP
+          </Text>
+        ) : (
+          <Text type="secondary" style={{ textAlign: 'center' }}>
+            Resend after {minutes}:{seconds}
+          </Text>
+        )}
       </View>
 
-      <View style={{
-        flex: 1,
-        justifyContent: "center",
-        gap: 25
-      }}>
+      <View style={{ flex: 1, justifyContent: "center", gap: 25 }}>
         {[
           ["1", "2", "3"],
           ["4", "5", "6"],
@@ -206,7 +213,6 @@ export default function OTPPage() {
           </View>
         ))}
       </View>
-
     </SafeAreaView>
   );
 }

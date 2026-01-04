@@ -40,6 +40,8 @@ class VisitorService {
 
       return newVisitor;
     } catch (error) {
+      console.log(error);
+      if(error.code === "23505") throw new BadRequestError('User with that email already exist!');
       throw error;
     }
   }

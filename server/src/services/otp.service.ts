@@ -32,7 +32,7 @@ class OTPservice {
   static async isOTPActive(vst) {
     try {
       const now = new Date();
-      const activeOtp = await db
+      const [activeOtp] = await db
         .select()
         .from(otp)
         .where(
@@ -50,9 +50,11 @@ class OTPservice {
 
   static async generateVisitorOTP(phone_number: string) {
     try {
+      console.log("Generating OTP...")
       const now = new Date();
 
       const vst = await this.getVisitorWithPhone(phone_number);
+      
       await this.isOTPActive(vst);
 
       const code = this.generateSixDigitPin();
@@ -78,6 +80,7 @@ class OTPservice {
         });
       return { vst, code };
     } catch (error) {
+      console.log('Failed to generate otp:', error.message);
       throw error;
     }
   }

@@ -13,9 +13,9 @@ export const SmsAPI = async (phone_number: string, message: string): Promise<SMS
       {
         api_token: SMS_API_TOKEN,
         message,
-        phone_number: '63' + phone_number,
-        sender_name: "kaprets"
+        phone_number: '63' + phone_number
       });
+      console.log(response.data)
     return response.data;
   } catch (error) {
     console.error(error);

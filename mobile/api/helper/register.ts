@@ -40,7 +40,7 @@ export const visitorRegister = async ({
   } catch (error) {
     return {
       success: false,
-      message: error.response ? error.response.error : error.message
+      message: error.response ? error.response.data.error : error.message
     }
   }
 }

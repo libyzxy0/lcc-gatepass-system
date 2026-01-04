@@ -66,7 +66,7 @@ export const getGatepass = async (): Promise<Gatepass[]> => {
     if (!response.data) return [];
     return response.data;
   } catch (error) {
-    console.error(error.response ? error.response.data.error : error.message);
+   // console.error(error.response ? error.response.data.error : error.message);
     return [];
   }
 }
@@ -83,7 +83,7 @@ export const deleteGatepass = async (visitId: string): Promise<DeleteVisitRespon
       message: response.data.message
     };
   } catch (error) {
-    console.error(error.response ? error.response.data.error : error.message);
+    //console.error(error.response ? error.response.data.error : error.message);
     return {
       success: false,
       message: error.response ? error.response.data.error : error.message
