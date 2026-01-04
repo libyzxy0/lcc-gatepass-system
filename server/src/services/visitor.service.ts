@@ -2,6 +2,7 @@ import db from '@/db/drizzle'
 import { visitor } from '@/db/schema'
 import { eq } from 'drizzle-orm'
 import { generateVisitorID } from '@/utils'
+import bcrypt from "bcryptjs";
 import {
   BadRequestError,
   UnauthorizedError,
@@ -25,6 +26,7 @@ type NewVisitor = {
 class VisitorService {
   static async createVisitor({ firstname, lastname, middle_initial, email, phone_number, pin }: NewVisitor) {
     try {
+      const hashedPin = await bcrypt.hash(pin, 10);
       const [newVisitor] = await db.insert(visitor).values({
         visitor_id: generateVisitorID(),
         firstname,
@@ -32,7 +34,7 @@ class VisitorService {
         middle_initial,
         email,
         phone_number,
-        pin
+        pin: hashedPin
       }).returning({
         id: visitor.id,
         phone_number: visitor.phone_number
@@ -53,8 +55,10 @@ class VisitorService {
         .where(eq(visitor.phone_number, phone_number));
 
       if (!visitorData) throw new NotFoundError('Invalid phone number');
+      
+      const isValidPin = await bcrypt.compare(pin, visitorData.pin);
 
-      if (visitorData.pin !== pin) throw new UnauthorizedError('Incorrect Pin');
+      if (!isValidPin) throw new UnauthorizedError('Opps.. Incorrect Pin');
 
       return visitorData;
     } catch (error) {

@@ -152,7 +152,7 @@ export default function OTPPage() {
 
       <View style={{ justifyContent: 'center', marginBottom: 20 }}>
         {remainingTime <= 0 ? (
-          <Text type="secondary" style={{ textAlign: 'center' }}>
+          <Text onPress={sendOTP} type="link" style={{ textAlign: 'center' }}>
             Resend OTP
           </Text>
         ) : (

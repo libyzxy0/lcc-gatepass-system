@@ -15,10 +15,8 @@ export const SmsAPI = async (phone_number: string, message: string): Promise<SMS
         message,
         phone_number: '63' + phone_number
       });
-      console.log(response.data)
     return response.data;
   } catch (error) {
-    console.error(error);
     return {
       status: error.response ? error.response.status : 500,
       message: error.message,
