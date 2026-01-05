@@ -27,17 +27,22 @@ class ESPController {
       });
 
       if (payload.action == 'scan/qr') {
-        const data = await EspService.verifyQR(payload.data);
+        try {
+          const data = await EspService.verifyQR(payload.data);
 
-        tg_api(encodeURIComponent(`<b>SCANNED</b>\n[Debug Notification]\n\n<b>Name</b>: ${data.visitor.firstname + " " + data.visitor.lastname}\n<b>Purpose</b>: ${data.gatepass.purpose}\n<b>Description</b>: ${data.gatepass.description}\n<b>Time</b>: ${localDate} ${localTime}\n\n<i>Received from ${process.env.NODE_ENV === 'production' ? "Production Server" : "Development Server"}</i>`));
+          tg_api(encodeURIComponent(`<b>SCANNED</b>\n[Debug Notification]\n\n<b>Name</b>: ${data.visitor.firstname + " " + data.visitor.lastname}\n<b>Purpose</b>: ${data.gatepass.purpose}\n<b>Description</b>: ${data.gatepass.description}\n<b>Time</b>: ${localDate} ${localTime}\n\n<i>Received from ${process.env.NODE_ENV === 'production' ? "Production Server" : "Development Server"}</i>`));
 
-        res.status(200).json({
-          verified: true,
-          reply_to_action: payload.action,
-          data: {
-            id: data.visitor.id
-          }
-        });
+          return res.json({
+            status: 'ok',
+            id: data.visitor.id,
+            name: data.visitor.firstname + " " + data.visitor.lastname
+          })
+        } catch (error) {
+          return res.json({
+            status: 'bad'
+          })
+        }
+
       } else if (payload.topic === 'scan/rfid') {
         try {
           const rfid_verification = await EspService.verifyRFID(payload.data);

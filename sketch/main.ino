@@ -451,7 +451,7 @@ void loop() {
     
     if (mqtt.publish(PRODUCTION ? "scan/qr" : "dev/scan/qr", payload.c_str())) {
       Serial.println("Message published successfully");
-      NotificationUtil::successTone();
+      NotificationUtil::readyTone();
     } else {
       Serial.println("Message publish FAILED");
       NotificationUtil::errorTone();
