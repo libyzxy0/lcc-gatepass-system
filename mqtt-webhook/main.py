@@ -74,7 +74,6 @@ def on_message(client, userdata, msg):
 
     payload.pop("secret_key", None)
     payload["topic"] = msg.topic
-    payload["received_at"] = payload.get("time")
 
     def post_webhook(data, topic):
         try:

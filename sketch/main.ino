@@ -7,10 +7,6 @@
 #include <HardwareSerial.h>
 #include <time.h>
 
-#define BUZZER_CHANNEL 0
-#define BUZZER_RESOLUTION 8
-#define BUZZER_DUTY 255
-
 #define SS_PIN 5
 #define RST_PIN 22
 
@@ -21,7 +17,8 @@
 
 #define BUZZER_PIN 4
 
-#define RELAY_PIN = 2;
+#define RELAY_PIN 2
+#define LOCK_SENSOR_RST 33
 
 /* Choose which server to communicate with, production(true) or development(false) */
 bool PRODUCTION = false;
@@ -33,8 +30,8 @@ bool PRODUCTION = false;
 * @ssid - WiFi SSID;
 * @password - WiFi Password;
 */
-const char* ssid = "AieSheNel_DITO";
-const char* password = "aie081501";
+const char* ssid = "OrangeCat";
+const char* password = "myorange32";
 
 /* ——————————————————————————————— */
 
@@ -114,23 +111,6 @@ unsigned long lastQrCharTime = 0;
 /* ——————————————————————————————— */
 
 /* Utility Functions */
-void buzzerTone(uint32_t freq) {
-  if (freq == 0) {
-    digitalWrite(BUZZER_PIN, LOW);
-    return;
-  }
-
-  uint32_t periodUs = 1000000UL / freq;
-  uint32_t halfPeriod = periodUs / 2;
-
-  unsigned long start = millis();
-  while (millis() - start < 120) {
-    digitalWrite(BUZZER_PIN, HIGH);
-    delayMicroseconds(halfPeriod);
-    digitalWrite(BUZZER_PIN, LOW);
-    delayMicroseconds(halfPeriod);
-  }
-}
 
 class JsonUtil {
   public:
@@ -198,39 +178,43 @@ class JsonUtil {
   }
 };
 class NotificationUtil {
-public:
+  public:
   static void successTone () {
-    buzzerTone(880);
+    ledcWriteTone(0, 880);
+    ledcWrite(0, 204);
     delay(150);
-    buzzerTone(0);
+    ledcWriteTone(0, 0);
     delay(50);
-    buzzerTone(988);
+    ledcWriteTone(0, 988);
     delay(150);
-    buzzerTone(0);
+    ledcWriteTone(0, 0);
   }
-
   static void errorTone() {
-    buzzerTone(220);
+    ledcWriteTone(0, 220);
+    ledcWrite(0, 204);
     delay(400);
-    buzzerTone(0);
+    ledcWriteTone(0, 0);
   }
-
   static void readyTone() {
-    buzzerTone(523);
+    ledcWriteTone(0, 523);
+    ledcWrite(0, 204);
     delay(100);
-    buzzerTone(659);
+    ledcWriteTone(0, 659);
+    ledcWrite(0, 204);
     delay(100);
-    buzzerTone(0);
+    ledcWriteTone(0, 0);
   }
-
   static void initializedTone() {
-    buzzerTone(1319);
+    ledcWriteTone(0, 1319);
+    ledcWrite(0, 204);
     delay(100);
-    buzzerTone(1568);
+    ledcWriteTone(0, 1568);
+    ledcWrite(0, 204);
     delay(100);
-    buzzerTone(1760);
+    ledcWriteTone(0, 1760);
+    ledcWrite(0, 204);
     delay(100);
-    buzzerTone(0);
+    ledcWriteTone(0, 0);
   }
 };
 
@@ -239,8 +223,11 @@ public:
 /* Setup Functions */
 void connectWiFi() {
   WiFi.begin(ssid, password);
-  Serial.print("Connecting to WiFi");
-
+  Serial.println("Connecting to WiFi");
+  Serial.print("Cred: ");
+  Serial.print(ssid);
+  Serial.print(":");
+  Serial.println(password);
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
     Serial.print(".");
@@ -255,7 +242,7 @@ void connectMQTT() {
 
     if (mqtt.connect(client_id, mqtt_user, mqtt_password)) {
       Serial.println("connected");
-      mqtt.subscribe("dev/scan/#");
+      mqtt.subscribe(PRODUCTION ? "scan/#" : "dev/scan/#");
       NotificationUtil::readyTone();
     } else {
       Serial.print("failed, rc=");
@@ -321,15 +308,53 @@ void getISOTime(char* buffer, size_t bufferSize) {
 }
 
 void mqtt_callback(char* topic, byte* payload, unsigned int length) {
-  SCANNING = false;
-  Serial.print("Message [");
-  Serial.print(topic);
-  Serial.print("]: ");
+
+  if (length == 0 || payload == nullptr) {
+    Serial.println("MQTT: Empty payload ignored");
+    return;
+  }
+
+  String message;
+  message.reserve(length);
 
   for (unsigned int i = 0; i < length; i++) {
-    Serial.print((char)payload[i]);
+    message += (char)payload[i];
   }
-  Serial.println();
+
+  Serial.print("MQTT [");
+  Serial.print(topic);
+  Serial.print("]: ");
+  Serial.println(message);
+
+  if (!message.startsWith("{") || !message.endsWith("}")) {
+    Serial.println("MQTT: Invalid JSON format");
+    NotificationUtil::errorTone();
+    NotificationUtil::errorTone();
+    NotificationUtil::errorTone();
+    return;
+  }
+  
+  String status = JsonUtil::getString(message, "status");
+  String name = JsonUtil::getString(message, "name");
+  
+  if (status.length() == 0) {
+    Serial.println("MQTT: Missing Status, ignoring command");
+    SCANNING = false;
+    return;
+  }
+  
+  Serial.println(name);
+
+  if (status == "ok") {
+    Serial.println("Access GRANTED → Gate unlocked");
+    digitalWrite(RELAY_PIN, HIGH);
+    NotificationUtil::successTone();
+  } else {
+    Serial.println("Access DENIED → Gate locked");
+    digitalWrite(RELAY_PIN, LOW);
+    NotificationUtil::errorTone();
+  }
+  SCANNING = false;
 }
 
 void setup() {
@@ -337,7 +362,11 @@ void setup() {
   SPI.begin();
   rfid.PCD_Init();
   QRScanner.begin(9600, SERIAL_8N1, QR_RX, QR_TX);
+  ledcSetup(0, 1000, 8);
+  ledcAttachPin(BUZZER_PIN, 0);
   pinMode(BUZZER_PIN, OUTPUT);
+  pinMode(RELAY_PIN, OUTPUT);
+  pinMode(LOCK_SENSOR_RST, INPUT_PULLUP);
   digitalWrite(BUZZER_PIN, LOW);
   Serial.println("Peripherals Ready");
   NotificationUtil::readyTone();
@@ -383,6 +412,10 @@ void loop() {
     connectMQTT();
   }
   
+  if(digitalRead(LOCK_SENSOR_RST) == LOW) {
+    digitalWrite(RELAY_PIN, LOW);
+  }
+  
   mqtt.loop();
   
   String uid;
@@ -398,7 +431,7 @@ void loop() {
     
     if (mqtt.publish(PRODUCTION ? "scan/rfid" : "dev/scan/rfid", payload.c_str())) {
       Serial.println("Message published successfully");
-      NotificationUtil::successTone();
+      NotificationUtil::readyTone();
     } else {
       Serial.println("Message publish FAILED");
       NotificationUtil::errorTone();

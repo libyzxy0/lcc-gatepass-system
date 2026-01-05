@@ -38,17 +38,21 @@ class ESPController {
             id: data.visitor.id
           }
         });
-      } else if (payload.action === 'SCAN_RFID') {
-        const rfid_verification = await EspService.verifyRFID(payload.data);
-        console.log(rfid_verification)
-        tg_api(encodeURIComponent(`<b>SCANNED</b>\n[Debug Notification]\n\n<b>Name</b>: ${rfid_verification.firstname + " " + rfid_verification.lastname}\n<b>Section</b>: ${rfid_verification.section}\n<b>Student ID:RFID</b>: ${rfid_verification.student_id}:${rfid_verification.rfid_code}\n<b>Time</b>: ${localDate} ${localTime}\n\n<i>Received from ${process.env.NODE_ENV === 'production' ? "Production Server" : "Development Server"}</i>`));
-        return res.json({
-          verified: true,
-          reply_to_action: payload.action,
-          data: {
-            id: rfid_verification.id
-          }
-        })
+      } else if (payload.topic === 'dev/scan/rfid') {
+        try {
+          const rfid_verification = await EspService.verifyRFID(payload.data);
+          console.log(rfid_verification)
+          tg_api(encodeURIComponent(`<b>SCANNED</b>\n[Debug Notification]\n\n<b>Name</b>: ${rfid_verification.firstname + " " + rfid_verification.lastname}\n<b>Section</b>: ${rfid_verification.section}\n<b>Student ID:RFID</b>: ${rfid_verification.student_id}:${rfid_verification.rfid_code}\n<b>Time</b>: ${localDate} ${localTime}\n\n<i>Received from ${process.env.NODE_ENV === 'production' ? "Production Server" : "Development Server"}</i>`));
+          return res.json({
+            status: 'ok',
+            id: rfid_verification.id,
+            name: rfid_verification.firstname + " " + rfid_verification.lastname
+          })
+        } catch (error) {
+          return res.json({
+            status: 'bad'
+          })
+        }
       }
 
 
