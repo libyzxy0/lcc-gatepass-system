@@ -26,7 +26,7 @@ class ESPController {
         hour12: false
       });
 
-      if (payload.action == 'SCAN_QR') {
+      if (payload.action == 'scan/qr') {
         const data = await EspService.verifyQR(payload.data);
 
         tg_api(encodeURIComponent(`<b>SCANNED</b>\n[Debug Notification]\n\n<b>Name</b>: ${data.visitor.firstname + " " + data.visitor.lastname}\n<b>Purpose</b>: ${data.gatepass.purpose}\n<b>Description</b>: ${data.gatepass.description}\n<b>Time</b>: ${localDate} ${localTime}\n\n<i>Received from ${process.env.NODE_ENV === 'production' ? "Production Server" : "Development Server"}</i>`));
@@ -38,7 +38,7 @@ class ESPController {
             id: data.visitor.id
           }
         });
-      } else if (payload.topic === 'dev/scan/rfid') {
+      } else if (payload.topic === 'scan/rfid') {
         try {
           const rfid_verification = await EspService.verifyRFID(payload.data);
           console.log(rfid_verification)
