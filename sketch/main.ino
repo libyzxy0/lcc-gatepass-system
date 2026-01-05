@@ -254,6 +254,19 @@ void connectMQTT() {
   }
 }
 
+void resubscribeTopics() {
+  mqtt.unsubscribe("scan/#");
+  mqtt.unsubscribe("dev/scan/#");
+
+  if (PRODUCTION) {
+    mqtt.subscribe("scan/#");
+    Serial.println("Subscribed to scan/#");
+  } else {
+    mqtt.subscribe("dev/scan/#");
+    Serial.println("Subscribed to dev/scan/#");
+  }
+}
+
 bool scanRfid(String &uidOut) {
   if (!rfid.PICC_IsNewCardPresent()) return false;
   if (!rfid.PICC_ReadCardSerial()) return false;
@@ -388,6 +401,7 @@ void setup() {
   mqtt.setBufferSize(512);
   
   connectMQTT();
+  resubscribeTopics();
   Serial.println("MQTT Connected!");
   Serial.println("Device Ready, See Configs:");
   Serial.println("[=========================]");
@@ -414,6 +428,24 @@ void loop() {
   
   if(digitalRead(LOCK_SENSOR_RST) == LOW) {
     digitalWrite(RELAY_PIN, LOW);
+  }
+  
+  if (Serial.available() > 0) {
+    String command = Serial.readStringUntil('\n');
+    
+    if (command.equals("DEV_MODE")) {
+      PRODUCTION = false;
+      SCANNING = false;
+      resubscribeTopics();
+      Serial.println("Environment set to DEVELOPMENT");
+      NotificationUtil::initializedTone();
+    } else if (command.equals("PROD_MODE")) {
+      PRODUCTION = true;
+      SCANNING = false;
+      resubscribeTopics();
+      Serial.println("Environment set to PRODUCTION");
+      NotificationUtil::initializedTone();
+    }
   }
   
   mqtt.loop();

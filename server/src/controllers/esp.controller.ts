@@ -26,7 +26,7 @@ class ESPController {
         hour12: false
       });
 
-      if (payload.topic === `${process.env.NODE_ENV === 'production' ?'scan/qr' : 'dev/scan/qr'}`) {
+      if (payload.topic === `${process.env.NODE_ENV === 'production' ? 'scan/qr' :'dev/scan/qr'}`) {
         try {
           const data = await EspService.verifyQR(payload.data);
 
@@ -43,7 +43,7 @@ class ESPController {
           })
         }
 
-      } else if (payload.topic === `${process.env.NODE_ENV === 'production' ?'scan/rfid' : 'dev/scan/rfid'}`) {
+      } else if (payload.topic == `${process.env.NODE_ENV === 'production' ? 'scan/rfid' : 'dev/scan/rfid'}`) {
         try {
           const rfid_verification = await EspService.verifyRFID(payload.data);
           console.log(rfid_verification)
