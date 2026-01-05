@@ -65,6 +65,27 @@ class GatepassController {
       res.status(error.status || 500).json({ error: error.message });
     }
   }
+  
+  static async approveGatepass(req: VisitorRequest, res: Response) {
+    const gatepassId = req.body.id;
+    try {
+      if(!req.visitor) return res.status(401).json({ error: 'Unauthorized access' })
+      const result = await GatepassService.approve(gatepassId);
+      return res.json({message: 'Gatepass status successfully set to approve'});
+    } catch (error) {
+      res.status(error.status || 500).json({ error: error.message });
+    }
+  }
+  static async rejectGatepass(req: VisitorRequest, res: Response) {
+    const gatepassId = req.body.id;
+    try {
+      if(!req.visitor) return res.status(401).json({ error: 'Unauthorized access' })
+      const result = await GatepassService.reject(gatepassId);
+      return res.json({message: 'Gatepass status successfully set to rejected'});
+    } catch (error) {
+      res.status(error.status || 500).json({ error: error.message });
+    }
+  }
 }
 
 export default GatepassController;

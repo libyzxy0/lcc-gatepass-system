@@ -1,12 +1,6 @@
 import { GatepassTable } from '@/components/gatepass-table'
 import type { ColumnDef } from "@tanstack/react-table"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { Trash, Pencil, IdCard, Ellipsis, ArrowUpDown, ThumbsUp, ThumbsDown } from 'lucide-react';
+import { ArrowUpDown } from 'lucide-react';
 import {
   useQuery,
 } from '@tanstack/react-query'
@@ -14,6 +8,7 @@ import { getAllGatepass } from '@/api/helpers/gatepass'
 import { Skeleton } from "@/components/ui/skeleton"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
+import { GatepassTableAction } from '@/components/GatepassTableAction'
 
 type Gatepass = {
   id: string;
@@ -112,39 +107,7 @@ export const columns: ColumnDef<Gatepass>[] = [
   },
   {
     id: "actions",
-    cell: () => (
-      <DropdownMenu>
-        <DropdownMenuTrigger>
-          <Ellipsis />
-        </DropdownMenuTrigger>
-        <DropdownMenuContent>
-          <DropdownMenuItem className="text-green-400 focus:text-green-400 hover:text-green-400 focus:bg-green-400/20 hover:focus:bg-green-400/20">
-            <ThumbsUp className="text-green-400" />
-            Approve
-          </DropdownMenuItem>
-
-          <DropdownMenuItem className="text-orange-400 focus:text-orange-400 hover:text-orange-400 focus:bg-orange-400/20 hover:focus:bg-orange-400/20">
-            <ThumbsDown className="text-orange-400" />
-            Reject
-          </DropdownMenuItem>
-
-          <DropdownMenuItem>
-            <IdCard />
-            View
-          </DropdownMenuItem>
-
-          <DropdownMenuItem>
-            <Pencil />
-            Edit
-          </DropdownMenuItem>
-
-          <DropdownMenuItem variant="destructive">
-            <Trash />
-            Delete
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
-    ),
+    cell: ({ row }) => <GatepassTableAction id={row.original.id} />,
   },
 ]
 

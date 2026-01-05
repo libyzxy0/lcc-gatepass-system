@@ -7,6 +7,8 @@ const router = Router();
 
 router.get("/", visitor_auth, GatepassController.gatepass);
 router.post("/request-gatepass", visitor_auth, GatepassController.requestGatepass);
+router.post("/approve", visitor_auth, GatepassController.approveGatepass);
+router.post("/reject", visitor_auth, GatepassController.rejectGatepass);
 router.delete("/delete-gatepass/:id", visitor_auth, GatepassController.deleteGatepass);
 
 /* Admin Data */

@@ -76,10 +76,11 @@ class GatepassService {
   /* Gatepass Data Services */
   static async getAllGatepassData() {
     try {
-      const allGAtepass = await db.select().from(gatepass).leftJoin(visitor, eq(visitor.id, gatepass.visitor_id));
-      if (allGAtepass.length === 0) throw new NotFoundError("No gatepass data yet.")
+      const allGatepass = await db.select().from(gatepass).leftJoin(visitor, eq(visitor.id, gatepass.visitor_id));
+      
+      if (allGatepass.length === 0) throw new NotFoundError("No gatepass data yet.")
 
-      return allGAtepass.map((gpass) => {
+      return allGatepass.map((gpass) => {
         return {
           ...gpass.gatepass,
           visitor_fullname: gpass.visitor.firstname + ' ' + gpass.visitor.lastname,
@@ -89,6 +90,22 @@ class GatepassService {
           visitor_id: gpass.visitor.id
         }
       })
+    } catch (error) {
+      throw error;
+    }
+  }
+  static async approve(id: string) {
+    try {
+      const result = await db.update(gatepass).set({ status: 'approved' }).where(eq(gatepass.id, id));
+      return result;
+    } catch (error) {
+      throw error;
+    }
+  }
+  static async reject(id: string) {
+    try {
+      const result = await db.update(gatepass).set({ status: 'rejected' }).where(eq(gatepass.id, id));
+      return result;
     } catch (error) {
       throw error;
     }
