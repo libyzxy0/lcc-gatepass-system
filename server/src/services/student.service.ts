@@ -105,7 +105,9 @@ class StudentService {
   static async delete(id) {
     try {
       const stdnt = await this.get(id);
+      console.log(stdnt)
       if (!stdnt) throw new NotFoundError('Failed to update, student did not exist');
+      await db.delete(guardian).where(eq(student.guardian_id, stdnt.guardian_id));
       const deleted = await db.delete(student)
         .where(eq(student.id, stdnt.id)).returning({ id: student.id });
     } catch (error) {

@@ -75,6 +75,7 @@ const formSchema = z.object({
 
 export function AddStudentDialog({ children, onCreate }: { children: React.ReactNode, onCreate: () => void; }) {
   const [open, setOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState('student');
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -98,6 +99,7 @@ export function AddStudentDialog({ children, onCreate }: { children: React.React
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     console.log(values);
+    setLoading(true);
     const data = await createStudent(values)
     if (!data.success) {
       toast.error(data.message);
@@ -381,7 +383,7 @@ export function AddStudentDialog({ children, onCreate }: { children: React.React
                   <Input type="file" />
                 </div>
                 <div className="mt-6">
-                  <Button type="submit">Add Student</Button>
+                  <Button type="submit">{loading ? "Creating..." : "Add Student"}</Button>
                 </div>
               </TabsContent>
             </Tabs>
