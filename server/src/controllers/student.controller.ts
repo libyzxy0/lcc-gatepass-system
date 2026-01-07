@@ -28,7 +28,7 @@ class StudentController {
 
   static async get(req: Request, res: Response) {
     try {
-      const { id } = req.body;
+      const { id } = req.params;
       const studentData = await StudentService.get(id);
       res.status(200).json(studentData)
     } catch (error) {

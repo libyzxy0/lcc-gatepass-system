@@ -79,9 +79,12 @@ class StudentService {
   }
   static async get(id: string) {
     try {
-      const [studentData] = await db.select().from(student).where(eq(student.id, id));
+      const [studentData] = await db.select().from(student).where(eq(student.id, id)).innerJoin(guardian, eq(guardian.student_id, student.id));
       if (!studentData) throw new NotFoundError('Cant find student to the database');
-      return studentData;
+      return {
+        ...studentData.student,
+        guardian: studentData.guardian
+      };
     } catch (error) {
       throw error;
     }

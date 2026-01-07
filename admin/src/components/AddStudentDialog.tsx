@@ -123,7 +123,7 @@ export function AddStudentDialog({ children, onCreate }: { children: React.React
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger>{children}</DialogTrigger>
-      <DialogContent>
+      <DialogContent className="md:min-w-[600px]">
         <DialogHeader className="text-left">
           <DialogTitle>Add New Student</DialogTitle>
           <DialogDescription>

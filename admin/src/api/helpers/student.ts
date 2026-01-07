@@ -16,6 +16,24 @@ interface Student {
   created_at: string;
 };
 
+type Guardian = {
+  id: string;
+  firstname: string;
+  lastname: string;
+  middle_name: string;
+  phone_number: string;
+  address: string;
+  rfid_code: string;
+  relationship: string;
+  photo_url: string;
+  created_at: string;
+  student_id: string;
+}
+
+type StudentWGuardian = Student & {
+  guardian: Guardian;
+};
+
 export type StudentFields = Partial<Omit<Student, "id" | "created_at">>;
 
 export const createStudent = async (form: StudentFields): Promise<{ success: boolean; message: string; }> => {
@@ -43,8 +61,8 @@ export const getStudents = async (): Promise<Student[]> => {
   }
 }
 
-export const getStudent = async (id: string): Promise<Student> => {
-  const response = await api.post('/student/get', { id });
+export const getStudent = async (id: string): Promise<StudentWGuardian> => {
+  const response = await api.get(`/student/get/${id}`);
   return response.data;
 }
 
