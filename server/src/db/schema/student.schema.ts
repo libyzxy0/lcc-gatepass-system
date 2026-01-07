@@ -6,7 +6,6 @@ import {
   pgEnum,
   boolean
 } from "drizzle-orm/pg-core";
-import { guardian } from './guardian.schema'
 
 export const student = pgTable("student", {
   id: uuid("id").primaryKey().defaultRandom(),
@@ -19,6 +18,5 @@ export const student = pgTable("student", {
   address: text("address").notNull(),
   rfid_code: text("rfid_code").unique().notNull(),
   photo_url: text("photo_url"),
-  created_at: timestamp("created_at", { mode: "string" }).defaultNow(),
-  guardian_id: uuid("guardian_id").references(() => guardian.id)
+  created_at: timestamp("created_at", { mode: "string" }).defaultNow()
 });

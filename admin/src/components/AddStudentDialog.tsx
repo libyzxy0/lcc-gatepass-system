@@ -98,16 +98,17 @@ export function AddStudentDialog({ children, onCreate }: { children: React.React
   })
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
     setLoading(true);
     const data = await createStudent(values)
     if (!data.success) {
       toast.error(data.message);
+      setLoading(false);
       return;
     }
 
     toast.success(data.message);
     resetForm(false);
+    setLoading(false);
   }
 
   const resetForm = (open: boolean) => {
@@ -383,7 +384,7 @@ export function AddStudentDialog({ children, onCreate }: { children: React.React
                   <Input type="file" />
                 </div>
                 <div className="mt-6">
-                  <Button type="submit">{loading ? "Creating..." : "Add Student"}</Button>
+                  <Button type="submit" disabled={loading}>{loading ? "Creating..." : "Add Student"}</Button>
                 </div>
               </TabsContent>
             </Tabs>

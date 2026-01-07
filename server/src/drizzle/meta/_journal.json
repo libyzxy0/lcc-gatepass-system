@@ -15,6 +15,13 @@
       "when": 1765974319084,
       "tag": "0001_harsh_vertigo",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1767701323976,
+      "tag": "0002_overconfident_prowler",
+      "breakpoints": true
     }
   ]
 }

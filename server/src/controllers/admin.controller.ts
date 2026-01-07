@@ -35,7 +35,7 @@ class AdminController {
         }
       });
     } catch (error) {
-      res.status(error.status || 500).send({ message: error.message });
+      res.status(error.status || 500).send({ error: error.message });
     }
   }
   static async login(req: Request, res: Response) {
@@ -69,7 +69,7 @@ class AdminController {
       });
       
     } catch (error) {
-      return res.status(500).json({ message: error.message });
+      return res.status(500).json({ error: error.message });
     }
   }
   static async refresh(req: Request, res: Response) {
@@ -102,7 +102,7 @@ class AdminController {
       const adminData = await AdminService.getAdmin(req.admin.id);
       return res.json(adminData);
     } catch (error) {
-      return res.status(401).json({ message: "invalid or expired token" });
+      return res.status(401).json({ error: "invalid or expired token" });
     }
   }
 }

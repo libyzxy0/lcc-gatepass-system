@@ -6,10 +6,6 @@ import {
   pgEnum,
   boolean
 } from "drizzle-orm/pg-core";
-import { student } from './student.schema'
-import { visitor } from './visitor.schema'
-import { staff } from './staff.schema'
-import { guardian } from './guardian.schema'
 
 export const logTypeEnum = pgEnum("log_type", [
   "student",
@@ -18,17 +14,20 @@ export const logTypeEnum = pgEnum("log_type", [
   "guardian"
 ]);
 
+export const entryTypeUsedEnum = pgEnum("entry_type", [
+  "rfid",
+  "qr"
+]);
 
-export const logs = pgTable("gate_log", {
+
+export const logs = pgTable("logs", {
   id: uuid("id").primaryKey().defaultRandom().notNull(),
-  type: logTypeEnum('log_type')
+  name: text('name').notNull(),
+  type: logTypeEnum('log_type').notNull(),
+  entry_type: entryTypeUsedEnum('entry_type').notNull(),
+  entity_id: uuid("entity_id").notNull(),
   device_id: text("device_id"),
-  time_in: timestamp("time_in", { mode: "string" }).defaultNow(),
+  time_in: timestamp("time_in", { mode: "string" }).defaultNow().notNull(),
   time_out: timestamp("time_out", { mode: "string" }),
-  created_at: timestamp("created_at", { mode: "string" }).defaultNow(),
-  student_id: uuid("student_id").references(() => student.id),
-  visitor_id: uuid("visitor_id").references(() => visitor.id),
-  guardian_id: uuid("guardian_id").references(() => guardian.id),
-
-  staff_id: uuid("staff_id").references(() => staff.id)
+  created_at: timestamp("created_at", { mode: "string" }).defaultNow()
 });

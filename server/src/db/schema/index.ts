@@ -5,4 +5,4 @@ export { admin, adminRoleEnum } from './admin.schema';
 export { gatepass, statusEnum } from './gatepass.schema';
 export { otp, userTypeEnum } from './otp.schema';
 export { guardian } from './guardian.schema';
-export { logs } from './logs.schema';
+export { logs, logTypeEnum, entryTypeUsedEnum } from './logs.schema';

@@ -8,23 +8,30 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Trash, IdCard, Ellipsis, ArrowUpDown } from 'lucide-react';
 import { Button } from '@/components/ui/button'
+import { getAllLogs } from '@/api/helpers/logs'
+import { useQuery } from '@tanstack/react-query'
+import { Skeleton } from "@/components/ui/skeleton"
 
-export type LogsType = {
+type LogsType = {
   id: string;
+  type: 'student' | 'visitor' | 'staff' | 'guardian';
   name: string;
-  type: string;
   time_in: string;
   time_out: string;
-}
+  entity_id: string;
+  device_id: string;
+  entry_type: 'qr' | 'rfid';
+  created_at: string;
+};
 
 export const columns: ColumnDef<LogsType>[] = [
   {
-    accessorKey: "id",
-    header: "ID",
-  },
-  {
     accessorKey: "name",
     header: "Name",
+  },
+  {
+    accessorKey: "entry_type",
+    header: "Entry Type",
   },
   {
     accessorKey: "time_in",
@@ -80,17 +87,25 @@ export const columns: ColumnDef<LogsType>[] = [
   }
 ]
 
-const data: LogsType[] = [
-  {
-    id: "STU20250327",
-    name: "Jan Liby Dela Costa",
-    type: "Staff",
-    time_in: "7:46 AM",
-    time_out: "4:12 PM",
-  },
-];
-
 export default function Logs() {
+  const { isPending, error, data } = useQuery({
+    queryKey: ['get-all-logs'],
+    queryFn: getAllLogs
+  })
+  
+  if (isPending) return (
+    <div className="grid grid-cols-1 gap-5">
+      <Skeleton className="h-8 w-36" />
+      <div className="grid grid-cols-6 lg:grid-cols-7 mt-8">
+        <Skeleton className="h-12 w-12 md:w-[100px]" />
+        <Skeleton className="h-12 w-[220px] md:w-[300px]" />
+      </div>
+      <Skeleton className="h-[300px] w-full" />
+    </div>
+  )
+
+  if (error) return 'An error has occurred: ' + error.message
+  
   return (
     <div>
       <header className="mb-8">
