@@ -20,12 +20,14 @@ import { deleteStudent } from '@/api/helpers/student'
 import { toast } from "sonner"
 import { useQueryClient } from '@tanstack/react-query';
 import { ViewStudentDialog } from '@/components/ViewStudentDialog';
+import { EditStudentDialog } from '@/components/EditStudentDialog';
 
 export function StudentTableActions({ id }: { id: string; }) {
   const queryClient = useQueryClient();
   const [loading, setLoading] = useState(false);
   const [deleteModal, showDeleteModal] = useState(false);
   const [viewModal, showViewModal] = useState(false);
+  const [editModal, showEditModal] = useState(false);
 
   const handleDelete = async () => {
     setLoading(true);
@@ -43,6 +45,8 @@ export function StudentTableActions({ id }: { id: string; }) {
   return (
     <>
     <ViewStudentDialog id={id} open={viewModal} onOpenChange={showViewModal} />
+    <EditStudentDialog id={id} open={editModal} onOpenChange={showEditModal} />
+    
       <AlertDialog open={deleteModal} onOpenChange={showDeleteModal}>
         <AlertDialogContent>
           <AlertDialogHeader>
@@ -63,10 +67,10 @@ export function StudentTableActions({ id }: { id: string; }) {
           <Ellipsis />
         </DropdownMenuTrigger>
         <DropdownMenuContent>
-          <DropdownMenuItem onClick={() => showViewModal(true)}>
+          <DropdownMenuItem onSelect={() => showViewModal(true)}>
             <IdCard />
             View</DropdownMenuItem>
-          <DropdownMenuItem>
+          <DropdownMenuItem onSelect={() => showEditModal(true)}>
             <Pencil />
             Edit</DropdownMenuItem>
           <DropdownMenuItem variant="destructive" onSelect={() => showDeleteModal(true)}>

@@ -66,9 +66,19 @@ export const getStudent = async (id: string): Promise<StudentWGuardian> => {
   return response.data;
 }
 
-export const updateStudent = async (id: string, fields: StudentFields): Promise<{ message: string; }> => {
+export const updateStudent = async (id: string, fields: StudentFields): Promise<{ success: boolean; message: string; }> => {
+  try {
   const response = await api.post('/student/update', { id, fields });
-  return response.data;
+   return {
+      success: true,
+      message: response.data.message
+    };
+  } catch (error: any) {
+    return {
+      success: false,
+      message: error.response ? error.response.data.error : error.message
+    }
+  }
 }
 
 export const deleteStudent = async (id: string): Promise<{ success: boolean; message: string; }> => {
