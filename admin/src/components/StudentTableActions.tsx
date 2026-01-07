@@ -19,11 +19,14 @@ import { Trash, Pencil, IdCard, Ellipsis } from 'lucide-react';
 import { deleteStudent } from '@/api/helpers/student'
 import { toast } from "sonner"
 import { useQueryClient } from '@tanstack/react-query';
+import { ViewStudentDialog } from '@/components/ViewStudentDialog';
 
 export function StudentTableActions({ id }: { id: string; }) {
   const queryClient = useQueryClient();
   const [loading, setLoading] = useState(false);
   const [deleteModal, showDeleteModal] = useState(false);
+  const [viewModal, showViewModal] = useState(false);
+
   const handleDelete = async () => {
     setLoading(true);
     const deleted = await deleteStudent(id);
@@ -39,6 +42,7 @@ export function StudentTableActions({ id }: { id: string; }) {
 
   return (
     <>
+    <ViewStudentDialog id={id} open={viewModal} onOpenChange={showViewModal} />
       <AlertDialog open={deleteModal} onOpenChange={showDeleteModal}>
         <AlertDialogContent>
           <AlertDialogHeader>
@@ -53,12 +57,13 @@ export function StudentTableActions({ id }: { id: string; }) {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
       <DropdownMenu>
         <DropdownMenuTrigger>
           <Ellipsis />
         </DropdownMenuTrigger>
         <DropdownMenuContent>
-          <DropdownMenuItem>
+          <DropdownMenuItem onClick={() => showViewModal(true)}>
             <IdCard />
             View</DropdownMenuItem>
           <DropdownMenuItem>

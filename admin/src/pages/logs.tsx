@@ -32,6 +32,10 @@ export const columns: ColumnDef<LogsType>[] = [
   {
     accessorKey: "entry_type",
     header: "Entry Type",
+    cell: (info) => {
+       const value = info.getValue<string | null>() ?? null;
+       return value?.toLocaleUpperCase();
+    }
   },
   {
     accessorKey: "time_in",
@@ -46,6 +50,13 @@ export const columns: ColumnDef<LogsType>[] = [
         </Button>
       )
     },
+    cell: (info) => {
+      const value = info.getValue<string | null>() ?? null;
+      return value && new Date(value).toLocaleTimeString('en-US', {
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+    }
   },
   {
     accessorKey: "time_out",
@@ -60,10 +71,21 @@ export const columns: ColumnDef<LogsType>[] = [
         </Button>
       )
     },
+    cell: (info) => {
+      const value = info.getValue<string | null>() ?? null;
+      return value ? new Date(value).toLocaleTimeString('en-US', {
+        hour: '2-digit',
+        minute: '2-digit'
+      }): "N/A";
+    }
   },
   {
     accessorKey: "type",
     header: "Type",
+    cell: (info) => {
+       const value = info.getValue<string | null>() ?? null;
+       return value?.toLocaleUpperCase();
+    }
   },
   {
     id: 'actions',
