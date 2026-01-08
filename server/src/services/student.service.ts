@@ -41,7 +41,7 @@ class StudentService {
       }).returning({ id: student.id });
 
       if (!newStudent) throw new BadRequestError('Failed to create student!');
-      
+
       const [newGuardian] = await db.insert(guardian).values({
         firstname: guardian_firstname,
         lastname: guardian_lastname,
@@ -53,7 +53,7 @@ class StudentService {
         relationship,
         student_id: newStudent.id
       }).returning({ id: guardian.id })
-      
+
       if (!newGuardian) throw new BadRequestError('Failed to create student!');
 
       return newStudent;
@@ -66,7 +66,7 @@ class StudentService {
       const students = await db.select().from(student).innerJoin(guardian, eq(guardian.student_id, student.id));
 
       if (students.length === 0) throw new NotFoundError('No students added to the database yet');
-      
+
       return students.map((data) => {
         return {
           ...data.student,
@@ -90,17 +90,55 @@ class StudentService {
     }
   }
 
-  static async update({ id, fields }) {
+  static async update({ id, fields: { student_id,
+    firstname,
+    lastname,
+    middle_name,
+    section,
+    grade_level,
+    address,
+    rfid_code,
+    photo_url,
+    guardian_photo_url,
+    guardian_phone_number,
+    guardian_firstname,
+    guardian_lastname,
+    guardian_middle_name,
+    guardian_rfid_code,
+    relationship } }: { id: string; fields: CreateStudentType }) {
     try {
-      if (!fields) throw new BadRequestError('Please specify fields to be updated!');
-
       const stdnt = await this.get(id);
       if (!stdnt) throw new NotFoundError('Failed to update, student did not exist');
 
-      const updated = await db.update(student)
-        .set(fields)
+      const [updated] = await db.update(student)
+        .set({
+          student_id,
+          firstname,
+          lastname,
+          middle_name,
+          section,
+          grade_level,
+          address,
+          rfid_code,
+          photo_url
+        })
         .where(eq(student.id, stdnt.id))
         .returning({ id: student.id });
+
+      await db.update(guardian)
+        .set({
+          firstname: guardian_firstname,
+          lastname: guardian_lastname,
+          middle_name: guardian_middle_name,
+          phone_number: guardian_phone_number,
+          address,
+          rfid_code: guardian_rfid_code,
+          photo_url: guardian_photo_url,
+          relationship,
+          student_id: updated.id
+        })
+        .where(eq(guardian.student_id, updated.id))
+        .returning({ id: guardian.id });
 
       return updated;
     } catch (error) {
@@ -113,7 +151,7 @@ class StudentService {
       const stdnt = await this.get(id);
       if (!stdnt) throw new NotFoundError('Failed to delete, student did not exist');
       const [deleted] = await db.delete(student).where(eq(student.id, stdnt.id)).returning({ id: student.id });
-      
+
       return deleted;
     } catch (error) {
       throw error;
