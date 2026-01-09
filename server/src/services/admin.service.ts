@@ -12,6 +12,8 @@ import {
   UnauthorizedError,
   NotFoundError
 } from '@/errors'
+import StudentService from '@/services/student.service'
+import GatepassService from '@/services/gatepass.service'
 
 type Admin = typeof admin.$inferSelect;
 type AdminSafe = Omit<Admin, "password"> & {
@@ -79,6 +81,24 @@ class AdminService {
         .where(eq(admin.id, id));
       if (!adminData) throw new NotFoundError('No admin with that ID')
       return adminData;
+    } catch (error) {
+      throw error;
+    }
+  }
+  static async getOverviewCounts() {
+    try {
+      const students = await StudentService.getAll();
+      
+      const gatepasses = (await GatepassService.getAllGatepassData()).filter((gpass) => gpass.status === 'pending');
+      
+      return {
+        students: students.length,
+        pending_gatepass: gatepasses.length,
+        other_people: 0,
+        students_today: 0,
+        visitors_today: 0,
+        people_today: students.length
+      }
     } catch (error) {
       throw error;
     }
