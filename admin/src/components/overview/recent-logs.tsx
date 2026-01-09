@@ -47,7 +47,7 @@ export function RecentLogs() {
           <TableBody>
             {data ? (
               <>
-                {data?.splice(0, 5).map((item, index) => (
+                {data?.slice(0, 5).map((item, index) => (
                   <TableRow key={index}>
                     <TableCell className="font-medium">{item.name}</TableCell>
                     <TableCell>{item.time_in ? new Date(item.time_in).toLocaleTimeString('en-US', {
