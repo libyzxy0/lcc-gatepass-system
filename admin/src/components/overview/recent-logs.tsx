@@ -13,47 +13,22 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-
-const visitors = [
-  {
-    id: "1",
-    name: "Jan Liby Dela Costa",
-    time_out: null,
-    time_in: "8:24 AM",
-    type: 'student'
-  },
-  {
-    id: "2",
-    name: "Krisha Sophia De Peralta",
-    time_out: "3:30 PM",
-    time_in: "9:21 AM",
-    type: 'student'
-  },
-  {
-    id: "3",
-    name: "Aiesha Jaden Dacallos",
-    time_out: "N/A",
-    time_in: "11:17 AM",
-    type: 'student'
-  },
-  {
-    id: "4",
-    name: "Rose Marie Indic",
-    time_out: "7:00 PM",
-    time_in: "4:33 PM",
-    type: 'student'
-  },
-  {
-    id: "5",
-    name: "Rhonyl Caballes",
-    time_out: "11:00 AM",
-    time_in: "N/A",
-    type: 'student'
-  },
-]
-
+import { getAllLogs } from '@/api/helpers/logs'
+import { useQuery } from '@tanstack/react-query'
+import { Skeleton } from '@/components/ui/skeleton'
 
 export function RecentLogs() {
+  const { isPending, error, data } = useQuery({
+    queryKey: ['get-all-logs'],
+    queryFn: getAllLogs
+  })
+
+  if (isPending) return (
+    <Skeleton className="h-[260px] md:h-[310px] w-full" />
+  );
+
+  if (error) return 'An error has occurred: ' + error.message
+
   return (
     <Card>
       <CardHeader className="flex flex-row justify-between items-center">
@@ -70,14 +45,31 @@ export function RecentLogs() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {visitors.map((visitors) => (
-              <TableRow key={visitors.id}>
-                <TableCell className="font-medium">{visitors.name}</TableCell>
-                <TableCell>{visitors.time_in}</TableCell>
-                <TableCell className="text-wrap">{visitors?.time_out ?? "N/A"}</TableCell>
-                <TableCell className="text-wrap capitalize">{visitors?.type}</TableCell>
+            {data ? (
+              <>
+                {data?.splice(0, 5).map((item, index) => (
+                  <TableRow key={index}>
+                    <TableCell className="font-medium">{item.name}</TableCell>
+                    <TableCell>{item.time_in ? new Date(item.time_in).toLocaleTimeString('en-US', {
+                      hour: '2-digit',
+                      minute: '2-digit'
+                    }) : 'N/A'}</TableCell>
+                    <TableCell>{item.time_out ? new Date(item.time_out).toLocaleTimeString('en-US', {
+                      hour: '2-digit',
+                      minute: '2-digit'
+                    }) : 'N/A'}</TableCell>
+
+                    <TableCell className="text-wrap capitalize">{item.type?.toUpperCase()}</TableCell>
+                  </TableRow>
+                ))}
+              </>
+            ) : (
+              <TableRow>
+                <TableCell colSpan={4} className="h-24 text-center">
+                  No recent logs for today yet.
+                </TableCell>
               </TableRow>
-            ))}
+            )}
           </TableBody>
         </Table>
       </CardContent>
