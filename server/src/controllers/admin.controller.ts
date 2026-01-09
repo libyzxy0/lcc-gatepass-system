@@ -67,7 +67,7 @@ class AdminController {
         message: `You're currently logged in as ${adminData.email}`,
         access_token: accessToken,
       });
-      
+
     } catch (error) {
       return res.status(500).json({ error: error.message });
     }
@@ -101,6 +101,14 @@ class AdminController {
       }
       const adminData = await AdminService.getAdmin(req.admin.id);
       return res.json(adminData);
+    } catch (error) {
+      return res.status(401).json({ error: "invalid or expired token" });
+    }
+  }
+  static async getOverviewCounts(req: Request, res: Response) {
+    try {
+      const result = await AdminService.getOverviewCounts();
+      res.json(result);
     } catch (error) {
       return res.status(401).json({ error: "invalid or expired token" });
     }
