@@ -121,6 +121,33 @@ class VisitorService {
       throw error;
     }
   }
+  static async getAll() {
+    try {
+      const all: VisitorSafe[] = await db
+        .select({
+          id: visitor.id,
+          visitor_id: visitor.visitor_id,
+          firstname: visitor.firstname,
+          lastname: visitor.lastname,
+          middle_initial: visitor.middle_initial,
+          address: visitor.address,
+          email: visitor.email,
+          phone_number: visitor.phone_number,
+          verified: visitor.verified,
+          activated: visitor.activated,
+          valid_id_type: visitor.valid_id_type,
+          valid_id_photo_url: visitor.valid_id_photo_url,
+          photo_url: visitor.photo_url,
+          created_at: visitor.created_at,
+        })
+        .from(visitor);
+        if(all.length === 0) throw new NotFoundError('No visitors data in the database yet.');
+        
+        return all;
+    } catch (error) {
+      throw error;
+    }
+  }
 }
 
 export default VisitorService;

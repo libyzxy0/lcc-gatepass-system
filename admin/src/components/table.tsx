@@ -1,55 +1,27 @@
-import React, { useState} from 'react'
+import React, { useState } from 'react'
 import {
   type ColumnDef,
-  type ColumnFiltersState,
   type SortingState,
   flexRender,
   getCoreRowModel,
   useReactTable,
   getPaginationRowModel,
-  getFilteredRowModel,
   getSortedRowModel
 } from "@tanstack/react-table"
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table"
-import {
-  Card,
-  CardContent,
-  CardFooter
-} from '@/components/ui/card'
-import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from "@/components/ui/pagination"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
-import { Input } from '@/components/ui/input'
 
-type FilterSelectType = {
-  label: string;
-  id: string;
-}
+import {
+  Table, TableBody, TableCell, TableHead, TableHeader, TableRow
+} from "@/components/ui/table"
+import { Card, CardContent, CardFooter } from '@/components/ui/card'
+import {
+  Pagination, PaginationContent, PaginationItem,
+  PaginationLink, PaginationNext, PaginationPrevious
+} from "@/components/ui/pagination"
 
 interface MyTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
   TableAction?: React.ReactNode;
-  filterSelect: FilterSelectType[];
   emptyMessage: string;
 }
 
@@ -57,87 +29,51 @@ export function MyTable<TData, TValue>({
   columns,
   data,
   TableAction,
-  filterSelect,
   emptyMessage
 }: MyTableProps<TData, TValue>) {
-  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>(
-    []
-  )
+
   const [sorting, setSorting] = useState<SortingState>([])
-  const [filterType, setFilterType] = useState('');
 
   const table = useReactTable({
     data,
     columns,
+    state: { sorting },
+    onSortingChange: setSorting,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
-    onColumnFiltersChange: setColumnFilters,
-    getFilteredRowModel: getFilteredRowModel(),
-    onSortingChange: setSorting,
     getSortedRowModel: getSortedRowModel(),
-    state: {
-      sorting,
-      columnFilters
-    },
   })
 
   return (
     <div>
-      <div className="flex justify-between py-4 gap-2 md:gap-0">
-        <div className="flex flex-row gap-2">
-          <Select value={filterType} onValueChange={setFilterType}>
-            <SelectTrigger>
-              <SelectValue placeholder="Filter" />
-            </SelectTrigger>
-            <SelectContent>
-              {filterSelect.map((item) => (
-                <SelectItem value={item.id} key={item.id}>
-                  {item.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          <Input
-            placeholder={`Filter by ${filterType}...`}
-            value={(table.getColumn(filterType)?.getFilterValue() as string) ?? ""}
-            onChange={(event) =>
-              table.getColumn(filterType)?.setFilterValue(event.target.value)
-            }
-            className="max-w-sm"
-          />
+      {TableAction && (
+        <div className="mb-2">
+          {TableAction}
         </div>
-        {TableAction}
-      </div>
+      )}
+
       <Card>
         <CardContent>
           <Table>
             <TableHeader>
-              {table.getHeaderGroups().map((headerGroup) => (
+              {table.getHeaderGroups().map(headerGroup => (
                 <TableRow key={headerGroup.id}>
-                  {headerGroup.headers.map((header) => {
-                    return (
-                      <TableHead key={header.id}>
-                        {header.isPlaceholder
-                          ? null
-                          : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
-                      </TableHead>
-                    )
-                  })}
+                  {headerGroup.headers.map(header => (
+                    <TableHead key={header.id}>
+                      {header.isPlaceholder ? null :
+                        flexRender(header.column.columnDef.header, header.getContext())
+                      }
+                    </TableHead>
+                  ))}
                 </TableRow>
               ))}
             </TableHeader>
+
             <TableBody>
-              {table.getRowModel().rows?.length ? (
-                table.getRowModel().rows.map((row) => (
-                  <TableRow
-                    key={row.id}
-                    data-state={row.getIsSelected() && "selected"}
-                    className="even:bg-gray-50"
-                  >
-                    {row.getVisibleCells().map((cell) => (
+              {table.getRowModel().rows.length ? (
+                table.getRowModel().rows.map(row => (
+                  <TableRow key={row.id} className="even:bg-gray-50">
+                    {row.getVisibleCells().map(cell => (
                       <TableCell key={cell.id}>
                         {flexRender(cell.column.columnDef.cell, cell.getContext())}
                       </TableCell>
@@ -154,33 +90,28 @@ export function MyTable<TData, TValue>({
             </TableBody>
           </Table>
         </CardContent>
+
         <CardFooter>
           <Pagination className="flex items-center justify-end space-x-2">
             <PaginationContent>
               <PaginationItem>
                 <PaginationPrevious
-                  onClick={() => table.getCanPreviousPage() && table.previousPage()}
-                  className={!table.getCanPreviousPage() ? 'opacity-50 pointer-event-none' : ''} />
+                  onClick={() => table.previousPage()}
+                  className={!table.getCanPreviousPage() ? "opacity-50 pointer-events-none" : ""}
+                />
               </PaginationItem>
-              <PaginationItem>
-                {table.getCanPreviousPage() && (
-                  <PaginationLink>{table.getState().pagination.pageIndex + 1 - 1}</PaginationLink>
-                )}
-              </PaginationItem>
+
               <PaginationItem>
                 <PaginationLink isActive>
                   {table.getState().pagination.pageIndex + 1}
                 </PaginationLink>
               </PaginationItem>
-              <PaginationItem>
-                {table.getCanNextPage() && (
-                  <PaginationLink>{table.getState().pagination.pageIndex + 1 + 1}</PaginationLink>
-                )}
-              </PaginationItem>
+
               <PaginationItem>
                 <PaginationNext
-                  onClick={() => table.getCanNextPage() && table.nextPage()}
-                  className={!table.getCanNextPage() ? 'opacity-50 pointer-event-none' : ''} />
+                  onClick={() => table.nextPage()}
+                  className={!table.getCanNextPage() ? "opacity-50 pointer-events-none" : ""}
+                />
               </PaginationItem>
             </PaginationContent>
           </Pagination>

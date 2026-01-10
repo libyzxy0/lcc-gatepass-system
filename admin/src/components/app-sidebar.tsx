@@ -28,19 +28,9 @@ const data = {
     },
     {
       title: "Logs",
+      url: "/dashboard/logs",
       icon: ClipboardClock,
-      url: "#",
-      items: [
-        {
-          title: 'Logs',
-          url: '/dashboard/logs'
-        },
-        {
-          title: 'Students',
-          url: '/dashboard/students/logs'
-        }
-      ]
-    },
+    }
   ],
   manage: [
     {

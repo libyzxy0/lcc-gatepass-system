@@ -125,6 +125,16 @@ class VisitorController {
       })
     }
   }
+  static async getAll(req: Request, res: Response) {
+    try {
+      const all = await VisitorService.getAll();
+      res.json(all);
+    } catch (error) {
+      res.status(error.status || 500).json({
+        error: error.message
+      })
+    }
+  }
 }
 
 export default VisitorController;
