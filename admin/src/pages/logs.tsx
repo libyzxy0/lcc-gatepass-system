@@ -112,7 +112,9 @@ export const columns: ColumnDef<LogsType>[] = [
 export default function Logs() {
   const { isPending, error, data } = useQuery({
     queryKey: ['get-all-logs'],
-    queryFn: getAllLogs
+    queryFn: getAllLogs,
+    refetchInterval: 1000,
+    refetchOnWindowFocus: true
   })
   
   if (isPending) return (

@@ -20,7 +20,9 @@ import { Skeleton } from '@/components/ui/skeleton'
 export function RecentLogs() {
   const { isPending, error, data } = useQuery({
     queryKey: ['get-all-logs'],
-    queryFn: getAllLogs
+    queryFn: getAllLogs,
+    refetchInterval: 1000,
+    refetchOnWindowFocus: true
   })
 
   if (isPending) return (

@@ -52,7 +52,7 @@ class LogsService {
   }
   static async getAll() {
     try {
-      const allLogs = await db.select().from(logs);
+      const allLogs = await db.select().from(logs).orderBy(desc(logs.created_at));
       
       if(allLogs.length === 0) throw new NotFoundError('No logs in database yet');
       
