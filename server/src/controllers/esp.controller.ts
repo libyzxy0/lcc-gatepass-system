@@ -27,7 +27,7 @@ class ESPController {
         try {
           const data = await EspService.verifyQR(payload.data);
           
-          LogService.create({
+          await LogService.create({
             name: data.visitor.firstname + " " + data.visitor.lastname,
             type: 'visitor',
             entity_id: data.visitor.id,
@@ -50,7 +50,7 @@ class ESPController {
         try {
           const rfid_verification = await EspService.verifyRFID(payload.data);
           
-          LogService.create({
+          await LogService.create({
             name: `${rfid_verification.firstname + " " + rfid_verification.lastname}`,
             type: 'student',
             entity_id: rfid_verification.id,
