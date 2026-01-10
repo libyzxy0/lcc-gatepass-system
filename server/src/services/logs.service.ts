@@ -10,7 +10,6 @@ import {
 type Logs = {
   type: 'student' | 'visitor' | 'staff' | 'guardian';
   name: string;
-  time_in: string;
   entity_id: string;
   device_id: string;
   entry_type: 'qr' | 'rfid';
@@ -20,23 +19,37 @@ class LogsService {
   static async create({
     type,
     name,
-    time_in,
     entity_id,
     device_id,
     entry_type
   }: Logs) {
     try {
+      const now = new Date();
 
-      const [newLogs] = await db.insert(logs).values({
-        type,
-        name,
-        time_in,
-        entity_id,
-        device_id,
-        entry_type
-      }).returning({ id: logs.id });
+      const [activeLog] = await db
+        .select()
+        .from(logs)
+        .where(eq(logs.entity_id, entity_id))
+        .orderBy(desc(logs.time_in))
+        .limit(1);
 
-      return newLogs;
+      if (activeLog && !activeLog.time_out) {
+        await db.update(logs)
+          .set({ time_out: now.toISOString() })
+          .where(eq(logs.id, activeLog.id));
+        console.log('Time out');
+      } else {
+        await db.insert(logs).values({
+          type,
+          name,
+          time_in: now.toISOString(),
+          entity_id,
+          device_id,
+          entry_type
+        });
+        console.log('Time In');
+      }
+
     } catch (error) {
       throw error;
     }
@@ -44,7 +57,7 @@ class LogsService {
   static async get(logId: string) {
     try {
       const [log] = await db.select().from(logs).where(eq(logs.id, logId));
-      if(!log) throw new NotFoundError('Cannot find log in database');
+      if (!log) throw new NotFoundError('Cannot find log in database');
       return log;
     } catch (error) {
       throw error;
@@ -53,9 +66,9 @@ class LogsService {
   static async getAll() {
     try {
       const allLogs = await db.select().from(logs).orderBy(desc(logs.created_at));
-      
-      if(allLogs.length === 0) throw new NotFoundError('No logs in database yet');
-      
+
+      if (allLogs.length === 0) throw new NotFoundError('No logs in database yet');
+
       return allLogs;
     } catch (error) {
       throw error;
@@ -64,7 +77,7 @@ class LogsService {
   static async delete(logId: string) {
     try {
       const log = await this.get(logId);
-      
+
       const [deleted] = await db.delete(logs).where(eq(logs.id, log.id)).returning({ id: logs.id });
       return deleted;
     } catch (error) {

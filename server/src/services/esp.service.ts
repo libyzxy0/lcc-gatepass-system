@@ -14,7 +14,6 @@ class ESPService {
     try {
       const [studentData] = await db.select().from(student).where(eq(student.rfid_code, rfid));
       if (!studentData) throw new UnauthorizedError('Invalid gatepass');
-
       return studentData;
     } catch (error) {
       throw error;
