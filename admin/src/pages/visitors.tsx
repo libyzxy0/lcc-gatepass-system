@@ -1,32 +1,14 @@
 import { MyTable } from '@/components/table'
 import type { ColumnDef } from "@tanstack/react-table"
-import { Download, Plus } from 'lucide-react';
+import { Download } from 'lucide-react';
 import {
   useQuery,
 } from '@tanstack/react-query'
-import { getAllVisitors } from '@/api/helpers/visitors'
+import { getAllVisitors, type Visitors } from '@/api/helpers/visitors'
 import { Skeleton } from "@/components/ui/skeleton"
 import { Button } from "@/components/ui/button"
-import { AddStudentDialog } from '@/components/AddStudentDialog'
-import { StudentTableActions } from '@/components/StudentTableActions'
 
-interface Student {
-  id: string;
-  student_id: string;
-  firstname: string;
-  lastname: string;
-  middle_name: string | null;
-  section: string;
-  grade_level: string;
-  parent_fullname: string;
-  parent_phone_number: string;
-  rfid_code: string;
-  photo_url: string;
-  address: string;
-  created_at: string;
-};
-
-export const columns: ColumnDef<Student>[] = [
+export const columns: ColumnDef<Visitors>[] = [
   {
     accessorKey: "visitor_id",
     header: "Visitor ID",
@@ -81,8 +63,8 @@ export const columns: ColumnDef<Student>[] = [
   }
 ]
 
-export default function Students() {
-  const { isPending, error, data, refetch } = useQuery({
+export default function Visitors() {
+  const { isPending, error, data } = useQuery({
     queryKey: ['get-all-visitors'],
     queryFn: getAllVisitors
   })

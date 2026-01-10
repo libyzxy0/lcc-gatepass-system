@@ -64,7 +64,7 @@ export default function Students() {
         student.lastname.toLowerCase().includes(word)
       )
 
-      const sectionMatch = sectionFilter
+      const sectionMatch = sectionFilter.toLowerCase() === 'all' ? true : sectionFilter
         ? student.grade_level.toLowerCase() === sectionFilter.toLowerCase()
         : true
 
@@ -79,19 +79,19 @@ export default function Students() {
     {
       accessorKey: "middle_name",
       header: "Middle Name",
-      cell: info => info.getValue() ?? "N/A"
+      cell: info => info.getValue<string | null>() ?? "N/A"
     },
     {
       accessorKey: "section",
       header: "Section",
-      cell: info => info.getValue() ?? "N/A"
+      cell: info => info.getValue<string | null>() ?? "N/A"
     },
     { accessorKey: "grade_level", header: "Level" },
     { accessorKey: "parent_fullname", header: "Parent Name" },
     {
       accessorKey: "address",
       header: "Address",
-      cell: info => <div className="text-wrap">{info.getValue() ?? "N/A"}</div>
+      cell: info => <div className="text-wrap">{info.getValue<string | null>() ?? "N/A"}</div>
     },
     { accessorKey: "rfid_code", header: "RFID CODE" },
     {
@@ -109,55 +109,55 @@ export default function Students() {
         emptyMessage="No students data yet."
         columns={columns}
         data={filteredData}
-      TableAction={
-        <div className="flex justify-between">
-        <div className="grid grid-cols-2 gap-2">
-          <Input
-            placeholder="Search by name..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="max-w-sm"
-          />
-          <Select
-            value={sectionFilter}
-            onValueChange={setSectionFilter}
-          >
-            <SelectTrigger className="w-40">
-              <SelectValue placeholder="Filter by Level" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value={null}>All</SelectItem>
-              <SelectItem value="SHS-12">SHS-12</SelectItem>
-              <SelectItem value="SHS-11">SHS-11</SelectItem>
-              <SelectItem value="JHS-10">JHS-10</SelectItem>
-              <SelectItem value="JHS-9">JHS-9</SelectItem>
-              <SelectItem value="JHS-8">JHS-8</SelectItem>
-              <SelectItem value="JHS-7">JHS-7</SelectItem>
-              <SelectItem value="ELEM-6">ELEM-6</SelectItem>
-              <SelectItem value="ELEM-5">ELEM-5</SelectItem>
-              <SelectItem value="ELEM-4">ELEM-4</SelectItem>
-              <SelectItem value="ELEM-3">ELEM-3</SelectItem>
-              <SelectItem value="ELEM-2">ELEM-2</SelectItem>
-              <SelectItem value="ELEM-1">ELEM-1</SelectItem>
-              <SelectItem value="Kindergarten">Kindergarten</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-        
-        <div className="hidden md:grid grid-cols-2 gap-2">
-          <Button variant={'outline'}>
-            <Download />
-            Download CSV
-          </Button>
-          <AddStudentDialog onCreate={() => refetch()}>
-            <Button>
-              <Plus />
-              Add Student
-            </Button>
-          </AddStudentDialog>
-        </div>
-        </div>
-      }
+        TableAction={
+          <div className="flex justify-between">
+            <div className="grid grid-cols-2 gap-2">
+              <Input
+                placeholder="Search by name..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="max-w-sm"
+              />
+              <Select
+                value={sectionFilter}
+                onValueChange={setSectionFilter}
+              >
+                <SelectTrigger className="w-40">
+                  <SelectValue placeholder="Filter by Level" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value={'all'}>All</SelectItem>
+                  <SelectItem value="SHS-12">SHS-12</SelectItem>
+                  <SelectItem value="SHS-11">SHS-11</SelectItem>
+                  <SelectItem value="JHS-10">JHS-10</SelectItem>
+                  <SelectItem value="JHS-9">JHS-9</SelectItem>
+                  <SelectItem value="JHS-8">JHS-8</SelectItem>
+                  <SelectItem value="JHS-7">JHS-7</SelectItem>
+                  <SelectItem value="ELEM-6">ELEM-6</SelectItem>
+                  <SelectItem value="ELEM-5">ELEM-5</SelectItem>
+                  <SelectItem value="ELEM-4">ELEM-4</SelectItem>
+                  <SelectItem value="ELEM-3">ELEM-3</SelectItem>
+                  <SelectItem value="ELEM-2">ELEM-2</SelectItem>
+                  <SelectItem value="ELEM-1">ELEM-1</SelectItem>
+                  <SelectItem value="Kindergarten">Kindergarten</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="hidden md:grid grid-cols-2 gap-2">
+              <Button variant={'outline'}>
+                <Download />
+                Download CSV
+              </Button>
+              <AddStudentDialog onCreate={() => refetch()}>
+                <Button>
+                  <Plus />
+                  Add Student
+                </Button>
+              </AddStudentDialog>
+            </div>
+          </div>
+        }
       />
     </div>
   )

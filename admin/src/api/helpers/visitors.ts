@@ -1,6 +1,6 @@
 import { api } from '../axios';
 
-type APIResVisitors = {
+export type Visitors = {
   id: string;
   visitor_id: string;
   firstname: string;
@@ -17,7 +17,7 @@ type APIResVisitors = {
   created_at: string;
 }
 
-export const getAllVisitors = async (): Promise<APIResVisitors[]> => {
+export const getAllVisitors = async (): Promise<Visitors[]> => {
   try {
     const response = await api.get('/visitor/all');
     return response.data;

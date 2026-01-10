@@ -97,7 +97,7 @@ export function MyTable<TData, TValue>({
               <PaginationItem>
                 <PaginationPrevious
                   onClick={() => table.previousPage()}
-                  className={!table.getCanPreviousPage() && "opacity-50 pointer-events-none"}
+                  className={!table.getCanPreviousPage() ? "opacity-50 pointer-events-none" : ""}
                 />
               </PaginationItem>
 
@@ -110,7 +110,7 @@ export function MyTable<TData, TValue>({
               <PaginationItem>
                 <PaginationNext
                   onClick={() => table.nextPage()}
-                  className={!table.getCanNextPage() && "opacity-50 pointer-events-none"}
+                  className={!table.getCanNextPage() ? "opacity-50 pointer-events-none" : ""}
                 />
               </PaginationItem>
             </PaginationContent>

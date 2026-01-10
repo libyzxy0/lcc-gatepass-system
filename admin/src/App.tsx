@@ -1,9 +1,8 @@
 import { Routes, Route, Navigate } from "react-router";
 import AdminLayout from '@/layouts/admin';
 import Overview from '@/pages/overview';
-import StudentsLog from '@/pages/students-log';
-import Students from '@/pages/students';
 import Logs from '@/pages/logs';
+import Students from '@/pages/students';
 import Gatepass from '@/pages/gatepass';
 import Visitors from '@/pages/visitors';
 import ProtectedRoute from '@/pages/protected-route';
@@ -32,12 +31,9 @@ export default function App() {
             <Route index element={<Overview />} />
 
             <Route path="students" element={<Students />} />
-            <Route path="students/logs" element={<StudentsLog />} />
-
             <Route path="gatepass" element={<Gatepass />} />
             <Route path="visitors" element={<Visitors />} />
             <Route path="logs" element={<Logs />} />
-
             <Route path="settings" element={<Settings />} />
             <Route path="settings/admins" element={<SettingsAdmins />} />
 

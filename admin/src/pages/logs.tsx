@@ -137,24 +137,6 @@ export default function Logs() {
       emptyMessage={"No visitor logs yet."}
       columns={columns} 
       data={data} 
-      filterSelect={[
-        {
-          id: 'name',
-          label: "Name"
-        },
-        {
-          id: 'visitor_id',
-          label: "Visitor ID"
-        },
-        {
-          id: 'visiting',
-          label: "Visiting"
-        },
-        {
-          id: 'grade_level',
-          label: "Grade Level"
-        },
-      ]}
       />
     </div>
   )
