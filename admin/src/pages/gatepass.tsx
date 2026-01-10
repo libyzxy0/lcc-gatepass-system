@@ -1,13 +1,13 @@
-import { GatepassTable } from '@/components/gatepass-table'
+import { useState, useMemo } from 'react'
+import { MyTable } from '@/components/table'
 import type { ColumnDef } from "@tanstack/react-table"
-import { ArrowUpDown } from 'lucide-react';
-import {
-  useQuery,
-} from '@tanstack/react-query'
+import { ArrowUpDown, Download } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query'
 import { getAllGatepass } from '@/api/helpers/gatepass'
 import { Skeleton } from "@/components/ui/skeleton"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
+import { Input } from '@/components/ui/input'
 import { GatepassTableAction } from '@/components/GatepassTableAction'
 
 type Gatepass = {
@@ -30,7 +30,15 @@ const colorMap: Record<string, string> = {
   'rejected': 'bg-red-500'
 }
 
-export const columns: ColumnDef<Gatepass>[] = [
+
+export default function Gatepass() {
+  const [search, setSearch] = useState("");
+  const { isPending, error, data } = useQuery({
+    queryKey: ['get-all-gatepass'],
+    queryFn: getAllGatepass
+  })
+  
+  const columns: ColumnDef<Gatepass>[] = [
   {
     accessorKey: "visitor_fullname",
     header: "Visitor",
@@ -111,13 +119,6 @@ export const columns: ColumnDef<Gatepass>[] = [
   },
 ]
 
-
-export default function Gatepass() {
-  const { isPending, error, data } = useQuery({
-    queryKey: ['get-all-gatepass'],
-    queryFn: getAllGatepass
-  })
-
   if (isPending) return (
     <div className="grid grid-cols-1 gap-5">
       <Skeleton className="h-8 w-36" />
@@ -130,15 +131,49 @@ export default function Gatepass() {
   )
 
   if (error) return 'An error has occurred: ' + error.message
+  
+  const filteredData = useMemo(() => {
+    if (!data) return []
+
+    const words = search.toLowerCase().trim().split(/\s+/)
+
+    return data.filter(gpass => {
+      const nameMatch = words.every(word =>
+        gpass.visitor_fullname.toLowerCase().includes(word)
+      )
+
+      return nameMatch
+    })
+  }, [data, search])
 
   return (
     <div>
       <header className="mb-8">
         <h1 className="font-semibold text-2xl">Gatepass</h1>
       </header>
-      <GatepassTable
+      <MyTable
         columns={columns}
-        data={data}
+        data={filteredData}
+        emptyMessage={'No gatepass data yet.'}
+        TableAction={
+          <div className="flex justify-between items-center">
+            <div className="grid grid-cols-2 gap-2">
+              <Input
+                placeholder="Search by name..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="max-w-sm"
+              />
+            </div>
+
+            <div>
+              <Button variant={'outline'}>
+                <Download />
+                Download CSV
+              </Button>
+            </div>
+          </div>
+        }
       />
     </div>
   )

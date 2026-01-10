@@ -1,74 +1,75 @@
+import { useState, useMemo } from 'react'
 import { MyTable } from '@/components/table'
 import type { ColumnDef } from "@tanstack/react-table"
 import { Download } from 'lucide-react';
-import {
-  useQuery,
-} from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 import { getAllVisitors, type Visitors } from '@/api/helpers/visitors'
 import { Skeleton } from "@/components/ui/skeleton"
 import { Button } from "@/components/ui/button"
-
-export const columns: ColumnDef<Visitors>[] = [
-  {
-    accessorKey: "visitor_id",
-    header: "Visitor ID",
-  },
-  {
-    accessorKey: "firstname",
-    header: "First Name",
-  },
-  {
-    accessorKey: "lastname",
-    header: "Last Name",
-  },
-  {
-    accessorKey: "middle_name",
-    header: "Middle Name",
-    cell: (info) => {
-      const value = info.getValue<string | null>()
-      return <div className="text-wrap">{value ? value : "N/A"}</div>
-    },
-  },
-  {
-    accessorKey: "activated",
-    header: "Activated",
-    cell: (info) => {
-      const activated = info.getValue<string | null>()
-      return <div className="text-wrap">{activated ? "TRUE" : "FALSE"}</div>
-    },
-  },
-  {
-    accessorKey: "verified",
-    header: "Status",
-    cell: (info) => {
-      const verified = info.getValue<string | null>()
-      return <div className="text-wrap">{verified ? "Verified" : info.row.original.valid_id_photo_url ? 'To Review' : 'Not Verfied'}</div>
-    },
-  },
-  {
-    accessorKey: "phone_number",
-    header: "Phone Number",
-  },
-  {
-    accessorKey: "email",
-    header: "Email",
-  },
-  {
-    accessorKey: "address",
-    header: "Address",
-    cell: (info) => {
-      const value = info.getValue<string | null>()
-      return <div className="text-wrap">{value ?? "N/A"}</div>
-    },
-  }
-]
+import { Input } from "@/components/ui/input"
 
 export default function Visitors() {
   const { isPending, error, data } = useQuery({
     queryKey: ['get-all-visitors'],
     queryFn: getAllVisitors
   })
-  
+  const [search, setSearch] = useState("")
+
+  const columns: ColumnDef<Visitors>[] = [
+    {
+      accessorKey: "visitor_id",
+      header: "Visitor ID",
+    },
+    {
+      accessorKey: "firstname",
+      header: "First Name",
+    },
+    {
+      accessorKey: "lastname",
+      header: "Last Name",
+    },
+    {
+      accessorKey: "middle_name",
+      header: "Middle Name",
+      cell: (info) => {
+        const value = info.getValue<string | null>()
+        return <div className="text-wrap">{value ? value : "N/A"}</div>
+      },
+    },
+    {
+      accessorKey: "activated",
+      header: "Activated",
+      cell: (info) => {
+        const activated = info.getValue<string | null>()
+        return <div className="text-wrap">{activated ? "TRUE" : "FALSE"}</div>
+      },
+    },
+    {
+      accessorKey: "verified",
+      header: "Status",
+      cell: (info) => {
+        const verified = info.getValue<string | null>()
+        return <div className="text-wrap">{verified ? "Verified" : info.row.original.valid_id_photo_url ? 'To Review' : 'Not Verfied'}</div>
+      },
+    },
+    {
+      accessorKey: "phone_number",
+      header: "Phone Number",
+    },
+    {
+      accessorKey: "email",
+      header: "Email",
+    },
+    {
+      accessorKey: "address",
+      header: "Address",
+      cell: (info) => {
+        const value = info.getValue<string | null>()
+        return <div className="text-wrap">{value ?? "N/A"}</div>
+      },
+    }
+  ];
+
   if (isPending) return (
     <div className="grid grid-cols-1 gap-5">
       <Skeleton className="h-8 w-36" />
@@ -81,6 +82,21 @@ export default function Visitors() {
   )
 
   if (error) return 'An error has occurred: ' + error.message
+  
+  const filteredData = useMemo(() => {
+    if (!data) return []
+
+    const words = search.toLowerCase().trim().split(/\s+/)
+
+    return data.filter(visitor => {
+      const nameMatch = words.every(word =>
+        visitor.firstname.toLowerCase().includes(word) ||
+        visitor.lastname.toLowerCase().includes(word)
+      )
+
+      return nameMatch
+    })
+  }, [data, search])
 
   return (
     <div>
@@ -90,13 +106,21 @@ export default function Visitors() {
       <MyTable
         emptyMessage={'No students data yet.'}
         columns={columns}
-        data={data}
+        data={filteredData}
         TableAction={
-          <div className="grid grid-cols-1 gap-2">
-            <Button className="hidden md:flex" variant={'outline'}>
+          <div className="flex flex-row justify-between items-center">
+           <Input
+                placeholder="Search by name..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="max-w-sm"
+              />
+              <div>
+            <Button variant={'outline'}>
               <Download />
               Download CSV
             </Button>
+            </div>
           </div>
         }
       />

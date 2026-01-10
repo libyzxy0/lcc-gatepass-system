@@ -33,7 +33,7 @@ export function PendingGatepass() {
     <Card>
       <CardHeader className="relative flex items-center">
         <CardTitle>Pending Gatepass</CardTitle>
-        <Link to="/gatepass" className="absolute right-5 text-sm text-gray-400">
+        <Link to="/dashboard/gatepass" className="absolute right-5 text-sm text-gray-400">
           See All
         </Link>
       </CardHeader>

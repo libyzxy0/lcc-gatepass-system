@@ -4,7 +4,7 @@ import {
   CardTitle,
   CardHeader
 } from '@/components/ui/card'
-
+import { Link } from 'react-router'
 import {
   Table,
   TableBody,
@@ -33,8 +33,11 @@ export function RecentLogs() {
 
   return (
     <Card>
-      <CardHeader className="flex flex-row justify-between items-center">
+    <CardHeader className="relative flex items-center">
         <CardTitle>Recent Logs</CardTitle>
+        <Link to="/dashboard/logs" className="absolute right-5 text-sm text-gray-400">
+          See All
+        </Link>
       </CardHeader>
       <CardContent>
         <Table>
