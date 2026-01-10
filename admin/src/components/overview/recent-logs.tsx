@@ -16,7 +16,7 @@ import {
 import { getAllLogs } from '@/api/helpers/logs'
 import { useQuery } from '@tanstack/react-query'
 import { Skeleton } from '@/components/ui/skeleton'
-
+import { toPHTime } from '@/utils/convert-time'
 export function RecentLogs() {
   const { isPending, error, data } = useQuery({
     queryKey: ['get-all-logs'],
@@ -52,15 +52,12 @@ export function RecentLogs() {
                 {data?.slice(0, 5).map((item, index) => (
                   <TableRow key={index}>
                     <TableCell className="font-medium">{item.name}</TableCell>
-                    <TableCell>{item.time_in ? new Date(item.time_in).toLocaleTimeString('en-US', {
-                      hour: '2-digit',
-                      minute: '2-digit'
-                    }) : 'N/A'}</TableCell>
-                    <TableCell>{item.time_out ? new Date(item.time_out).toLocaleTimeString('en-US', {
-                      hour: '2-digit',
-                      minute: '2-digit'
-                    }) : 'N/A'}</TableCell>
-
+                    <TableCell>
+                      {toPHTime(item.time_in)}
+                    </TableCell>
+                    <TableCell>
+                      {toPHTime(item.time_out)}
+                    </TableCell>
                     <TableCell className="text-wrap capitalize">{item.type?.toUpperCase()}</TableCell>
                   </TableRow>
                 ))}

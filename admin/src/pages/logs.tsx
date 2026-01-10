@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button'
 import { getAllLogs } from '@/api/helpers/logs'
 import { useQuery } from '@tanstack/react-query'
 import { Skeleton } from "@/components/ui/skeleton"
+import { toPHTime } from '@/utils/convert-time'
 
 type LogsType = {
   id: string;
@@ -52,10 +53,7 @@ export const columns: ColumnDef<LogsType>[] = [
     },
     cell: (info) => {
       const value = info.getValue<string | null>() ?? null;
-      return value && new Date(value).toLocaleTimeString('en-US', {
-        hour: '2-digit',
-        minute: '2-digit'
-      });
+      return toPHTime(value);
     }
   },
   {
@@ -73,10 +71,7 @@ export const columns: ColumnDef<LogsType>[] = [
     },
     cell: (info) => {
       const value = info.getValue<string | null>() ?? null;
-      return value ? new Date(value).toLocaleTimeString('en-US', {
-        hour: '2-digit',
-        minute: '2-digit'
-      }): "N/A";
+      return toPHTime(value);
     }
   },
   {
