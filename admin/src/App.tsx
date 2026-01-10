@@ -4,7 +4,8 @@ import Overview from '@/pages/overview';
 import StudentsLog from '@/pages/students-log';
 import Students from '@/pages/students';
 import Logs from '@/pages/logs';
-import Visitors from '@/pages/gatepass';
+import Gatepass from '@/pages/gatepass';
+import Visitors from '@/pages/visitors';
 import ProtectedRoute from '@/pages/protected-route';
 import Login from '@/pages/login';
 import NotFound from '@/pages/not-found';
@@ -33,7 +34,8 @@ export default function App() {
             <Route path="students" element={<Students />} />
             <Route path="students/logs" element={<StudentsLog />} />
 
-            <Route path="gatepass" element={<Visitors />} />
+            <Route path="gatepass" element={<Gatepass />} />
+            <Route path="visitors" element={<Visitors />} />
             <Route path="logs" element={<Logs />} />
 
             <Route path="settings" element={<Settings />} />

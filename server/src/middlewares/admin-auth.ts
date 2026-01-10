@@ -20,7 +20,6 @@ export const admin_auth = async (req: AdminRequest, res: Response, next: NextFun
     req.admin = decoded;
     next();
   } catch (error) {
-    console.error("[ERROR ADMIN AUTH MIDDLEWARE]:", error);
     res.status(401).send({ error: 'Unauthorized access!' });
   }
 };
