@@ -1,6 +1,7 @@
 import db from '@/db/drizzle'
-import { student, gatepass, visitor } from '@/db/schema'
-import { eq, and } from 'drizzle-orm'
+import { student, gatepass, visitor, staff, guardian } from '@/db/schema'
+import { eq, and, sql } from 'drizzle-orm'
+import { union } from 'drizzle-orm/pg-core'
 import axios from 'axios'
 import {
   BadRequestError,
@@ -10,11 +11,44 @@ import {
 import AuthService from '@/services/auth.service'
 
 class ESPService {
-  static async verifyRFID(rfid: string) {
+  static async findRFIDHolder(rfid: string) {
     try {
-      const [studentData] = await db.select().from(student).where(eq(student.rfid_code, rfid));
-      if (!studentData) throw new UnauthorizedError('Invalid gatepass');
-      return studentData;
+    const [result] = await union(
+      db.select({
+        id: student.id,
+        firstname: student.firstname,
+        lastname: student.lastname,
+        rfid_code: student.rfid_code,
+        rfid_from: sql`'student'`.as("rfid_from"),
+      }).from(student).where(eq(student.rfid_code, rfid)), 
+      db.select({
+        id: staff.id,
+        firstname: staff.firstname,
+        lastname: staff.lastname,
+        rfid_code: staff.rfid_code,
+        rfid_from: sql`'staff'`.as("rfid_from"),
+      }).from(staff).where(eq(staff.rfid_code, rfid)),
+      db.select({
+        id: guardian.id,
+        firstname: guardian.firstname,
+        lastname: guardian.lastname,
+        rfid_code: guardian.rfid_code,
+        rfid_from: sql`'guardian'`.as("rfid_from"),
+      }).from(guardian).where(eq(guardian.rfid_code, rfid))
+      );
+      if(!result) throw new Error('Cannot find RFID from the database');
+
+    return result;
+    } catch (error) {
+      throw error;
+    }
+  }
+  static async verifyRFID(rfid: string): Promise<any> {
+    try {
+      const result = await this.findRFIDHolder(rfid);
+
+      if (!result) throw new UnauthorizedError('Invalid gatepass');
+      return result;
     } catch (error) {
       throw error;
     }

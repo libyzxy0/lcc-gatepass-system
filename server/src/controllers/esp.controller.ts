@@ -8,7 +8,7 @@ class ESPController {
     try {
       const payload = req.body;
       console.log(payload);
-      console.log("==================");
+      console.log();
       const localDate = new Date().toLocaleDateString('en-PH', {
         weekday: 'long',
         year: 'numeric',
@@ -52,7 +52,7 @@ class ESPController {
           
           await LogService.create({
             name: `${rfid_verification.firstname + " " + rfid_verification.lastname}`,
-            type: 'student',
+            type: rfid_verification.rfid_from,
             entity_id: rfid_verification.id,
             entry_type: 'rfid',
             device_id: 'esp-gate-01'
