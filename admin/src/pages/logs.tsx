@@ -155,7 +155,7 @@ export default function Logs() {
         <h1 className="font-semibold text-2xl">Logs</h1>
       </header>
       <MyTable
-        emptyMessage={"No logs yet."}
+        emptyMessage={"No logs to show yet."}
         columns={columns}
         data={filteredData}
         TableAction={

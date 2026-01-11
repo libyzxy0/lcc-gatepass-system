@@ -3,6 +3,7 @@ import AdminLayout from '@/layouts/admin';
 import Overview from '@/pages/overview';
 import Logs from '@/pages/logs';
 import Students from '@/pages/students';
+import Staffs from '@/pages/staffs';
 import Gatepass from '@/pages/gatepass';
 import Visitors from '@/pages/visitors';
 import ProtectedRoute from '@/pages/protected-route';
@@ -31,6 +32,7 @@ export default function App() {
             <Route index element={<Overview />} />
 
             <Route path="students" element={<Students />} />
+            <Route path="staffs" element={<Staffs />} />
             <Route path="gatepass" element={<Gatepass />} />
             <Route path="visitors" element={<Visitors />} />
             <Route path="logs" element={<Logs />} />
