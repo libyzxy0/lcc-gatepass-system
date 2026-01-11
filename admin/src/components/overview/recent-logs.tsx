@@ -50,7 +50,7 @@ export function RecentLogs() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {data ? (
+            {data.length !== 0 ? (
               <>
                 {data?.slice(0, 5).map((item, index) => (
                   <TableRow key={index}>
