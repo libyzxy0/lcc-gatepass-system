@@ -40,7 +40,12 @@ export const generateQRToken = (id: string) => {
 }
 
 export const generateVisitorID = () => {
-  const digit4 = Math.floor(Math.random() * (1000 - 9999 + 1)) + 1000;
+  const digit4 = Math.floor(Math.random() * (9999 - 1000 + 1)) + 1000;
   const year = new Date().getFullYear();
   return `VST${year}${digit4}`
+}
+export const generateStaffID = () => {
+  const digit4 = Math.floor(Math.random() * (9999 - 1000 + 1)) + 1000;
+  const year = new Date().getFullYear();
+  return `STF${year}${digit4}`
 }

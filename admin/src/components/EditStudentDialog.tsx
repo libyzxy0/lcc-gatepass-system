@@ -30,10 +30,7 @@ import { z } from "zod"
 import { updateStudent } from '@/api/helpers/student'
 import { toast } from "sonner"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import {
-  useQuery,
-} from '@tanstack/react-query'
-import { useQueryClient } from '@tanstack/react-query';
+import { useQueryClient, useQuery } from '@tanstack/react-query';
 import { getStudent } from '@/api/helpers/student'
 
 const formSchema = z.object({

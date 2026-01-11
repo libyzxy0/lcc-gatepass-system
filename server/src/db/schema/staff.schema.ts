@@ -3,12 +3,11 @@ import {
   uuid,
   text,
   timestamp,
-  pgEnum,
-  boolean
+  pgEnum
 } from "drizzle-orm/pg-core";
 
 export const staffTypeEnum = pgEnum("staff_type", [
-  "teacher",
+  "faculty",
   "guard",
   "administrator",
   "canteen_vendors",
@@ -20,7 +19,7 @@ export const staff = pgTable("staff", {
   staff_id: text("staff_id").notNull().unique(),
   firstname: text("firstname").notNull(),
   lastname: text("lastname").notNull(),
-  middle_initial: text("middle_initial"),
+  middle_name: text("middle_name"),
   staff_type: staffTypeEnum('staff_type').notNull(),
   phone_number: text("phone_number").notNull(),
   email: text("email"),
