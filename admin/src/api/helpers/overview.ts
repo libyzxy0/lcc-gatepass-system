@@ -4,6 +4,7 @@ type OverviewCountsType = {
   students: number;
   pending_gatepass: number;
   other_people: number;
+  staffs_today: number;
   students_today: number;
   visitors_today: number;
   people_today: number;
@@ -20,6 +21,7 @@ export const getOverviewCounts = async (): Promise<OverviewCountsType> => {
       other_people: 0,
       students_today: 0,
       visitors_today: 0,
+      staffs_today: 0,
       people_today: 0
     }
     throw error;

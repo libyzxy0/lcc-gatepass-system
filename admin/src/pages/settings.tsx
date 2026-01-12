@@ -11,7 +11,7 @@ export default function Settings() {
   return (
     <div className="container mx-auto max-w-6xl">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold">Settings</h1>
+        <h1 className="text-2xl font-bold">Settings</h1>
         <p className="text-muted-foreground mt-2">Manage your gatepass system configuration</p>
       </div>
 
