@@ -47,7 +47,9 @@ const char* mqtt_server   = "37638f32d99b49fa968d88c783e2b03a.s1.eu.hivemq.cloud
 const int   mqtt_port     = 8883;
 const char* mqtt_user     = "libyzxy0";
 const char* mqtt_password = "Libyzxy0@123_esp32";
-const char* client_id     = "esp_gate01";
+const char* client_id     = "ESP-GATE-001";
+
+String statusTopic = String("status/") + client_id;
 
 /* ——————————————————————————————— */
 
@@ -239,10 +241,39 @@ void connectWiFi() {
 void connectMQTT() {
   while (!mqtt.connected()) {
     Serial.print("Connecting to MQTT...");
-
-    if (mqtt.connect(client_id, mqtt_user, mqtt_password)) {
+    
+    String offlinePayload = JsonUtil::create()
+      .add("client_id", client_id)
+      .add("status", "offline")
+      .add("secret_key", SECRET_KEY)
+      .toString();
+    
+    bool ok = mqtt.connect(
+      client_id,
+      mqtt_user,
+      mqtt_password,
+      statusTopic.c_str(), 
+      1,
+      true,
+      offlinePayload.c_str()
+    );
+    
+    if (ok) {
       Serial.println("connected");
       mqtt.subscribe(PRODUCTION ? "scan/#" : "dev/scan/#");
+      
+      String onlinePayload = JsonUtil::create()
+      .add("client_id", client_id)
+      .add("status", "online")
+      .add("secret_key", SECRET_KEY)
+      .toString();
+      
+      mqtt.publish(
+        statusTopic.c_str(),
+        onlinePayload.c_str(),
+        true
+      );
+      
       NotificationUtil::readyTone();
     } else {
       Serial.print("failed, rc=");

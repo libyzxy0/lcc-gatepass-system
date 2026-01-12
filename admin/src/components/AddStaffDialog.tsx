@@ -158,7 +158,8 @@ export function AddStaffDialog({ children, onCreate }: { children: React.ReactNo
                         </FormLabel>
 
                         <FormControl>
-                          <Select onValueChange={field.onChange} value={field.value}>
+                          <Select onValueChange={field.onChange}
+                          value={field.value}>
                             <SelectTrigger className="w-full">
                               <SelectValue placeholder="Staff Type" />
                             </SelectTrigger>

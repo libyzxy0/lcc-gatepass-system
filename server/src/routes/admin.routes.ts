@@ -4,7 +4,8 @@ import AdminController from "@/controllers/admin.controller";
 
 const router = Router();
 
-router.post("/new", admin_auth, AdminController.newAdmin);
+router.get("/all", admin_auth, AdminController.getAll);
+router.post("/create", admin_auth, AdminController.newAdmin);
 router.post("/login", AdminController.login);
 router.post("/refresh", AdminController.refresh);
 router.post("/logout", admin_auth, AdminController.logout);

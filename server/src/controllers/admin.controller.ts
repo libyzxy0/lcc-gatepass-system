@@ -18,8 +18,7 @@ class AdminController {
       const adm = req.body;
 
       const newAdmin = await AdminService.createAdmin({
-        firstname: adm.firstname,
-        lastname: adm.lastname,
+        name: adm.name,
         role: adm.role,
         email: adm.email,
         phone_number: adm.phone_number,
@@ -69,7 +68,7 @@ class AdminController {
       });
 
     } catch (error) {
-      return res.status(500).json({ error: error.message });
+      return res.status(error.status || 500).json({ error: error.message });
     }
   }
   static async refresh(req: Request, res: Response) {
@@ -105,12 +104,20 @@ class AdminController {
       return res.status(401).json({ error: "invalid or expired token" });
     }
   }
+  static async getAll(req: Request, res: Response) {
+    try {
+      const admins = await AdminService.getAll();
+      res.json(admins);
+    } catch (error) {
+      return res.status(error.status || 500).json({ error: error.message });
+    }
+  }
   static async getOverviewCounts(req: Request, res: Response) {
     try {
       const result = await AdminService.getOverviewCounts();
       res.json(result);
     } catch (error) {
-      return res.status(401).json({ error: "invalid or expired token" });
+      return res.status(error.status || 500).json({ error: error.message });
     }
   }
 }

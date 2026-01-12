@@ -7,8 +7,7 @@ const adminSeeder = async () => {
     const hashedPassword = await bcrypt.hash("admin123", 10);
     
     const data = await db.insert(admin).values({
-        firstname: "Super",
-        lastname: "Admin",
+        name: "Super Admin",
         role: "admin",
         email: "admin@lccgatepass.xyz",
         phone_number: "09937793944",

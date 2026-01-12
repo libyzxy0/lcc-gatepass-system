@@ -1,6 +1,6 @@
-import { eq } from "drizzle-orm";
+import { eq, count, and, or, isNull } from "drizzle-orm";
 import db from "@/db/drizzle";
-import { admin, gatepass, visitor } from "@/db/schema";
+import { admin, gatepass, visitor, student, logs } from "@/db/schema";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
 import {
@@ -21,13 +21,12 @@ type AdminSafe = Omit<Admin, "password"> & {
 };
 
 class AdminService {
-  static async createAdmin({ firstname, lastname, role, email, phone_number, password, photo_url }) {
+  static async createAdmin({ name, role, email, phone_number, password, photo_url }) {
     try {
       const hashedPassword = await bcrypt.hash(password, 10);
 
       const [newAdmin] = await db.insert(admin).values({
-        firstname,
-        lastname,
+        name,
         role,
         email,
         phone_number,
@@ -63,13 +62,27 @@ class AdminService {
       throw error;
     }
   }
+  static async getAll() {
+    const admins: AdminSafe[] = await db.select({
+      id: admin.id,
+      name: admin.name,
+      email: admin.email,
+      phone_number: admin.phone_number,
+      role: admin.role,
+      is_super_admin: admin.is_super_admin,
+      photo_url: admin.photo_url,
+      created_at: admin.created_at
+    }).from(admin);
+
+    if (admins.length === 0) throw new NotFoundError('No admins added in the database yet.');
+    return admins;
+  }
   static async getAdmin(id: string) {
     try {
       const [adminData]: AdminSafe[] = await db
         .select({
           id: admin.id,
-          firstname: admin.firstname,
-          lastname: admin.lastname,
+          name: admin.name,
           email: admin.email,
           phone_number: admin.phone_number,
           role: admin.role,
@@ -87,19 +100,42 @@ class AdminService {
   }
   static async getOverviewCounts() {
     try {
-      const students = await StudentService.getAll();
-      
-      const gatepasses = (await GatepassService.getAllGatepassData()).filter((gpass) => gpass.status === 'pending');
-      
+      const [students] = await db.select({ count: count() }).from(student);
+      const [gatepasses] = await db.select({ count: count() }).from(gatepass).where(eq(gatepass.status, 'pending'));
+
+      const [allLogs] = await db.selectDistinct({ count: count() }).from(logs).where(
+          isNull(logs.time_out),
+        );
+
+      const [studentsToday] = await db.selectDistinct({ count: count() }).from(logs).where(and(
+        isNull(logs.time_out),
+        eq(logs.type, 'student')
+        ));
+
+      const [visitorsToday] = await db.selectDistinct({ count: count() }).from(logs).where(and(
+        isNull(logs.time_out),
+        eq(logs.type, 'visitor')
+        ));
+
+      const [otherPeopleToday] = await db.selectDistinct({ count: count() }).from(logs).where(
+        and(
+          isNull(logs.time_out),
+          or(
+            eq(logs.type, 'staff'),
+            eq(logs.type, 'guardian'),
+          )
+        ));
+
       return {
-        students: students.length,
-        pending_gatepass: gatepasses.length,
-        other_people: 0,
-        students_today: 0,
-        visitors_today: 0,
-        people_today: students.length
+        students: students.count || 0,
+        pending_gatepass: gatepasses.count || 0,
+        other_people: otherPeopleToday.count || 0,
+        students_today: studentsToday.count || 0,
+        visitors_today: visitorsToday.count || 0,
+        people_today: allLogs.count || 0
       }
     } catch (error) {
+      console.error(error);
       throw error;
     }
   }
