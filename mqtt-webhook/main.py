@@ -4,13 +4,12 @@ import threading
 import ssl
 import logging
 import time
-
-import paho.mqtt.client as mqtt
 import requests
 from dotenv import load_dotenv
 from colorama import Fore, Style, init
+import paho.mqtt.client as mqtt
+from flask import Flask, jsonify
 
-# Initialize
 init(autoreset=True)
 load_dotenv()
 
@@ -39,7 +38,6 @@ class ColoredFormatter(logging.Formatter):
         logging.ERROR: Fore.RED,
         logging.CRITICAL: Fore.MAGENTA,
     }
-
     def format(self, record):
         color = self.LEVEL_COLORS.get(record.levelno, "")
         record.msg = f"{color}{record.msg}{Style.RESET_ALL}"
@@ -73,49 +71,32 @@ def on_message(client, userdata, msg):
         except Exception:
             logger.warning("❌ Invalid status JSON payload")
             return
-
         new_status = status_data.get("status", "unknown")
         old_status = client_status.get(client_id, {}).get("status")
-
-        client_status[client_id] = {
-            "status": new_status,
-            "last_seen": time.time()
-        }
-
+        client_status[client_id] = {"status": new_status, "last_seen": time.time()}
         logger.info(f"📡 Client {client_id} is now {new_status}")
-
         if new_status != old_status:
             def post_status_webhook(client_id, status):
-                payload = {
-                    "topic": msg.topic,
-                    "client_id": client_id,
-                    "status": status,
-                    "secret_key": MQTT_SECRET
-                }
+                payload = {"topic": msg.topic, "client_id": client_id, "status": status, "secret_key": MQTT_SECRET}
                 try:
                     response = requests.post(WEBHOOK_URL, json=payload, timeout=5)
                     response.raise_for_status()
                     logger.info(f"✅ Status webhook sent for client {client_id}: {status}")
                 except Exception as e:
                     logger.error(f"Webhook error: {e}")
-
             threading.Thread(target=post_status_webhook, args=(client_id, new_status), daemon=True).start()
         return
-
     try:
         payload = json.loads(msg.payload.decode())
     except Exception:
         logger.warning("❌ Invalid JSON payload")
         return
-
     secret = payload.get("secret_key")
     if secret != MQTT_SECRET:
         logger.warning(f"❌ Invalid secret key from topic: {msg.topic}")
         return
-
     payload.pop("secret_key", None)
     payload["topic"] = msg.topic
-
     def post_webhook(data, topic):
         try:
             response = requests.post(WEBHOOK_URL, json=data, timeout=5)
@@ -124,7 +105,6 @@ def on_message(client, userdata, msg):
             logger.info(f"✅ Webhook response sent for topic: {topic}")
         except Exception as e:
             logger.error(f"Webhook error: {e}")
-
     threading.Thread(target=post_webhook, args=(payload, msg.topic), daemon=True).start()
 
 client.username_pw_set(MQTT_USERNAME, MQTT_PASSWORD)
@@ -133,7 +113,6 @@ client.tls_insecure_set(True)
 client.on_connect = on_connect
 client.on_message = on_message
 
-# Start MQTT loop
 def start_mqtt_worker():
     try:
         client.connect(MQTT_BROKER, MQTT_PORT, keepalive=60)
@@ -141,6 +120,17 @@ def start_mqtt_worker():
     except Exception as e:
         logger.error(f"MQTT worker failed: {e}")
 
+app = Flask(__name__)
+
+@app.route("/")
+def root():
+    return jsonify({"status": "ok", "message": "MQTT worker is running"})
+
+def start_mqtt_thread():
+    threading.Thread(target=start_mqtt_worker, daemon=True).start()
+
 if __name__ == "__main__":
-    logger.info("🚀 Starting MQTT worker...")
-    start_mqtt_worker()
+    logger.info("🚀 Starting MQTT worker + web server...")
+    start_mqtt_thread()
+    app.run(host="0.0.0.0", port=int(os.getenv("PORT", 8000)))
+    
