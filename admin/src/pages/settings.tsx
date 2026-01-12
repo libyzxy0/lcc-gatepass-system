@@ -1,33 +1,41 @@
-import { Switch } from '@/components/ui/switch'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { General } from '@/components/settings/General'
+import { Admins } from '@/components/settings/Admins'
+import { Gates } from '@/components/settings/Gates'
+import { Danger } from '@/components/settings/Danger'
+import { useSearchParams } from "react-router";
 
 export default function Settings() {
+  const [searchParams, setSearchParams] = useSearchParams();
+  
   return (
-    <div>
-      <header>
-        <h1 className="font-semibold text-2xl">Settings</h1>
-      </header>
-
-      <div className="mt-8 grid grid-cols-1 gap-6">
-        <div className="grid grid-cols-3 items-center">
-          <div className="col-span-2">
-            <h1 className="font-semibold">Emergency Open</h1>
-            <p className="text-sm text-muted-foreground">Open all gates without any authorization.</p>
-          </div>
-          <div className="text-right">
-            <Switch />
-          </div>
-        </div>
-
-        <div className="grid grid-cols-3 items-center">
-          <div className="col-span-2">
-            <h1 className="font-semibold">Parent SMS Notifications</h1>
-            <p className="text-sm text-muted-foreground">Notify parents through SMS when their child enters or leaves the school.</p>
-          </div>
-          <div className="text-right">
-            <Switch />
-          </div>
-        </div>
+    <div className="container mx-auto max-w-6xl">
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold">Settings</h1>
+        <p className="text-muted-foreground mt-2">Manage your gatepass system configuration</p>
       </div>
+
+      <Tabs defaultValue={searchParams.get('activeTab') || 'general'} className="space-y-6">
+        <TabsList className="grid w-full grid-cols-4">
+          <TabsTrigger value="general" onClick={() => setSearchParams({ activeTab: 'general' })}>General</TabsTrigger>
+          <TabsTrigger value="admins" onClick={() => setSearchParams({ activeTab: 'admins' })}>Admins</TabsTrigger>
+          <TabsTrigger value="gates" onClick={() => setSearchParams({ activeTab: 'gates' })}>Gates</TabsTrigger>
+          <TabsTrigger value="danger" onClick={() => setSearchParams({ activeTab: 'danger' })}>Danger Zone</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="general" className="space-y-6">
+          <General />
+        </TabsContent>
+        <TabsContent value="admins" className="space-y-6">
+          <Admins />
+        </TabsContent>
+        <TabsContent value="gates" className="space-y-6">
+          <Gates />
+        </TabsContent>
+        <TabsContent value="danger" className="space-y-6">
+          <Danger />
+        </TabsContent>
+      </Tabs>
     </div>
   )
 }

@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { tg_api } from '@/sms-api/tgapi'
 import EspService from '@/services/esp.service'
 import LogService from '@/services/logs.service'
+import GateService from '@/services/gate.service'
 
 class ESPController {
   static async handleEvent(req: Request, res: Response) {
@@ -68,6 +69,8 @@ class ESPController {
             status: 'bad'
           })
         }
+      } else if(payload.topic?.startsWith('status/')) {
+        await GateService.updateStatus(payload.status, payload.client_id, payload.secret_key);
       }
     } catch (error) {
       console.error(error.message, error.status || 500);

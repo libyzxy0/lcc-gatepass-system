@@ -149,7 +149,7 @@ export default function Gatepass() {
   return (
     <div>
       <header className="mb-8">
-        <h1 className="font-semibold text-2xl">Gatepass</h1>
+        <h1 className="font-semibold text-2xl">QR Pass</h1>
       </header>
       <MyTable
         columns={columns}

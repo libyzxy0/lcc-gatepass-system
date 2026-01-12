@@ -15,7 +15,9 @@ import { CountCard } from '@/components/CountCard'
 export function Counts() {
   const { isPending, error, data } = useQuery({
     queryKey: ['get-counts'],
-    queryFn: getOverviewCounts
+    queryFn: getOverviewCounts,
+    refetchInterval: 500,
+    refetchOnWindowFocus: true
   })
   
   if (isPending) return (

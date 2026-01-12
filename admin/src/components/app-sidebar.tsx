@@ -61,18 +61,8 @@ const data = {
     {
       title: "Settings",
       icon: Settings2,
-      url: "#",
-      items: [
-        {
-          title: "General",
-          url: "/dashboard/settings",
-        },
-        {
-          title: "Admin Personels",
-          url: "/dashboard/settings/admins",
-        }
-      ],
-    },
+      url: "/dashboard/settings",
+    }
   ],
 }
 

@@ -9,15 +9,14 @@ import {
 
 export const adminRoleEnum = pgEnum("admin_role", [
   "admin",
-  "guard",
+  "security",
   "developer",
-  "department_head"
+  "other"
 ]);
 
 export const admin = pgTable("admin", {
   id: uuid("id").primaryKey().defaultRandom().notNull(),
-  firstname: text("firstname").notNull(),
-  lastname: text("lastname").notNull(),
+  name: text("name").notNull(),
   role: adminRoleEnum("role").notNull(),
   phone_number: text("phone_number").notNull(),
   email: text("email").notNull().unique(),

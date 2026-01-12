@@ -10,7 +10,6 @@ import ProtectedRoute from '@/pages/protected-route';
 import Login from '@/pages/login';
 import NotFound from '@/pages/not-found';
 import Settings from '@/pages/settings';
-import SettingsAdmins from '@/pages/settings-admins';
 import {
   QueryClient,
   QueryClientProvider,
@@ -37,7 +36,6 @@ export default function App() {
             <Route path="visitors" element={<Visitors />} />
             <Route path="logs" element={<Logs />} />
             <Route path="settings" element={<Settings />} />
-            <Route path="settings/admins" element={<SettingsAdmins />} />
 
           </Route>
         </Route>

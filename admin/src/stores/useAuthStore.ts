@@ -3,9 +3,8 @@ import { api } from "@/api/axios";
 
 type Admin = {
   id: string;
-  firstname: string;
-  lastname: string;
-  role: 'admin' | 'staff';
+  name: string;
+  role: string;
   email: string;
   phone_number: string;
   photo_url: string;

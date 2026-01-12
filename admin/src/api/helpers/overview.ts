@@ -10,6 +10,18 @@ type OverviewCountsType = {
 }
 
 export const getOverviewCounts = async (): Promise<OverviewCountsType> => {
-  const response = await api.get(`/admin/overview/counts`);
-  return response.data;
+  try {
+    const response = await api.get(`/admin/overview/counts`);
+    return response.data;
+  } catch (error: any) {
+    if (error.response?.status === 404) return {
+      students: 0,
+      pending_gatepass: 0,
+      other_people: 0,
+      students_today: 0,
+      visitors_today: 0,
+      people_today: 0
+    }
+    throw error;
+  }
 }
