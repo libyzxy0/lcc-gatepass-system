@@ -104,26 +104,28 @@ class AdminService {
       const [gatepasses] = await db.select({ count: count() }).from(gatepass).where(eq(gatepass.status, 'pending'));
 
       const [allLogs] = await db.selectDistinct({ count: count() }).from(logs).where(
-          isNull(logs.time_out),
-        );
+        isNull(logs.time_out),
+      );
 
       const [studentsToday] = await db.selectDistinct({ count: count() }).from(logs).where(and(
         isNull(logs.time_out),
         eq(logs.type, 'student')
-        ));
+      ));
 
       const [visitorsToday] = await db.selectDistinct({ count: count() }).from(logs).where(and(
         isNull(logs.time_out),
         eq(logs.type, 'visitor')
-        ));
+      ));
+
+      const [staffToday] = await db.selectDistinct({ count: count() }).from(logs).where(and(
+        isNull(logs.time_out),
+        eq(logs.type, 'staff'),
+      ));
 
       const [otherPeopleToday] = await db.selectDistinct({ count: count() }).from(logs).where(
         and(
           isNull(logs.time_out),
-          or(
-            eq(logs.type, 'staff'),
-            eq(logs.type, 'guardian'),
-          )
+          eq(logs.type, 'guardian'),
         ));
 
       return {
@@ -132,6 +134,7 @@ class AdminService {
         other_people: otherPeopleToday.count || 0,
         students_today: studentsToday.count || 0,
         visitors_today: visitorsToday.count || 0,
+        staffs_today: staffToday.count || 0,
         people_today: allLogs.count || 0
       }
     } catch (error) {
