@@ -71,6 +71,7 @@ class ESPController {
         }
       } else if(payload.topic?.startsWith('status/')) {
         await GateService.updateStatus(payload.status, payload.client_id, payload.secret_key);
+        res.json({ ping: 'ok' })
       }
     } catch (error) {
       console.error(error.message, error.status || 500);

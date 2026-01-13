@@ -19,6 +19,7 @@ import {
   useQuery,
 } from '@tanstack/react-query'
 import { getOverviewCounts } from '@/api/helpers/overview'
+import { getPeopleTypeWithHighestValue } from '@/utils/get-highest'
 import { Skeleton } from '@/components/ui/skeleton'
 
 export const description = "A pie chart with a label list"
@@ -85,8 +86,11 @@ export function VisitsPie() {
         </ChartContainer>
       </CardContent>
       <CardFooter className="flex-col gap-2 text-sm">
-        <div className="flex items-center gap-2 leading-none font-medium">
-          Students are the Most<TrendingUp className="h-4 w-4" />
+        <div className="flex items-center gap-2">
+        <p className="leading-none font-medium">
+          <span className="capitalize font-medium">{getPeopleTypeWithHighestValue(data).join(", ")}</span> are the Most
+          </p>
+          <TrendingUp className="h-4 w-4" />
         </div>
         <div className="text-muted-foreground leading-none text-center">
           Data are calculated based on today's gate logs.

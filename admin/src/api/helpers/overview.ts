@@ -1,6 +1,6 @@
 import { api } from '../axios';
 
-type OverviewCountsType = {
+export type OverviewCountsType = {
   students: number;
   pending_gatepass: number;
   other_people: number;
