@@ -1,13 +1,7 @@
 import { useState, useMemo } from 'react'
 import { MyTable } from '@/components/table'
 import type { ColumnDef } from "@tanstack/react-table"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { Trash, IdCard, Ellipsis, ArrowUpDown, Download } from 'lucide-react';
+import { ArrowUpDown, Download } from 'lucide-react';
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import {
@@ -21,6 +15,7 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { getAllLogs } from '@/api/helpers/logs'
 import { useQuery } from '@tanstack/react-query'
 import { toPHTime } from '@/utils/convert-time'
+import { LogsTableActions } from '@/components/LogsTableAction';
 
 type LogsType = {
   id: string;
@@ -102,23 +97,7 @@ export default function Logs() {
     },
     {
       id: 'actions',
-      cell: () => {
-        return (
-          <DropdownMenu>
-            <DropdownMenuTrigger>
-              <Ellipsis />
-            </DropdownMenuTrigger>
-            <DropdownMenuContent>
-              <DropdownMenuItem>
-                <IdCard />
-                View</DropdownMenuItem>
-              <DropdownMenuItem variant="destructive">
-                <Trash />
-                Delete</DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        )
-      }
+      cell: (info) => <LogsTableActions id={info.row.original.id} />
     }
   ];
   
