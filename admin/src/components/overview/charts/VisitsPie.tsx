@@ -93,7 +93,7 @@ export function VisitsPie() {
           <TrendingUp className="h-4 w-4" />
         </div>
         <div className="text-muted-foreground leading-none text-center">
-          Data are calculated based on today's gate logs.
+          Data are calculated based on todays gate logs.
         </div>
       </CardFooter>
     </Card>

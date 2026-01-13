@@ -45,7 +45,7 @@ class AdminController {
       if (process.env.NODE_ENV === 'production') {
         const cloudflareTurnstile = await verifyTurnstile(cloudflare_token);
         if (!cloudflareTurnstile && !cloudflareTurnstile.success) {
-          return res.status(403).json({ message: "Please verify CloudFlare captcha first!" });
+          return res.status(403).json({ message: "Please verify CloudFlare captcha first to login" });
         }
       }
 
