@@ -72,6 +72,11 @@ export function VisitsPie() {
         <CardDescription>Shows most people type that are inside the campus today.</CardDescription>
       </CardHeader>
       <CardContent className="flex-1 pb-0">
+        {getPeopleTypeWithHighestValue(data). length === 0 ? (
+          <div className="h-full grid place-items-center">
+          <p className="text-center mx-6">Failed to show chart, theres no people inside the campus today yet.</p>
+          </div>
+          ) : (
         <ChartContainer
           config={chartConfig}
           className="[&_.recharts-text]:fill-background mx-auto aspect-square max-h-[250px]"
@@ -84,7 +89,9 @@ export function VisitsPie() {
             />
           </PieChart>
         </ChartContainer>
+        )}
       </CardContent>
+      {getPeopleTypeWithHighestValue(data). length !== 0 && (
       <CardFooter className="flex-col gap-2 text-sm">
         <div className="flex items-center gap-2">
         <p className="leading-none font-medium">
@@ -96,6 +103,7 @@ export function VisitsPie() {
           Data are calculated based on todays gate logs.
         </div>
       </CardFooter>
+      )}
     </Card>
   )
 }
