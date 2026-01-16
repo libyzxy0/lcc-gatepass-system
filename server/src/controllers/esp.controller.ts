@@ -28,7 +28,7 @@ class ESPController {
         try {
           const data = await EspService.verifyQR(payload.data);
           
-          await LogService.create({
+          const { entry } = await LogService.create({
             name: data.visitor.firstname + " " + data.visitor.lastname,
             type: 'visitor',
             entity_id: data.visitor.id,
@@ -38,6 +38,7 @@ class ESPController {
 
           return res.json({
             status: 'ok',
+            entry,
             id: data.visitor.id,
             name: data.visitor.firstname + " " + data.visitor.lastname
           })
@@ -51,7 +52,7 @@ class ESPController {
         try {
           const rfid_verification = await EspService.verifyRFID(payload.data);
           
-          await LogService.create({
+          const { entry } = await LogService.create({
             name: `${rfid_verification.firstname + " " + rfid_verification.lastname}`,
             type: rfid_verification.rfid_from,
             entity_id: rfid_verification.id,
@@ -61,6 +62,7 @@ class ESPController {
           
           return res.json({
             status: 'ok',
+            entry,
             id: rfid_verification.id,
             name: rfid_verification.firstname + " " + rfid_verification.lastname
           })

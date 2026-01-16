@@ -17,7 +17,8 @@
 
 #define BUZZER_PIN 4
 
-#define RELAY_PIN 2
+#define RELAY_PIN_MAIN 34
+#define RELAY_PIN_SEC 35
 #define LOCK_SENSOR_RST 33
 
 /* Choose which server to communicate with, production(true) or development(false) */
@@ -379,6 +380,7 @@ void mqtt_callback(char* topic, byte* payload, unsigned int length) {
   }
   
   String status = JsonUtil::getString(message, "status");
+  String entry = JsonUtil::getString(message, "entry");
   String name = JsonUtil::getString(message, "name");
   
   if (status.length() == 0) {
@@ -391,11 +393,22 @@ void mqtt_callback(char* topic, byte* payload, unsigned int length) {
 
   if (status == "ok") {
     Serial.println("Access GRANTED → Gate unlocked");
-    digitalWrite(RELAY_PIN, HIGH);
-    NotificationUtil::successTone();
+    if(entry == "IN") {
+      digitalWrite(RELAY_PIN_MAIN, LOW);
+      digitalWrite(RELAY_PIN_SEC, HIGH);
+      Serial.println("Access IN GRANTED → Gate opened");
+    } else if(entry == "OUT") {
+      digitalWrite(RELAY_PIN_MAIN, HIGH);
+      digitalWrite(RELAY_PIN_SEC, LOW);
+      Serial.println("Access OUT GRANTED → Gate opened");
+    } else {
+      digitalWrite(RELAY_PIN_MAIN, HIGH);
+      digitalWrite(RELAY_PIN_SEC, HIGH);
+    }
   } else {
     Serial.println("Access DENIED → Gate locked");
-    digitalWrite(RELAY_PIN, LOW);
+    digitalWrite(RELAY_PIN_MAIN, HIGH);
+    digitalWrite(RELAY_PIN_SEC, HIGH);
     NotificationUtil::errorTone();
   }
   SCANNING = false;
@@ -409,9 +422,12 @@ void setup() {
   ledcSetup(0, 1000, 8);
   ledcAttachPin(BUZZER_PIN, 0);
   pinMode(BUZZER_PIN, OUTPUT);
-  pinMode(RELAY_PIN, OUTPUT);
+  pinMode(RELAY_PIN_MAIN, OUTPUT);
+  pinMode(RELAY_PIN_SEC, OUTPUT);
   pinMode(LOCK_SENSOR_RST, INPUT_PULLUP);
   digitalWrite(BUZZER_PIN, LOW);
+  digitalWrite(RELAY_PIN_MAIN, HIGH);
+  digitalWrite(RELAY_PIN_SEC, HIGH);
   Serial.println("Peripherals Ready");
   NotificationUtil::readyTone();
 
@@ -458,7 +474,8 @@ void loop() {
   }
   
   if(digitalRead(LOCK_SENSOR_RST) == LOW) {
-    digitalWrite(RELAY_PIN, LOW);
+    digitalWrite(RELAY_PIN_MAIN, HIGH);
+    digitalWrite(RELAY_PIN_MAIN, HIGH);
   }
   
   if (Serial.available() > 0) {

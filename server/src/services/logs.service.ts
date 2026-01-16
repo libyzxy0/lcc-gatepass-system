@@ -37,7 +37,7 @@ class LogsService {
         await db.update(logs)
           .set({ time_out: now.toISOString() })
           .where(eq(logs.id, activeLog.id));
-        console.log('Time out');
+        return { entry: 'OUT' };
       } else {
         await db.insert(logs).values({
           type,
@@ -47,9 +47,8 @@ class LogsService {
           device_id,
           entry_type
         });
-        console.log('Time In');
+        return { entry: 'IN' };
       }
-
     } catch (error) {
       throw error;
     }
