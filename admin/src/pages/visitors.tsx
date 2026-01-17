@@ -7,6 +7,13 @@ import { getAllVisitors, type Visitors } from '@/api/helpers/visitors'
 import { Skeleton } from "@/components/ui/skeleton"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { Badge } from "@/components/ui/badge"
+
+const statusBadges = {
+  verified: <Badge variant="default" className="bg-green-400/20 border-green-400/50 text-green-400">Verified</Badge>,
+  unverified: <Badge variant="default" className="bg-red-400/20 border-red-400/50 text-red-400">Unverified</Badge>,
+  review: <Badge variant="default" className="bg-yellow-400/20 border-yellow-400/50 text-yellow-400">Review</Badge>
+}
 
 export default function Visitors() {
   const { isPending, error, data } = useQuery({
@@ -37,24 +44,20 @@ export default function Visitors() {
       },
     },
     {
-      accessorKey: "activated",
-      header: "Activated",
-      cell: (info) => {
-        const activated = info.getValue<string | null>()
-        return <div className="text-wrap">{activated ? "TRUE" : "FALSE"}</div>
-      },
-    },
-    {
       accessorKey: "verified",
       header: "Status",
       cell: (info) => {
-        const verified = info.getValue<string | null>()
-        return <div className="text-wrap">{verified ? "Verified" : info.row.original.valid_id_photo_url ? 'To Review' : 'Not Verfied'}</div>
+        const verified = info.getValue<boolean | null>()
+        return verified ? statusBadges['verified'] : info.row.original.valid_id_photo_url ? statusBadges['review'] : statusBadges['unverified']
       },
     },
     {
       accessorKey: "phone_number",
-      header: "Phone Number",
+      header: "Phone",
+      cell: (info) => {
+        const phone = info.getValue<boolean | null>();
+        return <div className={info.row.original.activated ? 'text-green-400' : 'text-red-400'}>{"0" + phone}</div>
+      }
     },
     {
       accessorKey: "email",
@@ -82,7 +85,7 @@ export default function Visitors() {
   )
 
   if (error) return 'An error has occurred: ' + error.message
-  
+
   const filteredData = useMemo(() => {
     if (!data) return []
 
@@ -104,22 +107,22 @@ export default function Visitors() {
         <h1 className="font-semibold text-2xl">Visitors</h1>
       </header>
       <MyTable
-        emptyMessage={'No students data yet.'}
+        emptyMessage={'No visitors data yet.'}
         columns={columns}
         data={filteredData}
         TableAction={
-          <div className="flex flex-row justify-between items-center">
-           <Input
-                placeholder="Search by name..."
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                className="max-w-sm"
-              />
-              <div>
-            <Button variant={'outline'}>
-              <Download />
-              Download CSV
-            </Button>
+          <div className="flex flex-row justify-between items-center gap-2">
+            <Input
+              placeholder="Search visitor..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="max-w-sm"
+            />
+            <div>
+              <Button variant={'outline'}>
+                <Download />
+                Download CSV
+              </Button>
             </div>
           </div>
         }

@@ -23,11 +23,11 @@ type Gatepass = {
   created_at: string;
 };
 
-const colorMap: Record<string, string> = {
-  'pending': 'bg-yellow-400',
-  'approved': 'bg-green-400',
-  'expired': 'bg-orange-500',
-  'rejected': 'bg-red-500'
+const statusBadges = {
+  rejected: <Badge variant="default" className="bg-orange-400/20 border-orange-400/50 text-orange-400">Rejected</Badge>,
+  expired: <Badge variant="default" className="bg-red-400/20 border-red-400/50 text-red-400">Expired</Badge>,
+  approved: <Badge variant="default" className="bg-green-400/20 border-green-400/50 text-green-400">Approved</Badge>,
+  pending: <Badge variant="default" className="bg-yellow-400/20 border-yellow-400/50 text-yellow-400">Pending</Badge>
 }
 
 
@@ -105,12 +105,8 @@ export default function Gatepass() {
     accessorKey: "status",
     header: "Status",
     cell: (info) => {
-      const status = info.getValue<string>()
-      return (
-        <Badge className={`capitalize ${colorMap[status]}`}>
-          {status}
-        </Badge>
-      )
+      const status = info.getValue<'pending' | 'approved' | 'rejected' | 'expired'>()
+      return status ? statusBadges[status] : 'N/A'
     },
   },
   {
@@ -149,15 +145,16 @@ export default function Gatepass() {
   return (
     <div>
       <header className="mb-8">
-        <h1 className="font-semibold text-2xl">QR Pass</h1>
+        <h1 className="font-semibold text-2xl">QRCode Pass</h1>
+        <div className="border-l-4 border-green-200 px-2 text-gray-400 bg-gray-200/20 my-2 md:w-[400px]"><p className="py-2 text-[12px]"><span className="text-green-400 font-bold">Quickie Note:</span>{" "}QR Code Passes that are requested by verified visitor accounts will be automatically approve.</p></div>
       </header>
       <MyTable
         columns={columns}
         data={filteredData}
-        emptyMessage={'No gatepass data yet.'}
+        emptyMessage={'No QrPass data yet.'}
         TableAction={
-          <div className="flex justify-between items-center">
-            <div className="grid grid-cols-2 gap-2">
+          <div className="flex justify-between gap-2">
+            <div className="grid md:grid-cols-2 md:gap-2">
               <Input
                 placeholder="Search by name..."
                 value={search}
