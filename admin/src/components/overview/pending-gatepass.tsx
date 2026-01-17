@@ -49,7 +49,7 @@ export function PendingGatepass() {
           <TableBody>
             {!isPending && data && data.filter(gpass => gpass.status === 'pending').length !== 0 ? (
               <>
-                {(data.filter(gpass => gpass.status === 'pending')).slice(0, 5).map((gatepass, index) => (
+                {(data.filter(gpass => gpass.status === 'pending')).slice(0, 5).map((gatepass) => (
                   <TableRow key={gatepass.id}>
                     <TableCell className="font-medium">{gatepass.visitor_fullname}</TableCell>
                     <TableCell className="text-wrap">{gatepass.purpose}</TableCell>

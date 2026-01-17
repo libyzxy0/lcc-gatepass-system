@@ -5,7 +5,7 @@ export type Visitors = {
   visitor_id: string;
   firstname: string;
   lastname: string;
-  middle_initial: string;
+  middle_name: string;
   address: string;
   email: string;
   phone_number: string;
