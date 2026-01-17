@@ -17,6 +17,15 @@ import { getAllLogs } from '@/api/helpers/logs'
 import { useQuery } from '@tanstack/react-query'
 import { Skeleton } from '@/components/ui/skeleton'
 import { toPHTime } from '@/utils/convert-time'
+import { Badge } from "@/components/ui/badge"
+
+const typeBadges = {
+  student: <Badge variant="default" className="bg-blue-400/20 border-blue-400/50 text-blue-400">Student</Badge>,
+  visitor: <Badge variant="default" className="bg-orange-400/20 border-orange-400/50 text-orange-400">Visitor</Badge>,
+  staff: <Badge variant="default" className="bg-green-400/20 border-green-400/50 text-green-400">Staff</Badge>,
+  guardian: <Badge variant="default" className="bg-yellow-400/20 border-yellow-400/50 text-yellow-400">Guardian</Badge>,
+}
+
 export function RecentLogs() {
   const { isPending, error, data } = useQuery({
     queryKey: ['get-all-logs'],
@@ -61,7 +70,7 @@ export function RecentLogs() {
                     <TableCell>
                       {toPHTime(item.time_out)}
                     </TableCell>
-                    <TableCell className="text-wrap capitalize">{item.type?.toUpperCase()}</TableCell>
+                    <TableCell className="text-wrap capitalize">{typeBadges[item.type]}</TableCell>
                   </TableRow>
                 ))}
               </>
