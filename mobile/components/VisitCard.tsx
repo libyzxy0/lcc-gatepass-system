@@ -66,6 +66,18 @@ export function VisitCard({ id, purpose, description, vehicle, status, schedule_
     setDeleting(false);
   }
   
+  const handleViewGatepass = () => {
+    if (status === 'approved') {
+      router.push(`/gatepass/${id}`)
+    } else {
+      showToast({
+        type: 'default',
+        text1: 'Unable to View',
+        text2: 'Gatepass is not approved by the administrator.'
+      })
+    }
+  }
+
   return (
     <>
       <ModalDestructive
@@ -76,7 +88,7 @@ export function VisitCard({ id, purpose, description, vehicle, status, schedule_
         onClose={() => showDeleteModal(false)}
       />
       <TouchableOpacity
-        onPress={() => router.push(`/gatepass/${id}`)}
+        onPress={handleViewGatepass}
         delayLongPress={200}
         onLongPress={() => showDeleteModal(true)}
         activeOpacity={0.7}

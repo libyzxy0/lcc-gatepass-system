@@ -31,7 +31,7 @@ router.post(
             minConfidence: 95
           }
         ],
-        checks: `"file.size" < "1mb"`
+        checks: `"file.size" < "5mb"`
       });
 
       return res.json({

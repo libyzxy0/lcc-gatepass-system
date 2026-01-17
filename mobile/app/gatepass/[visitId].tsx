@@ -181,7 +181,7 @@ export default function GatePass() {
               <Text type={"semibold"} style={{
                 fontSize: 16,
                 color: visitor.verified ? colors.badges.green : colors.danger
-              }}>{visitor.verified ? "Verified Account" : "Not Verified"}</Text>
+              }}>{visitor.verified ? "Verified" : "Unverified"}</Text>
             </View>
             <View style={{
               flexDirection: 'row',
