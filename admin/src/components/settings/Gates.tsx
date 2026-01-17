@@ -179,10 +179,10 @@ export function Gates() {
         <CardContent>
           <div className="space-y-3">
             {data.length !== 0 ? data.map((gate, i) => (
-              <div key={i} className={`flex items-center justify-between p-4 border rounded-lg ${gate.status === 'online' ? 'bg-green-400/10 border-green-400/50' : ''}`}>
+              <div key={i} className={`flex items-center justify-between p-4 border rounded-lg ${gate.status === 'online' ? 'bg-green-400/10 border-green-200' : ''}`}>
                 <div>
-                  <p className="font-medium">{gate.name}</p>
-                  <p className="text-sm text-muted-foreground">Code: {gate.gate_id}</p>
+                  <p className={`font-medium ${gate.status === 'online' ? 'text-green-400' : ''}`}>{gate.name}</p>
+                  <p className="text-sm text-muted-foreground">{gate.gate_id}</p>
                   <div className="flex gap-3 mt-1">
                     <p className="text-xs text-muted-foreground capitalize">Type: {gate.type}</p>
                     <p className={`text-xs font-medium capitalize ${gate.status === 'online' ? 'text-green-600' : 'text-gray-500'}`}>
@@ -191,7 +191,6 @@ export function Gates() {
                   </div>
                 </div>
                 <div className="flex gap-2">
-                  <Button variant="outline" size="sm">Edit</Button>
                   <Button variant="ghost" size="icon" className="text-destructive">
                     <Trash2 className="w-4 h-4" />
                   </Button>

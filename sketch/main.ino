@@ -37,6 +37,7 @@ const char* password = "myorange32";
 /* ——————————————————————————————— */
 
 /* Server Authorization Configuration */
+const char* client_id     = "ESP-GATE-001";
 const char* SECRET_KEY = "79408c3e-6c50-4fb0-98cb-98db70596411";
 
 /* ——————————————————————————————— */
@@ -48,7 +49,6 @@ const char* mqtt_server   = "37638f32d99b49fa968d88c783e2b03a.s1.eu.hivemq.cloud
 const int   mqtt_port     = 8883;
 const char* mqtt_user     = "libyzxy0";
 const char* mqtt_password = "Libyzxy0@123_esp32";
-const char* client_id     = "ESP-GATE-001";
 
 String statusTopic = String("status/") + client_id;
 
@@ -332,26 +332,6 @@ bool scanQRCode(String &qrOut) {
     return false; 
 }
 
-void setup_time() {
-  configTime(28800, 0, ntpServer);
-  Serial.print("Waiting for NTP time sync: ");
-  time_t now = time(nullptr);
-  while (now < 24 * 3600) {
-    delay(100);
-    Serial.print("_");
-    now = time(nullptr);
-  }
-  Serial.println("\nTime synchronized.");
-}
-
-void getISOTime(char* buffer, size_t bufferSize) {
-  time_t now = time(nullptr);
-  struct tm timeinfo;
-  localtime_r(&now, &timeinfo);
-
-  strftime(buffer, bufferSize, "%Y-%m-%dT%H:%M:%S+08:00", &timeinfo);
-}
-
 void mqtt_callback(char* topic, byte* payload, unsigned int length) {
 
   if (length == 0 || payload == nullptr) {
@@ -435,15 +415,12 @@ void setup() {
   NotificationUtil::readyTone();
 
   connectWiFi();
-  setup_time();
   if(WiFi.status() == WL_CONNECTED) {
     NotificationUtil::readyTone();
   } else {
     NotificationUtil::errorTone();
   }
   Serial.println("WiFi and Time Ready");
-  char isoTime[40];
-  getISOTime(isoTime, sizeof(isoTime));
 
   secureClient.setCACert(ca_cert);
   mqtt.setServer(mqtt_server, mqtt_port);
@@ -455,8 +432,6 @@ void setup() {
   Serial.println("MQTT Connected!");
   Serial.println("Device Ready, See Configs:");
   Serial.println("[=========================]");
-  Serial.print("TIME: ");
-  Serial.println(isoTime);
   Serial.print("ENVIRONMENT: ");
   Serial.println(PRODUCTION ? "PRODUCTION" : "DEVELOPMENT");
   Serial.print("WIFI CRED: ");
@@ -510,6 +485,7 @@ void loop() {
     String payload = JsonUtil::create()
     .add("data", uid.c_str())
     .add("secret_key", SECRET_KEY)
+    .add("client_id", client_id)
     .toString();
     
     if (mqtt.publish(PRODUCTION ? "scan/rfid" : "dev/scan/rfid", payload.c_str())) {
@@ -530,6 +506,7 @@ void loop() {
     String payload = JsonUtil::create()
     .add("data", qr_data.c_str())
     .add("secret_key", SECRET_KEY)
+    .add("client_id", client_id)
     .toString();
     
     if (mqtt.publish(PRODUCTION ? "scan/qr" : "dev/scan/qr", payload.c_str())) {

@@ -127,7 +127,7 @@ class AdminService {
           eq(logs.type, 'guardian'),
         ));
 
-      const good = {
+      return {
         students: students.count || 0,
         pending_gatepass: gatepasses.count || 0,
         other_people: otherPeopleToday.count || 0,
@@ -136,9 +136,6 @@ class AdminService {
         staffs_today: staffToday.count || 0,
         people_today: allLogs.count || 0
       }
-      
-      console.log(good);
-      return good;
     } catch (error) {
       console.error(error);
       throw error;
