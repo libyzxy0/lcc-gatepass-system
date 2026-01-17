@@ -41,7 +41,6 @@ export function PendingGatepass() {
         <Table>
           <TableHeader>
             <TableRow className="font-bold">
-              <TableHead className="w-[10px]">No.</TableHead>
               <TableHead className="w-[100px]">Name</TableHead>
               <TableHead className="w-[20px]">Purpose</TableHead>
               <TableHead>Schedule</TableHead>
@@ -52,7 +51,6 @@ export function PendingGatepass() {
               <>
                 {(data.filter(gpass => gpass.status === 'pending')).slice(0, 5).map((gatepass, index) => (
                   <TableRow key={gatepass.id}>
-                    <TableCell>{index + 1}</TableCell>
                     <TableCell className="font-medium">{gatepass.visitor_fullname}</TableCell>
                     <TableCell className="text-wrap">{gatepass.purpose}</TableCell>
                     <TableCell>{gatepass.schedule_date && new Date(gatepass.schedule_date).toLocaleDateString('en-US', {

@@ -70,7 +70,7 @@ export function RecentLogs() {
                     <TableCell>
                       {toPHTime(item.time_out)}
                     </TableCell>
-                    <TableCell className="text-wrap capitalize">{typeBadges[item.type]}</TableCell>
+                    <TableCell>{typeBadges[item.type]}</TableCell>
                   </TableRow>
                 ))}
               </>
