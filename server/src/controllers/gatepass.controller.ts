@@ -14,6 +14,9 @@ interface TokenDecodedType {
 interface VisitorRequest extends Request {
   visitor?: TokenDecodedType;
 }
+interface AdminRequest extends Request {
+  admin?: TokenDecodedType;
+}
 
 class GatepassController {
   static async requestGatepass(req: VisitorRequest, res: Response) {
@@ -41,14 +44,13 @@ class GatepassController {
     }
   }
 
-  static async deleteGatepass(req: VisitorRequest, res: Response) {
+  static async deleteGatepass(req: Request, res: Response) {
     try {
       const { id } = req.params;
-      if(!req.visitor) return res.status(401).json({ error: 'Unauthorized access' })
       
       await GatepassService.deleteGatepass(id);
       
-      res.status(200).json({ message: "Your gatepass has been deleted succesfully!" })
+      res.status(200).json({ message: "QRCode Pass has been deleted succesfully!" })
     } catch (error) {
       res.status(500).json({
         error: error.message
@@ -66,20 +68,20 @@ class GatepassController {
     }
   }
   
-  static async approveGatepass(req: VisitorRequest, res: Response) {
+  static async approveGatepass(req: AdminRequest, res: Response) {
     const gatepassId = req.body.id;
     try {
-      if(!req.visitor) return res.status(401).json({ error: 'Unauthorized access' })
+      if(!req.admin) return res.status(401).json({ error: 'Unauthorized access' })
       const result = await GatepassService.approve(gatepassId);
       return res.json({message: 'Gatepass status successfully set to approve'});
     } catch (error) {
       res.status(error.status || 500).json({ error: error.message });
     }
   }
-  static async rejectGatepass(req: VisitorRequest, res: Response) {
+  static async rejectGatepass(req: AdminRequest, res: Response) {
     const gatepassId = req.body.id;
     try {
-      if(!req.visitor) return res.status(401).json({ error: 'Unauthorized access' })
+      if(!req.admin) return res.status(401).json({ error: 'Unauthorized access' })
       const result = await GatepassService.reject(gatepassId);
       return res.json({message: 'Gatepass status successfully set to rejected'});
     } catch (error) {

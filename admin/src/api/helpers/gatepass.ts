@@ -58,3 +58,18 @@ export const reject = async (id: string) => {
     }
   }
 }
+
+export const deletePass = async (id: string) => {
+  try {
+    const response = await api.delete(`/gatepass/delete/${id}`);
+    return {
+      success: true,
+      message: response.data.message
+    };
+  } catch (error: any) {
+    return {
+      success: false,
+      error: error.response ? error.response.data.error : 'An error occurred'
+    }
+  }
+}
