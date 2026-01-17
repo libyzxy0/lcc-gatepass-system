@@ -30,7 +30,9 @@ class GatepassController {
       })
 
     } catch (error) {
-      return res.status(500).json({ error: error });
+      res.status(error.status || 500).json({
+        error: error.message
+      })
     }
   }
 
@@ -40,7 +42,21 @@ class GatepassController {
 
       return res.status(200).json(allGatepass);
     } catch (error) {
-      return res.status(500).json({ error: error.message });
+      res.status(error.status || 500).json({
+        error: error.message
+      })
+    }
+  }
+  
+  static async getGatepass(req: Request, res: Response) {
+    try {
+      const gpass = await GatepassService.getGatepass(req.params.id);
+
+      return res.status(200).json(gpass);
+    } catch (error) {
+      res.status(error.status || 500).json({
+        error: error.message
+      })
     }
   }
 
@@ -52,13 +68,12 @@ class GatepassController {
       
       res.status(200).json({ message: "QRCode Pass has been deleted succesfully!" })
     } catch (error) {
-      res.status(500).json({
+      res.status(error.status || 500).json({
         error: error.message
       })
     }
   }
   
-  /* Gatepass Data Controllers */
   static async getAllGatepassData(req: Request, res: Response) {
     try {
     const allGatepass = await GatepassService.getAllGatepassData();

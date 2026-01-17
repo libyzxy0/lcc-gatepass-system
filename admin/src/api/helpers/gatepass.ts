@@ -19,12 +19,44 @@ type APIResGatepass = Gatepass & {
   visitor_firstname: string;
 }
 
+export type Visitor = {
+  id: string;
+  visitor_id: string;
+  firstname: string;
+  lastname: string;
+  middle_name: string;
+  address: string;
+  email: string;
+  phone_number: string;
+  verified: boolean;
+  activated: boolean;
+  valid_id_type: string;
+  valid_id_photo_url: string;
+  photo_url: string;
+  created_at: string;
+}
+
+type GatepassGetType = {
+  gatepass: Gatepass;
+  visitor: Visitor;
+}
+
 export const getAllGatepass = async (): Promise<APIResGatepass[]> => {
   try {
   const response = await api.get('/gatepass/all');
   return response.data;
   } catch (error: any) {
     if(error.status === 404) return [];
+    throw error;
+  }
+}
+
+export const getGatepass = async (id: string): Promise<GatepassGetType> => {
+  try {
+  const response = await api.get(`/gatepass/get/${id}`);
+  console.log(response.data)
+  return response.data;
+  } catch (error: any) {
     throw error;
   }
 }

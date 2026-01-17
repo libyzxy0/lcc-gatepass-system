@@ -6,7 +6,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Button } from '@/components/ui/button'
-import { Trash, Pencil, IdCard, Ellipsis, ThumbsUp, ThumbsDown } from 'lucide-react';
+import { Trash, IdCard, Ellipsis, ThumbsUp, ThumbsDown } from 'lucide-react';
 import { useQueryClient } from '@tanstack/react-query';
 import { approve, reject, deletePass } from '@/api/helpers/gatepass'
 import { toast } from "sonner"
@@ -19,6 +19,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle
 } from "@/components/ui/alert-dialog"
+import { ViewQRPassDialog } from '@/components/ViewQRPassDialog'
 
 type ActionType = 'approve' | 'reject';
 
@@ -26,6 +27,7 @@ export function GatepassTableAction({ id }: { id: string }) {
   const queryClient = useQueryClient();
   const [deleting, setDeleting] = useState(false);
   const [deleteModal, showDeleteModal] = useState(false);
+  const [viewModal, showViewModal] = useState(false);
   
   const handleApproveReject = async (action: ActionType) => {
 
@@ -57,6 +59,8 @@ export function GatepassTableAction({ id }: { id: string }) {
   
   return (
     <>
+    <ViewQRPassDialog id={id} open={viewModal} onOpenChange={showViewModal} />
+    
     <AlertDialog open={deleteModal} onOpenChange={showDeleteModal}>
         <AlertDialogContent>
           <AlertDialogHeader>
@@ -86,14 +90,9 @@ export function GatepassTableAction({ id }: { id: string }) {
           Reject
         </DropdownMenuItem>
 
-        <DropdownMenuItem>
+        <DropdownMenuItem onClick={() => showViewModal(true)}>
           <IdCard />
           View
-        </DropdownMenuItem>
-
-        <DropdownMenuItem>
-          <Pencil />
-          Edit
         </DropdownMenuItem>
 
         <DropdownMenuItem variant="destructive" onClick={() => showDeleteModal(true)}>

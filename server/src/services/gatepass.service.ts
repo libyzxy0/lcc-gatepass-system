@@ -56,6 +56,17 @@ class GatepassService {
       throw error;
     }
   }
+  static async getGatepass(id: string) {
+    try {
+      const [gpass] = await db.select().from(gatepass).where(eq(gatepass.id, id)).leftJoin(visitor, eq(visitor.id, gatepass.visitor_id));
+
+      if (!gpass) throw new NotFoundError('No qrpass with that ID exists!');
+
+      return gpass;
+    } catch (error) {
+      throw error;
+    }
+  }
   static async deleteGatepass(id: string) {
     try {
       const [gatepassData] = await db.select().from(gatepass).where(eq(gatepass.id, id));
