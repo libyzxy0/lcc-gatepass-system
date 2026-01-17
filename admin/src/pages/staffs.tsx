@@ -16,6 +16,7 @@ import {
   SelectContent,
   SelectValue
 } from '@/components/ui/select'
+import { Badge } from "@/components/ui/badge"
 
 interface Staff {
   id: string;
@@ -30,6 +31,14 @@ interface Staff {
   email: string;
   created_at: string;
 };
+
+const typeBadges = {
+  faculty: <Badge variant="default" className="bg-blue-400/20 border-blue-400/50 text-blue-400">Faculty</Badge>,
+  guard: <Badge variant="default" className="bg-red-400/20 border-red-400/50 text-red-400">Security</Badge>,
+  administrator: <Badge variant="default" className="bg-green-400/20 border-green-400/50 text-green-400">Admin</Badge>,
+  canteen_vendors: <Badge variant="default" className="bg-yellow-400/20 border-yellow-400/50 text-yellow-400">Vendors</Badge>,
+  other: <Badge variant="default" className="bg-gray-400/20 border-gray-400/50 text-gray-400">Other</Badge>,
+}
 
 export default function Staff() {
   const { isPending, error, data, refetch } = useQuery({
@@ -78,18 +87,24 @@ export default function Staff() {
     {
       accessorKey: "middle_name",
       header: "Middle Name",
-      cell: info => info.getValue<string | null>() ?? "N/A"
+      cell: info => {
+        const value = info.getValue<string | null>() ?? "N/A"
+        return !!value ? value : 'N/A'
+      }
     },
-    {
-      accessorKey: "staff_type",
-      header: "Type",
-      cell: info => info.getValue<string | null>() ?? "N/A"
-    },
-    { accessorKey: "phone_number", header: "Level" },
+    { accessorKey: "phone_number", header: "Phone" },
     {
       accessorKey: "email",
       header: "Email",
       cell: info => <div className="text-wrap">{info.getValue<string | null>() ?? "N/A"}</div>
+    },
+    {
+      accessorKey: "staff_type",
+      header: "Type",
+      cell: info => {
+        const value = info.getValue<'faculty' | 'guard' | 'administrator' | 'canteen_vendors' | 'other'>();
+        return value ? typeBadges[value] : 'N/A'
+      }
     },
     { accessorKey: "rfid_code", header: "RFID CODE" },
     {
@@ -101,7 +116,7 @@ export default function Staff() {
   return (
     <div>
       <header className="mb-8">
-        <h1 className="font-semibold text-2xl">Staff</h1>
+        <h1 className="font-semibold text-2xl">Staffs</h1>
       </header>
       <MyTable
         emptyMessage="No staffs data yet."
@@ -126,7 +141,7 @@ export default function Staff() {
                 <SelectContent>
                   <SelectItem value={'all'}>All</SelectItem>
                   <SelectItem value="faculty">Faculty</SelectItem>
-                  <SelectItem value="guard">Guard/Security</SelectItem>
+                  <SelectItem value="guard">Security</SelectItem>
                   <SelectItem value="administrator">Administrator</SelectItem>
                   <SelectItem value="canteen_vendors">Canteen Vendors</SelectItem>
                   <SelectItem value="other">Other</SelectItem>
@@ -134,7 +149,7 @@ export default function Staff() {
               </Select>
             </div>
 
-            <div className="hidden md:grid grid-cols-2 gap-2">
+            <div className="hidden md:grid grid-cols-2">
               <Button variant={'outline'}>
                 <Download />
                 Download CSV
