@@ -180,6 +180,7 @@ class JsonUtil {
     return doc[key].as < float > ();
   }
 };
+
 class NotificationUtil {
   public:
   static void successTone () {
@@ -221,22 +222,53 @@ class NotificationUtil {
   }
 };
 
+class GateUtil {
+  public:
+  static void openEntryGate() {
+    digitalWrite(RELAY_PIN_MAIN, LOW);
+    digitalWrite(RELAY_PIN_SEC, HIGH);
+  }
+  static void openExitGate() {
+    digitalWrite(RELAY_PIN_MAIN, HIGH);
+    digitalWrite(RELAY_PIN_SEC, LOW);
+  }
+  static void closeGate() {
+    digitalWrite(RELAY_PIN_MAIN, HIGH);
+    digitalWrite(RELAY_PIN_SEC, HIGH);
+  }
+};
+
 /* ——————————————————————————————— */
 
 /* Setup Functions */
 void connectWiFi() {
+  const int maxRetries = 5;
+  int retryCount = 0;
+
   WiFi.begin(ssid, password);
-  Serial.println("Connecting to WiFi");
-  Serial.print("Cred: ");
+
+  Serial.println("Connecting to WiFi...");
+  Serial.print("CREDENTIALS: ");
   Serial.print(ssid);
   Serial.print(":");
   Serial.println(password);
+
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
     Serial.print(".");
+    retryCount++;
+
+    if (retryCount >= maxRetries) {
+      Serial.println("\nFailed to connect after 5 attempts. Restarting...");
+      NotificationUtil::errorTone();
+      NotificationUtil::errorTone();
+      delay(2000);
+      ESP.restart();
+    }
   }
 
-  Serial.println("\nWiFi connected");
+  Serial.println("\nWiFi connected!");
+  NotificationUtil::readyTone();
 }
 
 void connectMQTT() {
@@ -280,6 +312,7 @@ void connectMQTT() {
       Serial.print("failed, rc=");
       Serial.print(mqtt.state());
       Serial.println(" retrying in 5 seconds");
+      NotificationUtil::errorTone();
       NotificationUtil::errorTone();
       delay(5000);
     }
@@ -346,25 +379,18 @@ void mqtt_callback(char* topic, byte* payload, unsigned int length) {
     message += (char)payload[i];
   }
 
-  Serial.print("MQTT [");
-  Serial.print(topic);
-  Serial.print("]: ");
-  Serial.println(message);
-
-  if (!message.startsWith("{") || !message.endsWith("}")) {
-    Serial.println("MQTT: Invalid JSON format");
-    NotificationUtil::errorTone();
-    NotificationUtil::errorTone();
-    NotificationUtil::errorTone();
-    return;
-  }
+  if (!message.startsWith("{") || !message.endsWith("}")) return;
   
   String status = JsonUtil::getString(message, "status");
   String entry = JsonUtil::getString(message, "entry");
   String name = JsonUtil::getString(message, "name");
   
   if (status.length() == 0) {
-    Serial.println("MQTT: Missing Status, ignoring command");
+    SCANNING = false;
+    return;
+  }
+  
+  if (entry.length() == 0) {
     SCANNING = false;
     return;
   }
@@ -372,26 +398,22 @@ void mqtt_callback(char* topic, byte* payload, unsigned int length) {
   Serial.println(name);
 
   if (status == "ok") {
-    Serial.println("Access GRANTED → Gate unlocked");
+    Serial.println("Access GRANTED");
     if(entry == "IN") {
-      digitalWrite(RELAY_PIN_MAIN, LOW);
-      digitalWrite(RELAY_PIN_SEC, HIGH);
+      GateUtil::openEntryGate();
       NotificationUtil::successTone();
-      Serial.println("Access IN GRANTED → Gate opened");
+      Serial.println("Access IN → Gate opened");
     } else if(entry == "OUT") {
-      digitalWrite(RELAY_PIN_MAIN, HIGH);
-      digitalWrite(RELAY_PIN_SEC, LOW);
+      GateUtil::openExitGate();
       NotificationUtil::successTone();
-      Serial.println("Access OUT GRANTED → Gate opened");
+      Serial.println("Access OUT → Gate opened");
     } else {
-      digitalWrite(RELAY_PIN_MAIN, HIGH);
-      digitalWrite(RELAY_PIN_SEC, HIGH);
+      GateUtil::closeGate();
       NotificationUtil::errorTone();
     }
   } else {
-    Serial.println("Access DENIED → Gate locked");
-    digitalWrite(RELAY_PIN_MAIN, HIGH);
-    digitalWrite(RELAY_PIN_SEC, HIGH);
+    Serial.println("Access DENIED");
+    GateUtil::closeGate();
     NotificationUtil::errorTone();
   }
   SCANNING = false;
@@ -411,16 +433,10 @@ void setup() {
   digitalWrite(BUZZER_PIN, LOW);
   digitalWrite(RELAY_PIN_MAIN, HIGH);
   digitalWrite(RELAY_PIN_SEC, HIGH);
-  Serial.println("Peripherals Ready");
+  Serial.println("PERIPHERALS ARE READY");
   NotificationUtil::readyTone();
 
   connectWiFi();
-  if(WiFi.status() == WL_CONNECTED) {
-    NotificationUtil::readyTone();
-  } else {
-    NotificationUtil::errorTone();
-  }
-  Serial.println("WiFi and Time Ready");
 
   secureClient.setCACert(ca_cert);
   mqtt.setServer(mqtt_server, mqtt_port);
@@ -429,33 +445,24 @@ void setup() {
   
   connectMQTT();
   resubscribeTopics();
-  Serial.println("MQTT Connected!");
+  Serial.println();
   Serial.println("Device Ready, See Configs:");
   Serial.println("[=========================]");
   Serial.print("ENVIRONMENT: ");
   Serial.println(PRODUCTION ? "PRODUCTION" : "DEVELOPMENT");
   Serial.print("WIFI CRED: ");
   Serial.println(String(ssid) + ":" + String(password));
+  Serial.print("CLIENT ID: ");
+  Serial.println(client_id);
   Serial.print("SECRET KEY: ");
   Serial.println(SECRET_KEY);
   
   Serial.println("[=========================]");
+  Serial.println();
   NotificationUtil::initializedTone();
 }
 
-/* ——————————————————————————————— */
-
-/* Main Functions */
-void loop() {
-  if (!mqtt.connected()) {
-    connectMQTT();
-  }
-  
-  if(digitalRead(LOCK_SENSOR_RST) == LOW) {
-    digitalWrite(RELAY_PIN_MAIN, HIGH);
-    digitalWrite(RELAY_PIN_SEC, HIGH);
-  }
-  
+void handleSerialCommands() {
   if (Serial.available() > 0) {
     String command = Serial.readStringUntil('\n');
     
@@ -473,8 +480,22 @@ void loop() {
       NotificationUtil::initializedTone();
     }
   }
-  
+}
+
+/* ——————————————————————————————— */
+
+/* Main Functions */
+void loop() {
+  if (!mqtt.connected()) {
+    connectMQTT();
+  }
   mqtt.loop();
+  
+  if(digitalRead(LOCK_SENSOR_RST) == LOW) {
+    GateUtil::closeGate();
+  }
+  
+  handleSerialCommands();
   
   String uid;
   if (scanRfid(uid) && !SCANNING) {
@@ -489,10 +510,8 @@ void loop() {
     .toString();
     
     if (mqtt.publish(PRODUCTION ? "scan/rfid" : "dev/scan/rfid", payload.c_str())) {
-      Serial.println("Message published successfully");
       NotificationUtil::readyTone();
     } else {
-      Serial.println("Message publish FAILED");
       NotificationUtil::errorTone();
     }
   }
@@ -510,10 +529,8 @@ void loop() {
     .toString();
     
     if (mqtt.publish(PRODUCTION ? "scan/qr" : "dev/scan/qr", payload.c_str())) {
-      Serial.println("Message published successfully");
       NotificationUtil::readyTone();
     } else {
-      Serial.println("Message publish FAILED");
       NotificationUtil::errorTone();
     }
   }
