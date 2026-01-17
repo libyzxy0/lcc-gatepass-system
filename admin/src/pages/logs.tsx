@@ -96,16 +96,16 @@ export default function Logs() {
       accessorKey: "entry_type",
       header: "Entry Type",
       cell: (info) => {
-        const value = info.getValue<string | null>() ?? null;
-        return entryTypeBadges[value]
+        const value = info.getValue<'rfid' | 'qr'>();
+        return value ? entryTypeBadges[value] : 'N/A'
       }
     },
     {
       accessorKey: "type",
       header: "Type",
       cell: (info) => {
-        const value = info.getValue<string | null>() ?? null;
-        return typeBadges[value];
+        const value = info.getValue<'student' | 'visitor' | 'staff' | 'guardian'>();
+        return value ? typeBadges[value] : 'N/A'
       }
     },
     {
