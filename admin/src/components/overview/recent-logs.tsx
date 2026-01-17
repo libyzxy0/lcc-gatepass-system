@@ -36,7 +36,7 @@ export function RecentLogs() {
     <CardHeader className="relative flex items-center">
         <CardTitle>Recent Logs</CardTitle>
         <Link to="/dashboard/logs" className="absolute right-5 text-sm text-gray-400">
-          See All
+          See all
         </Link>
       </CardHeader>
       <CardContent>

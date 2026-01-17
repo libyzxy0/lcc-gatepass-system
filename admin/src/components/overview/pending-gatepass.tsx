@@ -34,7 +34,7 @@ export function PendingGatepass() {
       <CardHeader className="relative flex items-center">
         <CardTitle>Pending QRPass</CardTitle>
         <Link to="/dashboard/gatepass" className="absolute right-5 text-sm text-gray-400">
-          See All
+          See all
         </Link>
       </CardHeader>
       <CardContent>
