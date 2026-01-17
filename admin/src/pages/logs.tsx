@@ -16,6 +16,7 @@ import { getAllLogs } from '@/api/helpers/logs'
 import { useQuery } from '@tanstack/react-query'
 import { toPHTime } from '@/utils/convert-time'
 import { LogsTableActions } from '@/components/LogsTableAction';
+import { Badge } from "@/components/ui/badge"
 
 type LogsType = {
   id: string;
@@ -28,6 +29,18 @@ type LogsType = {
   entry_type: 'qr' | 'rfid';
   created_at: string;
 };
+
+const typeBadges = {
+  student: <Badge variant="default" className="bg-blue-400/20 border-blue-400/50 text-blue-400">Student</Badge>,
+  visitor: <Badge variant="default" className="bg-orange-400/20 border-orange-400/50 text-orange-400">Visitor</Badge>,
+  staff: <Badge variant="default" className="bg-green-400/20 border-green-400/50 text-green-400">Staff</Badge>,
+  guardian: <Badge variant="default" className="bg-yellow-400/20 border-yellow-400/50 text-yellow-400">Guardian</Badge>,
+}
+
+const entryTypeBadges = {
+  rfid: <Badge variant="default" className="bg-sky-400/20 border-sky-400/50 text-sky-400">RFID</Badge>,
+  qr: <Badge variant="default" className="bg-pink-400/20 border-pink-400/50 text-pink-400">QRC</Badge>,
+}
 
 export default function Logs() {
   const [search, setSearch] = useState("")
@@ -42,14 +55,6 @@ export default function Logs() {
     {
       accessorKey: "name",
       header: "Name",
-    },
-    {
-      accessorKey: "entry_type",
-      header: "Entry Type",
-      cell: (info) => {
-        const value = info.getValue<string | null>() ?? null;
-        return value?.toLocaleUpperCase();
-      }
     },
     {
       accessorKey: "time_in",
@@ -88,11 +93,19 @@ export default function Logs() {
       }
     },
     {
+      accessorKey: "entry_type",
+      header: "Entry Type",
+      cell: (info) => {
+        const value = info.getValue<string | null>() ?? null;
+        return entryTypeBadges[value]
+      }
+    },
+    {
       accessorKey: "type",
       header: "Type",
       cell: (info) => {
         const value = info.getValue<string | null>() ?? null;
-        return value?.toLocaleUpperCase();
+        return typeBadges[value];
       }
     },
     {

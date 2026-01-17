@@ -179,7 +179,7 @@ export function Gates() {
         <CardContent>
           <div className="space-y-3">
             {data.length !== 0 ? data.map((gate, i) => (
-              <div key={i} className="flex items-center justify-between p-4 border rounded-lg">
+              <div key={i} className={`flex items-center justify-between p-4 border rounded-lg ${gate.status === 'online' ? 'bg-green-400/10 border-green-400/50' : ''}`}>
                 <div>
                   <p className="font-medium">{gate.name}</p>
                   <p className="text-sm text-muted-foreground">Code: {gate.gate_id}</p>
