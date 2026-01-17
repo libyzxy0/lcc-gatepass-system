@@ -96,7 +96,7 @@ export default function Logs() {
       accessorKey: "entry_type",
       header: "Entry Type",
       cell: (info) => {
-        const value = info.getValue<string | null>() ?? null;
+        const value = info.getValue<'rfid' | 'qr'>();
         return entryTypeBadges[value]
       }
     },
@@ -104,7 +104,7 @@ export default function Logs() {
       accessorKey: "type",
       header: "Type",
       cell: (info) => {
-        const value = info.getValue<string | null>() ?? null;
+        const value = info.getValue<'student' | 'visitor' | 'staff' | 'guardian'>();
         return typeBadges[value];
       }
     },
