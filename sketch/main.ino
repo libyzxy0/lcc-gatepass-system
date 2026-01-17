@@ -17,8 +17,8 @@
 
 #define BUZZER_PIN 4
 
-#define RELAY_PIN_MAIN 27
-#define RELAY_PIN_SEC 26
+#define RELAY_PIN_MAIN 34
+#define RELAY_PIN_SEC 35
 #define LOCK_SENSOR_RST 33
 
 /* Choose which server to communicate with, production(true) or development(false) */
@@ -396,17 +396,14 @@ void mqtt_callback(char* topic, byte* payload, unsigned int length) {
     if(entry == "IN") {
       digitalWrite(RELAY_PIN_MAIN, LOW);
       digitalWrite(RELAY_PIN_SEC, HIGH);
-      NotificationUtil::successTone();
       Serial.println("Access IN GRANTED → Gate opened");
     } else if(entry == "OUT") {
       digitalWrite(RELAY_PIN_MAIN, HIGH);
       digitalWrite(RELAY_PIN_SEC, LOW);
-      NotificationUtil::successTone();
       Serial.println("Access OUT GRANTED → Gate opened");
     } else {
       digitalWrite(RELAY_PIN_MAIN, HIGH);
       digitalWrite(RELAY_PIN_SEC, HIGH);
-      NotificationUtil::errorTone();
     }
   } else {
     Serial.println("Access DENIED → Gate locked");
@@ -478,7 +475,7 @@ void loop() {
   
   if(digitalRead(LOCK_SENSOR_RST) == LOW) {
     digitalWrite(RELAY_PIN_MAIN, HIGH);
-    digitalWrite(RELAY_PIN_SEC, HIGH);
+    digitalWrite(RELAY_PIN_MAIN, HIGH);
   }
   
   if (Serial.available() > 0) {
