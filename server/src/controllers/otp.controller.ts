@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { sendSMSOTP } from '@/sms-api/otp'
+import { sendEmailOTP } from '@/mailer/otp'
 import OTPService from '@/services/otp.service'
 
 class OTPController {
@@ -11,6 +12,7 @@ class OTPController {
       console.log(vst, code);
         
         /* Send SMS OTP via Iprog SMS API */
+      await sendEmailOTP(vst.email, code, vst.id);
       await sendSMSOTP(vst.phone_number, code, vst.id);
 
       return res.status(200).json({
