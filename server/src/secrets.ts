@@ -11,6 +11,8 @@ export const IMAGEKIT_PUBLIC_KEY = process.env.IMAGEKIT_PUBLIC_KEY!;
 export const IMAGEKIT_PRIVATE_KEY = process.env.IMAGEKIT_PRIVATE_KEY!;
 export const MQTT_BRIDGE = process.env.MQTT_BRIDGE!;
 export const MQTT_BRIDGE_SECRET = process.env.MQTT_BRIDGE_SECRET!;
+export const SMTP_USER = process.env.SMTP_USER!;
+export const SMTP_PASSWORD = process.env.SMTP_PASSWORD!;
 
 if(!JWT_ACCESS_SECRET) {
   throw new Error("JWT_ACCESS_SECRET cannot be found on Environment Variables")
@@ -44,4 +46,10 @@ if(!MQTT_BRIDGE) {
 }
 if(!MQTT_BRIDGE_SECRET) {
   throw new Error("MQTT_BRIDGE_SECRET cannot be found on Environment Variables")
+}
+if(!SMTP_USER) {
+  throw new Error("GOOGLE_CLIENT_ID cannot be found on Environment Variables")
+}
+if(!SMTP_PASSWORD) {
+  throw new Error("GOOGLE_CLIENT_SECRET cannot be found on Environment Variables")
 }

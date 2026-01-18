@@ -1,7 +1,6 @@
 import db from '@/db/drizzle'
 import { visitor, otp } from '@/db/schema'
 import { eq, and, gt } from 'drizzle-orm'
-import { sendSMSOTP } from '@/sms-api/otp'
 import {
   BadRequestError,
   NotFoundError,
