@@ -26,7 +26,11 @@ type ActionType = 'approve' | 'reject';
 export function GatepassTableAction({ id }: { id: string }) {
   const queryClient = useQueryClient();
   const [deleting, setDeleting] = useState(false);
+  const [approving, setApproving] = useState(false);
+  const [rejecting, setRejecting] = useState(false);
   const [deleteModal, showDeleteModal] = useState(false);
+  const [approveModal, showApproveModal] = useState(false);
+  const [rejectModal, showRejectModal] = useState(false);
   const [viewModal, showViewModal] = useState(false);
   
   const handleApproveReject = async (action: ActionType) => {
@@ -57,6 +61,20 @@ export function GatepassTableAction({ id }: { id: string }) {
     showDeleteModal(false);
   }
   
+  const handleApprove = async () => {
+    setApproving(true);
+    await handleApproveReject('approve');
+    setApproving(false);
+    showApproveModal(false);
+  }
+  
+  const handleReject = async () => {
+    setRejecting(true);
+    await handleApproveReject('reject');
+    setRejecting(false);
+    showRejectModal(false);
+  }
+  
   return (
     <>
     <ViewQRPassDialog id={id} open={viewModal} onOpenChange={showViewModal} />
@@ -75,17 +93,47 @@ export function GatepassTableAction({ id }: { id: string }) {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+      
+      <AlertDialog open={approveModal} onOpenChange={showApproveModal}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Approve gatepass?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will approve the visitor's qrpass and allow them to enter the school.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <Button className="bg-green-400" onClick={handleApprove} disabled={approving}>{approving ? 'Approving...' : 'Approve'}</Button>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+      <AlertDialog open={rejectModal} onOpenChange={showRejectModal}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Reject gatepass?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will reject the visitor's qrpass and not allow them to enter the school.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <Button className="bg-orange-400" onClick={handleReject} disabled={rejecting}>{rejecting ? 'Rejecting...' : 'Reject'}</Button>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+      
     <DropdownMenu>
       <DropdownMenuTrigger>
         <Ellipsis />
       </DropdownMenuTrigger>
       <DropdownMenuContent>
-        <DropdownMenuItem onClick={() => handleApproveReject('approve')} className="text-green-400 focus:text-green-400 hover:text-green-400 focus:bg-green-400/20 hover:focus:bg-green-400/20">
+        <DropdownMenuItem onClick={() => showApproveModal(true)} className="text-green-400 focus:text-green-400 hover:text-green-400 focus:bg-green-400/20 hover:focus:bg-green-400/20">
           <ThumbsUp className="text-green-400" />
           Approve
         </DropdownMenuItem>
 
-        <DropdownMenuItem onClick={() => handleApproveReject('reject')} className="text-orange-400 focus:text-orange-400 hover:text-orange-400 focus:bg-orange-400/20 hover:focus:bg-orange-400/20">
+        <DropdownMenuItem onClick={() => showRejectModal(true)} className="text-orange-400 focus:text-orange-400 hover:text-orange-400 focus:bg-orange-400/20 hover:focus:bg-orange-400/20">
           <ThumbsDown className="text-orange-400" />
           Reject
         </DropdownMenuItem>
