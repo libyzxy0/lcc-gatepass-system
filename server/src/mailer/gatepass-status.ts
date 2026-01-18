@@ -25,8 +25,13 @@ const colors = {
   reject: '#db561a',
   expire: '#db1a1a',
 }
+const note = {
+  approve: 'You can now use your QRCode gatepass to enter or exit within La Concepcion College premises.',
+  reject: "Sorry, we can't approve your gatepass request for now, please contact us for more information why we do this.",
+  expire: "Your gatepass has been expired, you are not able to use this now to enter or exit within La Concepcion College premises."
+}
 
-const mailGatepassStatus = async ({
+export const sendGatepassStatus = async ({
   email, 
   status,
   purpose,
@@ -75,7 +80,7 @@ const mailGatepassStatus = async ({
             </tr>
             <tr>
               <td style="font-size:14px; color:#555; text-align:center; padding:0 30px 20px;">
-                You can now use your QRCode gatepass to enter or exit within La Concepcion College premises.
+                ${note[status]}
               </td>
             </tr>
             <tr>
@@ -100,7 +105,7 @@ const mailGatepassStatus = async ({
 
 /*
 (async () => {
-  const data = await mailGatepassStatus({
+  const data = await sendGatepassStatus({
     email: 'dacallosaieshajadenj@gmail.com',
     status: 'approve',
     purpose: 'Testing Gatepass',

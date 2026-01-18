@@ -7,8 +7,10 @@ import {
   NotFoundError
 } from '@/errors'
 import AuthService from '@/services/auth.service'
+import { sendGatepassStatus } from '@/mailer/gatepass-status';
 
 type Gatepass = typeof gatepass.$inferSelect;
+type Visitor = typeof visitor.$inferSelect;
 
 class GatepassService {
   static async createGatepass({
@@ -56,7 +58,7 @@ class GatepassService {
       throw error;
     }
   }
-  static async getGatepass(id: string) {
+  static async getGatepass(id: string): Promise<{ visitor: Visitor, gatepass: Gatepass }> {
     try {
       const [gpass] = await db.select().from(gatepass).where(eq(gatepass.id, id)).leftJoin(visitor, eq(visitor.id, gatepass.visitor_id));
 
@@ -88,7 +90,7 @@ class GatepassService {
   static async getAllGatepassData() {
     try {
       const allGatepass = await db.select().from(gatepass).leftJoin(visitor, eq(visitor.id, gatepass.visitor_id));
-      
+
       if (allGatepass.length === 0) throw new NotFoundError("No gatepass data yet.")
 
       return allGatepass.map((gpass) => {
@@ -105,9 +107,21 @@ class GatepassService {
       throw error;
     }
   }
+
   static async approve(id: string) {
     try {
-      const result = await db.update(gatepass).set({ status: 'approved' }).where(eq(gatepass.id, id));
+      const [result] = await db.update(gatepass).set({ status: 'approved' }).where(eq(gatepass.id, id)).returning({
+        id: gatepass.id
+      });
+
+      const gpassData = await this.getGatepass(result.id);
+      await sendGatepassStatus({
+        email: gpassData.visitor.email,
+        status: 'approve',
+        purpose: gpassData.gatepass.purpose,
+        description: gpassData.gatepass.description
+      })
+
       return result;
     } catch (error) {
       throw error;
@@ -115,7 +129,16 @@ class GatepassService {
   }
   static async reject(id: string) {
     try {
-      const result = await db.update(gatepass).set({ status: 'rejected' }).where(eq(gatepass.id, id));
+      const [result] = await db.update(gatepass).set({ status: 'rejected' }).where(eq(gatepass.id, id)).returning({
+        id: gatepass.id
+      });
+      const gpassData = await this.getGatepass(result.id);
+      await sendGatepassStatus({
+        email: gpassData.visitor.email,
+        status: 'reject',
+        purpose: gpassData.gatepass.purpose,
+        description: gpassData.gatepass.description
+      })
       return result;
     } catch (error) {
       throw error;
