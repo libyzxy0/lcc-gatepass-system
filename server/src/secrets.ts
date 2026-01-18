@@ -48,8 +48,8 @@ if(!MQTT_BRIDGE_SECRET) {
   throw new Error("MQTT_BRIDGE_SECRET cannot be found on Environment Variables")
 }
 if(!SMTP_USER) {
-  throw new Error("GOOGLE_CLIENT_ID cannot be found on Environment Variables")
+  throw new Error("SMTP_USER cannot be found on Environment Variables")
 }
 if(!SMTP_PASSWORD) {
-  throw new Error("GOOGLE_CLIENT_SECRET cannot be found on Environment Variables")
+  throw new Error("SMTP_PASSWORD cannot be found on Environment Variables")
 }
