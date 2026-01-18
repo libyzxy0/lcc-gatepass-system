@@ -18,7 +18,7 @@ class OTPservice {
   static async getVisitorWithPhone(phone_number: string) {
     try {
       const [vst] = await db
-        .select({ id: visitor.id, phone_number: visitor.phone_number })
+        .select({ id: visitor.id, phone_number: visitor.phone_number, email: visitor.email })
         .from(visitor)
         .where(eq(visitor.phone_number, phone_number));
       if (!vst) throw new NotFoundError('Cannot send otp to that phone number!');
