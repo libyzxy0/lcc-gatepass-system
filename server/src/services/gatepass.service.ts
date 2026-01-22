@@ -1,5 +1,5 @@
 import db from '@/db/drizzle'
-import { gatepass, visitor } from '@/db/schema'
+import { gatepass, visitor, student } from '@/db/schema'
 import { eq, desc } from 'drizzle-orm'
 import {
   BadRequestError,
@@ -14,6 +14,7 @@ type Visitor = typeof visitor.$inferSelect;
 
 class GatepassService {
   static async createGatepass({
+    student_pass_secret,
     visitor_id,
     purpose,
     description,
@@ -21,28 +22,62 @@ class GatepassService {
     vehicle
   }) {
     try {
-      const [gatepassData] = await db.insert(gatepass).values({
-        visitor_id,
-        purpose,
-        description,
-        schedule_date,
-        vehicle_type: vehicle ? vehicle.type : null,
-        vehicle_plate: vehicle ? vehicle.plate_number : null
-      }).returning({
-        id: gatepass.id
-      });
 
-      if (!gatepassData) throw new BadRequestError('Unable to create gatepass!');
+      if (student_pass_secret) {
+        const [studentData] = await db.select().from(student).where(eq(student.enrollment_secret, student_pass_secret));
+        if (!studentData) throw new UnauthorizedError('Invalid QRKey key!');
 
-      const qr_token = AuthService.generateQRToken(gatepassData.id);
+        const [gatepassData] = await db.insert(gatepass).values({
+          student_pass: !!student_pass_secret,
+          visitor_id,
+          purpose,
+          description,
+          schedule_date,
+          vehicle_type: vehicle ? vehicle.type : null,
+          vehicle_plate: vehicle ? vehicle.plate_number : null,
+          status: 'approved'
+        }).returning({
+          id: gatepass.id
+        });
 
-      const [gatePassWithToken] = await db.update(gatepass).set({
-        qr_token
-      }).where(eq(gatepass.id, gatepassData.id)).returning({
-        id: gatepass.id
-      });
+        if (!gatepassData) throw new BadRequestError('Unable to create gatepass!');
 
-      return gatePassWithToken;
+        const qr_token = AuthService.generateQRToken(gatepassData.id);
+
+        const [gatePassWithToken] = await db.update(gatepass).set({
+          qr_token
+        }).where(eq(gatepass.id, gatepassData.id)).returning({
+          id: gatepass.id
+        });
+
+        return gatePassWithToken;
+      } else {
+        const [gatepassData] = await db.insert(gatepass).values({
+          student_pass: !!student_pass_secret,
+          visitor_id,
+          purpose,
+          description,
+          schedule_date,
+          vehicle_type: vehicle ? vehicle.type : null,
+          vehicle_plate: vehicle ? vehicle.plate_number : null,
+
+        }).returning({
+          id: gatepass.id
+        });
+
+        if (!gatepassData) throw new BadRequestError('Unable to create gatepass!');
+
+        const qr_token = AuthService.generateQRToken(gatepassData.id);
+
+        const [gatePassWithToken] = await db.update(gatepass).set({
+          qr_token
+        }).where(eq(gatepass.id, gatepassData.id)).returning({
+          id: gatepass.id
+        });
+
+        return gatePassWithToken;
+      }
+
     } catch (error) {
       throw error;
     }

@@ -57,6 +57,7 @@ export function ViewStudentDialog({ id, open, onOpenChange }: ViewStudentDialogT
                 })}
               </p>
               <p className="text-sm font-medium text-gray-900">Student ID: {data.student_id}</p>
+              <p className="text-sm font-medium text-gray-900">Student QRKey: {data.enrollment_secret}</p>
             </div>
           </div>
           

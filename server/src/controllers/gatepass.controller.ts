@@ -21,9 +21,9 @@ interface AdminRequest extends Request {
 class GatepassController {
   static async requestGatepass(req: VisitorRequest, res: Response) {
     try {
-      const { purpose, description, schedule_date, vehicle } = req.body;
+      const { student_pass_secret, purpose, description, schedule_date, vehicle } = req.body;
 
-     await GatepassService.createGatepass({ visitor_id: req.visitor.id, purpose, description, schedule_date, vehicle });
+     await GatepassService.createGatepass({ student_pass_secret, visitor_id: req.visitor.id, purpose, description, schedule_date, vehicle });
 
       return res.status(200).json({
         message: 'Gatepass request has been sent to Administrators!'

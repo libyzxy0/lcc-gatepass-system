@@ -4,9 +4,12 @@ import StudentService from '@/services/student.service'
 class StudentController {
   static async create(req: Request, res: Response) {
     try {
-      await StudentService.create(req.body);
+      const enrollmentSecret = await StudentService.create(req.body);
+      console.log(enrollmentSecret);
+      
       res.status(200).json({
-        message: "Student added successfully"
+        message: "Student added successfully",
+        enrollment_secret: enrollmentSecret
       })
     } catch (error) {
       res.status(error.status || 500).json({

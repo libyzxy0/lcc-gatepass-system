@@ -22,7 +22,7 @@
 #define LOCK_SENSOR_RST 33
 
 /* Choose which server to communicate with, production(true) or development(false) */
-bool PRODUCTION = true;
+bool PRODUCTION = false;
 
 /* ——————————————————————————————— */
 

@@ -10,6 +10,7 @@ import {
 export const student = pgTable("student", {
   id: uuid("id").primaryKey().defaultRandom(),
   student_id: text("student_id").notNull().unique(),
+  enrollment_secret: text('enrollment_secret').unique().notNull(),
   firstname: text("firstname").notNull(),
   lastname: text("lastname").notNull(),
   middle_name: text("middle_name"),

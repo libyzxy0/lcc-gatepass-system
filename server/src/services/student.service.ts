@@ -37,8 +37,9 @@ class StudentService {
         grade_level,
         address,
         rfid_code,
-        photo_url
-      }).returning({ id: student.id });
+        photo_url,
+        enrollment_secret: crypto.randomUUID().slice(0, 6).toUpperCase()
+      }).returning({ id: student.id, enrollment_secret: student.enrollment_secret });
 
       if (!newStudent) throw new BadRequestError('Failed to create student!');
 
@@ -56,7 +57,7 @@ class StudentService {
 
       if (!newGuardian) throw new BadRequestError('Failed to create student!');
 
-      return newStudent;
+      return  newStudent.enrollment_secret;
     } catch (error) {
       throw error;
     }

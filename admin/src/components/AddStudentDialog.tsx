@@ -105,6 +105,8 @@ export function AddStudentDialog({ children, onCreate }: { children: React.React
       setLoading(false);
       return;
     }
+    
+    alert("Student QRKey: " + data.enrollment_secret);
 
     toast.success(data.message);
     resetForm(false);

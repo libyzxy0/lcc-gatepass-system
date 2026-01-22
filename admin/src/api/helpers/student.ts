@@ -14,6 +14,7 @@ interface Student {
   photo_url: string;
   address: string;
   created_at: string;
+  enrollment_secret?: string;
 };
 
 type Guardian = {
@@ -36,12 +37,14 @@ type StudentWGuardian = Student & {
 
 export type StudentFields = Partial<Omit<Student, "id" | "created_at">>;
 
-export const createStudent = async (form: StudentFields): Promise<{ success: boolean; message: string; }> => {
+export const createStudent = async (form: StudentFields): Promise<{ success: boolean; message: string; enrollment_secret?: string; }> => {
   try {
     const response = await api.post('/student/create', form);
+    console.log("Student created:", response.data);
     return {
       success: true,
-      message: response.data.message
+      message: response.data.message,
+      enrollment_secret: response.data.enrollment_secret
     };
   } catch (error: any) {
     return {

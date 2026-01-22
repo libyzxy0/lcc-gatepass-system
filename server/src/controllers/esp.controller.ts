@@ -30,7 +30,7 @@ class ESPController {
           
           const { entry } = await LogService.create({
             name: data.visitor.firstname + " " + data.visitor.lastname,
-            type: 'visitor',
+            type: data.gatepass.student_pass ? 'student' : 'visitor',
             entity_id: data.visitor.id,
             entry_type: 'qr',
             device_id: 'esp-gate-01'
