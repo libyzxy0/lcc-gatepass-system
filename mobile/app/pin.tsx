@@ -185,8 +185,9 @@ export default function Pin() {
             alignItems: 'center'
           }}>
             <Text style={{
-              color: '#a7a7a7'
-            }}>Project made possible by ICT-12A Group 2.</Text>
+              color: '#a7a7a7',
+              fontSize: 12
+            }}>Project made possible by ICT-12A All Things Tech.</Text>
           </View>
         </View>
       </View>

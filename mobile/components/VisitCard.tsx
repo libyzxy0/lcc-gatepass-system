@@ -24,9 +24,10 @@ interface IVisitorCard {
   status: 'pending' | 'approved' | 'rejected';
   schedule_date: string;
   qr_token: string;
+  permanent: boolean;
 }
 
-export function VisitCard({ id, purpose, description, vehicle, status, schedule_date, qr_token }: IVisitorCard) {
+export function VisitCard({ id, purpose, description, vehicle, status, schedule_date, qr_token, permanent }: IVisitorCard) {
   const router = useRouter();
   const colors = useColors();
   const [deleteModal, showDeleteModal] = useState(false);
@@ -36,8 +37,8 @@ export function VisitCard({ id, purpose, description, vehicle, status, schedule_
   const colorStatusMap = {
     'pending': colors.warning,
     'approved': colors.success,
-    'expired': colors.badges.pink,
-    'rejected': colors.danger
+    'expired': colors.danger,
+    'rejected': colors.badges.orange
   }
 
   const labelMap = {
@@ -65,7 +66,7 @@ export function VisitCard({ id, purpose, description, vehicle, status, schedule_
     })
     setDeleting(false);
   }
-  
+
   const handleViewGatepass = () => {
     if (status === 'approved') {
       router.push(`/gatepass/${id}`)
@@ -129,7 +130,6 @@ export function VisitCard({ id, purpose, description, vehicle, status, schedule_
               {purpose}
             </Text>
 
-
             <Text
               type="secondary"
               style={{ fontSize: 12 }}
@@ -156,22 +156,22 @@ export function VisitCard({ id, purpose, description, vehicle, status, schedule_
                   {labelMap[status]}
                 </Text>
               </View>
-              <View style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                gap: 5
-              }}>
-                <Octicons name="calendar" size={12} color={colors.primary} />
-                <Text style={{
-                  fontSize: 12,
-                  color: colors.primary
-                }}>{schedule_date && new Date(schedule_date).toLocaleDateString('en-US', {
-                  weekday: 'short',
-                  year: 'numeric',
-                  month: 'short',
-                  day: 'numeric'
-                })}</Text>
-              </View>
+                <View style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  gap: 5
+                }}>
+                  <Octicons name="calendar" size={12} color={colors.primary} />
+                  <Text style={{
+                    fontSize: 12,
+                    color: colors.primary
+                  }}>{permanent ? 'Use Anytime' : schedule_date && new Date(schedule_date).toLocaleDateString('en-US', {
+                    weekday: 'short',
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric'
+                  })}</Text>
+                </View>
             </View>
           </View>
 

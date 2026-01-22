@@ -72,6 +72,7 @@ export default function Main() {
                 keyExtractor={item => item.id}
                 renderItem={({ item }) => (
                   <VisitCard
+                    permanent={item.student_pass}
                     {...item}
                   />
                 )}

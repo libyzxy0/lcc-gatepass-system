@@ -199,7 +199,7 @@ export default function PhonePage() {
                 textAlign: 'center'
               }}
             >
-              © Copyright 2025, La Concepcion College Digital Gatepass System, All rights reserved.
+              © Copyright 2026, La Concepcion College Digital Gatepass System All rights reserved.
             </Text>
           </View>
         </View>

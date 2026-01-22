@@ -24,6 +24,7 @@ interface IVehicle {
 }
 
 interface IRequestGatepass {
+  student_pass_secret?: string | null;
   purpose: string;
   description: string;
   schedule_date: string;
@@ -35,9 +36,10 @@ interface APIResposneType {
   error?: string | null;
 }
 
-export const requestGatepass = async ({ purpose, description, schedule_date, vehicle }: IRequestGatepass): Promise<APIResposneType | null> => {
+export const requestGatepass = async ({ student_pass_secret, purpose, description, schedule_date, vehicle }: IRequestGatepass): Promise<APIResposneType | null> => {
   try {
     const response = await api.post('/gatepass/request-gatepass', {
+      student_pass_secret: student_pass_secret ?? null,
       purpose,
       description,
       schedule_date,

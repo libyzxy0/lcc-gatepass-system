@@ -18,6 +18,7 @@ export const RequestGatepassSheet = forwardRef<BottomSheet, any>((props, ref) =>
   const [selectedVehicleOption, setSelectedVehicleOption] = useState<DropdownOption>({ label: "No, I don't have", value: 'no' });
   const [selectedVehicleType, setSelectedVehicleType] = useState<DropdownOption>({ label: '', value: '' });
   const [description, setDescription] = useState<string | null>(null);
+  const [studentPass, setStudentPass] = useState<string | null>(null);
   const [subPurpose, setSubPurpose] = useState<string | null>(null);
   const [dateISO, setDateISO] = useState<string | null>(null);
   const [vehiclePlateNo, setVehiclePlateNo] = useState<string | null>(null);
@@ -25,6 +26,10 @@ export const RequestGatepassSheet = forwardRef<BottomSheet, any>((props, ref) =>
   const { fetchGatepass } = useGatepassStore();
 
   const purposeOptions = [
+    {
+      label: 'Student QR Pass',
+      value: 'student_pass'
+    },
     {
       label: 'Attend School Event',
       value: 'school_event'
@@ -58,10 +63,6 @@ export const RequestGatepassSheet = forwardRef<BottomSheet, any>((props, ref) =>
       value: 'delivery'
     },
     {
-      label: 'Job Interview',
-      value: 'interview'
-    },
-    {
       label: 'Maintenance/Repair',
       value: 'maintenance'
     },
@@ -93,9 +94,11 @@ export const RequestGatepassSheet = forwardRef<BottomSheet, any>((props, ref) =>
     setSelectedVehicleType({ label: '', value: '' })
     setSelectedVehicleOption({ label: "No, I don't have", value: 'no' })
     setSubPurpose(null);
+    setStudentPass(null);
     setDescription(null);
     setDateISO(null);
     setVehiclePlateNo(null);
+    setStudentPass(null);
     setLoading(false);
   }
 
@@ -108,7 +111,15 @@ export const RequestGatepassSheet = forwardRef<BottomSheet, any>((props, ref) =>
       })
       return;
     }
-    if (['meet_student', 'meet_principal', 'meet_teacher', 'other'].includes(selectedPurpose.value) && subPurpose === null) {
+    if (['meet_student', 'meet_principal', 'meet_teacher', 'other'].includes(selectedPurpose.value) && (subPurpose === null || subPurpose === "")) {
+      showToast({
+        type: 'warning',
+        text1: 'Incomplete Field',
+        text2: "Please fill up 'Purpose' field"
+      })
+      return;
+    }
+    if(selectedPurpose.value === 'student_pass' && (studentPass === null || studentPass === "")) {
       showToast({
         type: 'warning',
         text1: 'Incomplete Field',
@@ -124,7 +135,8 @@ export const RequestGatepassSheet = forwardRef<BottomSheet, any>((props, ref) =>
       })
       return;
     }
-    if (dateISO === null) {
+    
+    if (selectedPurpose.value !== 'student_pass' && dateISO === null) {
       showToast({
         type: 'warning',
         text1: 'Incomplete Field',
@@ -154,11 +166,21 @@ export const RequestGatepassSheet = forwardRef<BottomSheet, any>((props, ref) =>
 
     if (['meet_student', 'meet_principal', 'meet_teacher'].includes(selectedPurpose.value)) {
       purpose = `Meet ${subPurpose}`;
+    } else if(selectedPurpose.value === 'student_pass') {
+      purpose = 'Student QR Pass';
     } else if (selectedPurpose.value === 'other') {
+      if(purposeOptions.find((item) => item.label === subPurpose)) {
+        showToast({
+        type: 'warning',
+        text1: 'Incomplete Field',
+        text2: "You can't use that purpose name."
+      })
+      }
       purpose = subPurpose;
     }
 
     const data = {
+      student_pass_secret: studentPass,
       purpose,
       description,
       schedule_date: dateISO,
@@ -178,6 +200,7 @@ export const RequestGatepassSheet = forwardRef<BottomSheet, any>((props, ref) =>
         text1: 'Failed to request gatepass',
         text2: gpass.error
       });
+      setLoading(false);
       return;
     }
 
@@ -251,6 +274,7 @@ export const RequestGatepassSheet = forwardRef<BottomSheet, any>((props, ref) =>
             onSelect={(slc) => {
               setSelectedPurpose(slc);
               setSubPurpose(null);
+              setStudentPass(null);
             }}
             selectedValue={selectedPurpose}
             options={purposeOptions}
@@ -287,6 +311,22 @@ export const RequestGatepassSheet = forwardRef<BottomSheet, any>((props, ref) =>
               placeholderTextColor={colors.textSecondary}
             />
           )}
+          {['student_pass'].includes(selectedPurpose.value) && (
+            <BottomSheetTextInput
+              onChangeText={setStudentPass}
+              defaultValue={studentPass}
+              style={{
+                backgroundColor: colors.input,
+                color: colors.text,
+                paddingHorizontal: 15,
+                borderRadius: 7,
+                borderWidth: 1,
+                borderColor: colors.border
+              }}
+              placeholder="Enter QRKey (given from enrollment)"
+              placeholderTextColor={colors.textSecondary}
+            />
+          )}
         </View>
 
         <View
@@ -315,7 +355,8 @@ export const RequestGatepassSheet = forwardRef<BottomSheet, any>((props, ref) =>
             placeholderTextColor={colors.textSecondary}
           />
         </View>
-
+        
+        {!['student_pass'].includes(selectedPurpose.value) && (
         <View
           transparent
           style={{
@@ -355,6 +396,7 @@ export const RequestGatepassSheet = forwardRef<BottomSheet, any>((props, ref) =>
             </View>
           </Button>
         </View>
+        )}
 
         <View
           transparent

@@ -150,7 +150,7 @@ export default function GatePass() {
               <Text type={"semibold"} style={{
                 fontSize: 16,
                 color: colors.badges.blue
-              }}>{gpass.schedule_date && new Date(gpass.schedule_date).toLocaleDateString('en-US', {
+              }}>{gpass.student_pass ? 'Any Time' : gpass.schedule_date && new Date(gpass.schedule_date).toLocaleDateString('en-US', {
                 weekday: 'short',
                 year: 'numeric',
                 month: 'short',
@@ -215,7 +215,7 @@ export default function GatePass() {
             marginTop: 40,
             marginHorizontal: 20,
             paddingBottom: 40
-          }}>© Copyright 2025, La Concepcion College Digital Gatepass System, All rights reserved.</Text>
+          }}>© Copyright 2026, La Concepcion College Digital Gatepass System All rights reserved.</Text>
         </ViewShot>
       </ScrollView>
     </SafeAreaView>

@@ -123,7 +123,7 @@ export default function OTPPage() {
         </Text>
 
         <Text>
-          Please enter the One Time Pin (OTP) we've sent to your phone number{" "}
+          Please enter the One Time Pin (OTP) we've sent to your email or phone number{" "}
           <Text onPress={() => setShowConfirm(true)} type="link">
             (+63) {formatPHNumber(phoneNumber)}
           </Text>.
