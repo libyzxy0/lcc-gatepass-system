@@ -13,7 +13,8 @@ const studentsData = [
     parent_name: "Emie Dela Costa",
     rfid_code: "67993725",
     address: 'Pilar Village, Sto. Cristo, San Jose del Monte, Bulacan',
-    photo_url: null
+    photo_url: null,
+    enrollment_secret: 'TEST'
   }
 ];
 
