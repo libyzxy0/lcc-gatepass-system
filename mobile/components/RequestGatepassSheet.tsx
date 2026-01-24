@@ -119,7 +119,7 @@ export const RequestGatepassSheet = forwardRef<BottomSheet, any>((props, ref) =>
       })
       return;
     }
-    if(selectedPurpose.value === 'student_pass' && (studentPass === null || studentPass === "")) {
+    if (selectedPurpose.value === 'student_pass' && (studentPass === null || studentPass === "")) {
       showToast({
         type: 'warning',
         text1: 'Incomplete Field',
@@ -135,7 +135,7 @@ export const RequestGatepassSheet = forwardRef<BottomSheet, any>((props, ref) =>
       })
       return;
     }
-    
+
     if (selectedPurpose.value !== 'student_pass' && dateISO === null) {
       showToast({
         type: 'warning',
@@ -166,15 +166,16 @@ export const RequestGatepassSheet = forwardRef<BottomSheet, any>((props, ref) =>
 
     if (['meet_student', 'meet_principal', 'meet_teacher'].includes(selectedPurpose.value)) {
       purpose = `Meet ${subPurpose}`;
-    } else if(selectedPurpose.value === 'student_pass') {
+    } else if (selectedPurpose.value === 'student_pass') {
       purpose = 'Student QR Pass';
     } else if (selectedPurpose.value === 'other') {
-      if(purposeOptions.find((item) => item.label === subPurpose)) {
+      if (purposeOptions.find((item) => item.label === subPurpose)) {
         showToast({
-        type: 'warning',
-        text1: 'Incomplete Field',
-        text2: "You can't use that purpose name."
-      })
+          type: 'error',
+          text1: 'Invalid Name',
+          text2: "You can't use that purpose name."
+        })
+        return;
       }
       purpose = subPurpose;
     }
@@ -355,47 +356,47 @@ export const RequestGatepassSheet = forwardRef<BottomSheet, any>((props, ref) =>
             placeholderTextColor={colors.textSecondary}
           />
         </View>
-        
+
         {!['student_pass'].includes(selectedPurpose.value) && (
-        <View
-          transparent
-          style={{
-            gap: 5
-          }}
-        >
-          <Text type={'secondary'}>
-            Date of Visit <Text style={{ color: colors.danger }}>*</Text>
-          </Text>
-          <Button
-            variant={'outline'}
+          <View
+            transparent
             style={{
-              width: '100%',
-              backgroundColor: colors.input
+              gap: 5
             }}
-            onPress={() => showDatePicker(true)}>
-            <View style={{
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-              alignItems: 'center'
-            }}>
-              <Text style={{
-                color: !dateISO ? colors.textSecondary : colors.text
+          >
+            <Text type={'secondary'}>
+              Date of Visit <Text style={{ color: colors.danger }}>*</Text>
+            </Text>
+            <Button
+              variant={'outline'}
+              style={{
+                width: '100%',
+                backgroundColor: colors.input
+              }}
+              onPress={() => showDatePicker(true)}>
+              <View style={{
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                alignItems: 'center'
               }}>
-                {dateISO ? new Date(dateISO).toLocaleDateString('en-US', {
-                  weekday: 'short',
-                  year: 'numeric',
-                  month: 'short',
-                  day: 'numeric'
-                }) : 'Select your Date of Visit'}
-              </Text>
-              <Ionicons
-                name={datepicker ? 'chevron-up' : 'chevron-down'}
-                size={16}
-                color={colors.textSecondary}
-              />
-            </View>
-          </Button>
-        </View>
+                <Text style={{
+                  color: !dateISO ? colors.textSecondary : colors.text
+                }}>
+                  {dateISO ? new Date(dateISO).toLocaleDateString('en-US', {
+                    weekday: 'short',
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric'
+                  }) : 'Select your Date of Visit'}
+                </Text>
+                <Ionicons
+                  name={datepicker ? 'chevron-up' : 'chevron-down'}
+                  size={16}
+                  color={colors.textSecondary}
+                />
+              </View>
+            </Button>
+          </View>
         )}
 
         <View
