@@ -177,7 +177,8 @@ class GatepassService {
         email: gpassData.visitor.email,
         status: 'reject',
         purpose: gpassData.gatepass.purpose,
-        description: gpassData.gatepass.description
+        description: gpassData.gatepass.description,
+        reason
       })
       return result;
     } catch (error) {

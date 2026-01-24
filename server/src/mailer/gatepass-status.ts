@@ -6,6 +6,7 @@ type MailGatepassStatusType = {
   status: 'approve' | 'reject' | 'expire';
   purpose: string;
   description: string;
+  reason?: string | null;
 }
 
 const labels = {
@@ -25,19 +26,20 @@ const colors = {
   reject: '#db561a',
   expire: '#db1a1a',
 }
-const note = {
-  approve: 'You can now use your QRCode gatepass to enter or exit within La Concepcion College premises.',
-  reject: "Sorry, we can't approve your gatepass request for now, please contact us for more information why we do this.",
-  expire: "Your gatepass has been expired, you are not able to use this now to enter or exit within La Concepcion College premises."
-}
 
 export const sendGatepassStatus = async ({
-  email, 
+  email,
   status,
   purpose,
-  description
+  description,
+  reason
 }: MailGatepassStatusType) => {
   try {
+    const note = {
+      approve: 'You can now use your QRCode gatepass to enter or exit within La Concepcion College premises.',
+      reject: `Sorry, we can't approve your gatepass request for now. Reason: ${reason}`,
+      expire: "Your gatepass has been expired, you are not able to use this now to enter or exit within La Concepcion College premises."
+    }
     const info = await transporter.sendMail({
       from: `La Concepcion College Digital Gatepass System <${SMTP_USER}>`,
       to: email,
