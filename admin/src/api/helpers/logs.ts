@@ -1,7 +1,9 @@
 import { api } from '../axios';
 
-type Log = {id: string;
+type Log = {
+  id: string;
   type: 'student' | 'visitor' | 'staff' | 'guardian';
+  log_id: string;
   name: string;
   time_in: string;
   time_out: string;
@@ -21,7 +23,7 @@ export const getAllLogs = async (): Promise<Log[]> => {
   }
 }
 
-export const getLog = async (id: string): Promise<{ success: boolean; message: string; }> => {
+export const getLog = async (id: string): Promise<Log> => {
     const response = await api.get(`/logs/get/${id}`);
     return response.data;
 }
