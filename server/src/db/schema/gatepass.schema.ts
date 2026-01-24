@@ -25,6 +25,7 @@ export const gatepass = pgTable("gatepass", {
   qr_token: text("qr_token").unique(),
   schedule_date: timestamp("schedule_date", { mode: "string" }),
   student_pass: boolean("student_pass").default(false),
+  entity_id: uuid("entity_id").default(null),
   status: statusEnum("status").default("pending"),
   created_at: timestamp("created_at", { mode: "string" }).defaultNow()
 })

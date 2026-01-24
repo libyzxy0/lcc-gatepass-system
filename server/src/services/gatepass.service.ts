@@ -24,11 +24,12 @@ class GatepassService {
     try {
 
       if (student_pass_secret) {
-        const [studentData] = await db.select().from(student).where(eq(student.enrollment_secret, student_pass_secret));
-        if (!studentData) throw new UnauthorizedError('Invalid QRKey key!');
+        const [studentData] = await db.select({ id: student.id }).from(student).where(eq(student.enrollment_secret, student_pass_secret));
+        if (!studentData) throw new UnauthorizedError('Invalid QRKey!');
 
         const [gatepassData] = await db.insert(gatepass).values({
-          student_pass: !!student_pass_secret,
+          student_pass: !!studentData,
+          entity_id: studentData.id,
           visitor_id,
           purpose,
           description,
@@ -53,7 +54,6 @@ class GatepassService {
         return gatePassWithToken;
       } else {
         const [gatepassData] = await db.insert(gatepass).values({
-          student_pass: !!student_pass_secret,
           visitor_id,
           purpose,
           description,
@@ -82,6 +82,7 @@ class GatepassService {
       throw error;
     }
   }
+  
   static async getAllGatepass(visitor_id: string) {
     try {
       const allGatepass: Gatepass[] = await db.select().from(gatepass).where(eq(gatepass.visitor_id, visitor_id)).orderBy(desc(gatepass.created_at));

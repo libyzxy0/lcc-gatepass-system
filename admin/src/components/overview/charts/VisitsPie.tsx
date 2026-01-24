@@ -15,14 +15,18 @@ import {
   ChartLegendContent,
   type ChartConfig,
 } from "@/components/ui/chart"
-import {
-  useQuery,
-} from '@tanstack/react-query'
-import { getOverviewCounts } from '@/api/helpers/overview'
 import { getPeopleTypeWithHighestValue } from '@/utils/get-highest'
-import { Skeleton } from '@/components/ui/skeleton'
 
-export const description = "A pie chart with a label list"
+type MostType = {
+  students: number;
+  visitors: number;
+  staffs: number;
+  other: number;
+}
+
+type VisitsPieType = {
+  data: MostType | null;
+}
 
 const chartConfig = {
   count: {
@@ -46,23 +50,13 @@ const chartConfig = {
   },
 } satisfies ChartConfig
 
-export function VisitsPie() {
-  const { isPending, error, data } = useQuery({
-    queryKey: ['get-counts'],
-    queryFn: getOverviewCounts,
-    refetchInterval: 500,
-    refetchOnWindowFocus: true
-  })
-  
-  if(isPending) return <Skeleton className="w-full h-[280px]" />
-  
-  if(error) return 'An error occurred ' + error
+export function VisitsPie({ data }: VisitsPieType) {
   
   const chartData = [
-  { type: "students", count: data.students_today, fill: "#3add79" },
-  { type: "visitors", count: data.visitors_today, fill: "#3a71dd" },
-    { type: "staff", count: data.staffs_today, fill: "#dd3a3a" },
-  { type: "other", count: data.other_people, fill: "#8f8f8f" }
+  { type: "students", count: data?.students ?? 0, fill: "#3add79" },
+  { type: "visitors", count: data?.visitors ?? 0, fill: "#3a71dd" },
+    { type: "staff", count: data?.staffs ?? 0, fill: "#dd3a3a" },
+  { type: "other", count: data?.other ?? 0, fill: "#8f8f8f" }
 ]
   
   return (
@@ -72,7 +66,7 @@ export function VisitsPie() {
         <CardDescription>Shows most people type that are inside the campus today.</CardDescription>
       </CardHeader>
       <CardContent className="flex-1 pb-0">
-        {getPeopleTypeWithHighestValue(data). length === 0 ? (
+        {data !== null && getPeopleTypeWithHighestValue(data).length === 0 ? (
           <div className="h-full grid place-items-center">
           <p className="text-center mx-6">Failed to show chart, theres no people inside the campus today yet.</p>
           </div>
@@ -91,11 +85,11 @@ export function VisitsPie() {
         </ChartContainer>
         )}
       </CardContent>
-      {getPeopleTypeWithHighestValue(data). length !== 0 && (
+      {data !== null && getPeopleTypeWithHighestValue(data). length !== 0 && (
       <CardFooter className="flex-col gap-2 text-sm">
         <div className="flex items-center gap-2">
         <p className="leading-none font-medium">
-          <span className="capitalize font-medium">{getPeopleTypeWithHighestValue(data).join(", ")}</span> are the Most
+          <span className="capitalize font-medium">{data !== null && getPeopleTypeWithHighestValue(data).join(", ")}</span> are the Most
           </p>
           <TrendingUp className="h-4 w-4" />
         </div>

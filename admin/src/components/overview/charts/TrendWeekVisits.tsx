@@ -16,17 +16,14 @@ import {
   type ChartConfig,
 } from "@/components/ui/chart"
 
-export const description = "A bar chart"
+type WeekdayType = {
+  day: string;
+  visits: number;
+}
 
-const chartData = [
-  { month: "Monday", visits: 186 },
-  { month: "Tuesday", visits: 305 },
-  { month: "Wednesday", visits: 237 },
-  { month: "Thursday", visits: 73 },
-  { month: "Friday", visits: 209 },
-  { month: "Saturday", visits: 214 },
-  { month: "Sunday", visits: 104 },
-]
+type TrendWeekVisitsType = {
+  data: WeekdayType[];
+}
 
 const chartConfig = {
   visits: {
@@ -35,7 +32,7 @@ const chartConfig = {
   },
 } satisfies ChartConfig
 
-export function TrendWeekVisits() {
+export function TrendWeekVisits({ data }: TrendWeekVisitsType) {
   return (
     <Card>
       <CardHeader>
@@ -44,10 +41,10 @@ export function TrendWeekVisits() {
       </CardHeader>
       <CardContent>
         <ChartContainer config={chartConfig}>
-          <BarChart accessibilityLayer data={chartData}>
+          <BarChart accessibilityLayer data={data}>
             <CartesianGrid vertical={false} />
             <XAxis
-              dataKey="month"
+              dataKey="day"
               tickLine={false}
               tickMargin={10}
               axisLine={false}

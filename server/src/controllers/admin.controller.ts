@@ -127,6 +127,14 @@ class AdminController {
       return res.status(error.status || 500).json({ error: error.message });
     }
   }
+  static async getCharts(req: Request, res: Response) {
+    try {
+      const result = await AdminService.getCharts();
+      res.json(result);
+    } catch (error) {
+      return res.status(error.status || 500).json({ error: error.message });
+    }
+  }
 }
 
 export default AdminController;

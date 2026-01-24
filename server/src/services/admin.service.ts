@@ -14,6 +14,7 @@ import {
 } from '@/errors'
 import StudentService from '@/services/student.service'
 import GatepassService from '@/services/gatepass.service'
+import { getDailyCounts, getWeekdayCounts } from '@/utils/charts'
 
 type Admin = typeof admin.$inferSelect;
 type AdminSafe = Omit<Admin, "password"> & {
@@ -135,6 +136,26 @@ class AdminService {
         visitors_today: visitorsToday.count || 0,
         staffs_today: staffToday.count || 0,
         people_today: allLogs.count || 0
+      }
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
+  }
+  static async getCharts() {
+    try {
+      const daily = await getDailyCounts();
+      const weekday = await getWeekdayCounts();
+      const overviewCounts = await this.getOverviewCounts();
+      return {
+        daily,
+        weekday,
+        most: {
+          students: overviewCounts.students_today,
+          visitors: overviewCounts.visitors_today,
+          staffs: overviewCounts.staffs_today,
+          other: overviewCounts.other_people
+        }
       }
     } catch (error) {
       console.error(error);

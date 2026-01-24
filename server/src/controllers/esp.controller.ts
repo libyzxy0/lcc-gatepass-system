@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { tg_api } from '@/sms-api/tgapi'
+import { sendSMSGuardianNotif } from '@/sms-api/student-entry-exit'
 import EspService from '@/services/esp.service'
 import LogService from '@/services/logs.service'
 import GateService from '@/services/gate.service'
@@ -24,17 +24,21 @@ class ESPController {
         hour12: false
       });
 
-      if (payload.topic === `${process.env.NODE_ENV === 'production' ? 'scan/qr' :'dev/scan/qr'}`) {
+      if (payload.topic === `${process.env.NODE_ENV === 'production' ? 'scan/qr' : 'dev/scan/qr'}`) {
         try {
           const data = await EspService.verifyQR(payload.data);
-          
+
           const { entry } = await LogService.create({
             name: data.visitor.firstname + " " + data.visitor.lastname,
             type: data.gatepass.student_pass ? 'student' : 'visitor',
-            entity_id: data.visitor.id,
+            entity_id: data.gatepass.student_pass ? data.gatepass.entity_id : data.visitor.id,
             entry_type: 'qr',
             device_id: 'esp-gate-01'
           })
+
+          if (data.gatepass.student_pass) {
+            sendSMSGuardianNotif(data.gatepass.entity_id, entry);
+          }
 
           return res.json({
             status: 'ok',
@@ -51,7 +55,7 @@ class ESPController {
       } else if (payload.topic == `${process.env.NODE_ENV === 'production' ? 'scan/rfid' : 'dev/scan/rfid'}`) {
         try {
           const rfid_verification = await EspService.verifyRFID(payload.data);
-          
+
           const { entry } = await LogService.create({
             name: `${rfid_verification.firstname + " " + rfid_verification.lastname}`,
             type: rfid_verification.rfid_from,
@@ -59,7 +63,9 @@ class ESPController {
             entry_type: 'rfid',
             device_id: 'esp-gate-01'
           })
-          
+
+          sendSMSGuardianNotif(rfid_verification.id, entry);
+
           return res.json({
             status: 'ok',
             entry,
@@ -71,7 +77,7 @@ class ESPController {
             status: 'bad'
           })
         }
-      } else if(payload.topic?.startsWith('status/')) {
+      } else if (payload.topic?.startsWith('status/')) {
         await GateService.updateStatus(payload.status, payload.client_id, payload.secret_key);
         res.json({ ping: 'ok' })
       }

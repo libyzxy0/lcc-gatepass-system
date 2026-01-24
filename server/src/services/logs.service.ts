@@ -22,7 +22,7 @@ class LogsService {
     entity_id,
     device_id,
     entry_type
-  }: Logs) {
+  }: Logs): Promise<{ entry: 'IN' | 'OUT'}> {
     try {
       const now = new Date();
 

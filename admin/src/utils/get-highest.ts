@@ -1,6 +1,4 @@
-import { type OverviewCountsType } from '@/api/helpers/overview';
-
-type ReturnType = {
+type HighestType = {
   students: number;
   visitors: number;
   staffs: number;
@@ -8,23 +6,16 @@ type ReturnType = {
 }
 
 export const getPeopleTypeWithHighestValue = (
-  data: OverviewCountsType
-): (keyof ReturnType)[] => {
+  data: HighestType
+): (keyof HighestType)[] => {
   
-  const obj: ReturnType = {
-    students: data.students_today,
-    visitors: data.visitors_today,
-    staffs: data.staffs_today,
-    other: data.other_people,
-  };
-  
-  if(obj.students === 0 && obj.visitors === 0 && obj.staffs === 0 && obj.other === 0) return [];
+  if(data.students === 0 && data.visitors === 0 && data.staffs === 0 && data.other === 0) return [];
 
-  const values = Object.values(obj);
+  const values = Object.values(data);
   if (values.length === 0) return [];
 
   const maxVal = Math.max(...values);
 
-  return (Object.keys(obj) as (keyof ReturnType)[])
-    .filter(key => obj[key] === maxVal);
+  return (Object.keys(data) as (keyof HighestType)[])
+    .filter(key => data[key] === maxVal);
 };

@@ -22,23 +22,6 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 
-export const description = "An interactive area chart"
-
-const chartData = [
-  { date: "2025-12-01", visits: 222 },
-  { date: "2025-12-02", visits: 97 },
-  { date: "2025-12-03", visits: 167 },
-  { date: "2025-12-04", visits: 242 },
-  { date: "2025-12-05", visits: 373 },
-  { date: "2025-12-06", visits: 301 },
-  { date: "2025-12-07", visits: 245 },
-  { date: "2025-12-08", visits: 409 },
-  { date: "2025-12-09", visits: 59 },
-  { date: "2025-12-10", visits: 261 },
-  { date: "2025-12-11", visits: 327 }
-];
-
-
 const chartConfig = {
   visitors: {
     label: "Visitors",
@@ -49,12 +32,21 @@ const chartConfig = {
   }
 } satisfies ChartConfig
 
-export function MonthlyVisits() {
+type ChartType = {
+  date: string;
+  visits: number;
+}
+
+type MonthlyVisitsChart = {
+  data: ChartType[];
+}
+
+export function MonthlyVisits({ data }: MonthlyVisitsChart) {
   const [timeRange, setTimeRange] = React.useState("90d")
 
-  const filteredData = chartData.filter((item) => {
+  const filteredData = data?.filter((item) => {
     const date = new Date(item.date)
-    const referenceDate = new Date("2024-06-30")
+    const referenceDate = new Date(data[0].date)
     let daysToSubtract = 90
     if (timeRange === "30d") {
       daysToSubtract = 30

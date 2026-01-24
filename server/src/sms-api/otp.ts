@@ -7,9 +7,7 @@ export const sendSMSOTP = async (phone_number: string, otp: string, account_id) 
   
   if(SMS_ENABLED) {
     const data = await SmsAPI(phone_number, otp_msg);
-    
-    tg_api(encodeURIComponent(`<b>VISITOR OTP</b>\n[Debug Notification]\n\n<b>IProgSms</b>: ${data?.message}\n<b>Phone</b>: ${phone_number}\n<b>Account Id</b>: ${account_id}\n<b>Code</b>: ${otp}\n\n<i>Received from Server (LCC Gatepass Server)</i>`));
-    
+    console.log(data);
     if(data.status === 200) return data;
   } else {
     const data = await tg_api(otp_msg);
