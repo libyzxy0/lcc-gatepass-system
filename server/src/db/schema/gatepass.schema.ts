@@ -17,6 +17,7 @@ export const statusEnum = pgEnum("status", [
 
 export const gatepass = pgTable("gatepass", {
   id: uuid("id").primaryKey().defaultRandom().notNull(),
+  gatepass_id: text('gatepass_id').notNull().unique(),
   visitor_id: uuid("visitor_id").references(() => visitor.id).notNull(),
   purpose: text("purpose").notNull(),
   description: text("description").notNull(),

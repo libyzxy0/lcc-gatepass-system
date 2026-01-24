@@ -1,4 +1,3 @@
-import { TrendingUp } from "lucide-react"
 import { Bar, BarChart, CartesianGrid, XAxis } from "recharts"
 
 import {
@@ -36,7 +35,7 @@ export function TrendWeekVisits({ data }: TrendWeekVisitsType) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Weekly Visits Trend</CardTitle>
+        <CardTitle>Weekday Visits</CardTitle>
         <CardDescription>This chart highlights peak traffic days to help improve gate monitoring.</CardDescription>
       </CardHeader>
       <CardContent>
@@ -59,9 +58,6 @@ export function TrendWeekVisits({ data }: TrendWeekVisitsType) {
         </ChartContainer>
       </CardContent>
       <CardFooter className="flex-col gap-2 text-sm">
-        <div className="flex items-center gap-2 leading-none font-medium">
-          Trending up by 5.2% this week<TrendingUp className="h-4 w-4" />
-        </div>
         <div className="text-muted-foreground leading-none text-center">
           Showing total gate logs for the last 4 weeks
         </div>

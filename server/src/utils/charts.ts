@@ -33,7 +33,6 @@ export const getDailyCounts = async () => {
 
     return result;
   } catch (err) {
-    console.error(err);
     return [];
   }
 };
@@ -68,8 +67,6 @@ export const getWeekdayCounts = async () => {
     }));
 
   } catch (err) {
-    console.error(err);
-
     return Object.entries(DEFAULT).map(([day, visits]) => ({
       day,
       visits

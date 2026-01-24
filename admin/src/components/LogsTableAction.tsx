@@ -19,6 +19,7 @@ import { useState } from "react";
 import { deleteLog } from "@/api/helpers/logs";
 import { toast } from "sonner"
 import { useQueryClient } from '@tanstack/react-query'
+import { ViewLogDialog } from '@/components/ViewLogDialog'
 
 type LogsTableActionType = {
     id: string;
@@ -27,6 +28,7 @@ type LogsTableActionType = {
 export function LogsTableActions({ id }: LogsTableActionType) {
   const [loading, setLoading] = useState(false);
   const [deleteModal, showDeleteModal] = useState(false);
+  const [viewModal, showViewModal] = useState(false);
   const queryClient = useQueryClient();
 
   const handleDelete = async () => {
@@ -45,6 +47,7 @@ export function LogsTableActions({ id }: LogsTableActionType) {
 
   return (
     <>
+    <ViewLogDialog id={id} open={viewModal} onOpenChange={showViewModal} />
     <AlertDialog open={deleteModal} onOpenChange={showDeleteModal}>
         <AlertDialogContent>
           <AlertDialogHeader>
@@ -64,7 +67,7 @@ export function LogsTableActions({ id }: LogsTableActionType) {
         <Ellipsis />
       </DropdownMenuTrigger>
       <DropdownMenuContent>
-        <DropdownMenuItem>
+        <DropdownMenuItem onClick={() => showViewModal(true)}>
           <IdCard />
           View
         </DropdownMenuItem>

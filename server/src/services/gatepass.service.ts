@@ -8,6 +8,7 @@ import {
 } from '@/errors'
 import AuthService from '@/services/auth.service'
 import { sendGatepassStatus } from '@/mailer/gatepass-status';
+import { generateQRPassID } from '@/utils'
 
 type Gatepass = typeof gatepass.$inferSelect;
 type Visitor = typeof visitor.$inferSelect;
@@ -29,6 +30,7 @@ class GatepassService {
 
         const [gatepassData] = await db.insert(gatepass).values({
           student_pass: !!studentData,
+          gatepass_id: generateQRPassID(),
           entity_id: studentData.id,
           visitor_id,
           purpose,
@@ -54,6 +56,7 @@ class GatepassService {
         return gatePassWithToken;
       } else {
         const [gatepassData] = await db.insert(gatepass).values({
+          gatepass_id: generateQRPassID(),
           visitor_id,
           purpose,
           description,

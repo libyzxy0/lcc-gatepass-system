@@ -22,6 +22,7 @@ export const entryTypeUsedEnum = pgEnum("entry_type", [
 
 export const logs = pgTable("logs", {
   id: uuid("id").primaryKey().defaultRandom().notNull(),
+  log_id: text('log_id').notNull().unique(),
   name: text('name').notNull(),
   type: logTypeEnum('log_type').notNull(),
   entry_type: entryTypeUsedEnum('entry_type').notNull(),

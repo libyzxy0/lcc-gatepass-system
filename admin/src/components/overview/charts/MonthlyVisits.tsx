@@ -7,6 +7,7 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
+  CardFooter
 } from "@/components/ui/card"
 import {
   ChartContainer,
@@ -64,7 +65,7 @@ export function MonthlyVisits({ data }: MonthlyVisitsChart) {
         <div className="grid flex-1 gap-1">
           <CardTitle>Monthly Visits</CardTitle>
           <CardDescription>
-            Showing total number of visits for the last 3 months.
+            This chart highlights peak traffic months to help improve gate monitoring.
           </CardDescription>
         </div>
         <Select value={timeRange} onValueChange={setTimeRange}>
@@ -158,6 +159,11 @@ export function MonthlyVisits({ data }: MonthlyVisitsChart) {
           </AreaChart>
         </ChartContainer>
       </CardContent>
+      <CardFooter className="flex-col gap-2 text-sm">
+        <div className="text-muted-foreground leading-none text-center">
+          Showing total gate logs for the last 3 months
+        </div>
+      </CardFooter>
     </Card>
   )
 }

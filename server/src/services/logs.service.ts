@@ -6,6 +6,7 @@ import {
   UnauthorizedError,
   NotFoundError
 } from '@/errors'
+import { generateLogID } from '@/utils'
 
 type Logs = {
   type: 'student' | 'visitor' | 'staff' | 'guardian';
@@ -40,6 +41,7 @@ class LogsService {
         return { entry: 'OUT' };
       } else {
         await db.insert(logs).values({
+          log_id: generateLogID(),
           type,
           name,
           time_in: now.toISOString(),

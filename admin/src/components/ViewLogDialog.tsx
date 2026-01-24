@@ -11,7 +11,7 @@ import {
 import {
   useQuery,
 } from '@tanstack/react-query'
-import { getStaff } from '@/api/helpers/staff'
+import { getLog } from '@/api/helpers/logs'
 import { toast } from "sonner"
 
 
@@ -21,10 +21,10 @@ type ViewStudentDialogType = {
   onOpenChange: (open: boolean) => void;
 }
 
-export function ViewStaffDialog({ id, open, onOpenChange }: ViewStudentDialogType) {
+export function ViewLogDialog({ id, open, onOpenChange }: ViewStudentDialogType) {
   const { isPending, error, data } = useQuery({
-    queryKey: ['get-staff', id],
-    queryFn: () => getStaff(id)
+    queryKey: ['get-log', id],
+    queryFn: () => getLog(id)
   })
   
   if(isPending || !data) return null;
@@ -35,9 +35,9 @@ export function ViewStaffDialog({ id, open, onOpenChange }: ViewStudentDialogTyp
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="md:min-w-[720px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Staff Details</DialogTitle>
+          <DialogTitle>Log Details</DialogTitle>
           <DialogDescription>
-            Full information about the staff.
+            Full information about the log.
           </DialogDescription>
         </DialogHeader>
         
@@ -46,17 +46,17 @@ export function ViewStaffDialog({ id, open, onOpenChange }: ViewStudentDialogTyp
             <img 
               src={data.photo_url || '/avatar.png'} 
               className="rounded-lg w-44 h-44 object-cover border-2 border-gray-200" 
-              alt="Staff profile"
+              alt="Student profile"
             />
             <div className="space-y-1">
               <p className="text-sm text-gray-600">
-                Added at {new Date(data.created_at).toLocaleDateString('en-US', {
+                Logged at {new Date(data.created_at).toLocaleDateString('en-US', {
                   day: '2-digit',
                   month: 'short',
                   year: 'numeric'
                 })}
               </p>
-              <p className="text-sm font-medium text-gray-900">Staff ID: {data.staff_id}</p>
+              <p className="text-sm font-medium text-gray-900">Log ID: {data.log_id}</p>
             </div>
           </div>
           
@@ -82,7 +82,7 @@ export function ViewStaffDialog({ id, open, onOpenChange }: ViewStudentDialogTyp
                 <div className="grid grid-cols-3 gap-4">
                   <div>
                     <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">Type</label>
-                    <p className="mt-1 text-base text-gray-900">{data.staff_type}</p>
+                    <p className="mt-1 text-base text-gray-900">{data.log_type}</p>
                   </div>
                   <div>
                     <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">Phone</label>
@@ -96,8 +96,8 @@ export function ViewStaffDialog({ id, open, onOpenChange }: ViewStudentDialogTyp
                 
                 <div className="grid grid-cols-3 gap-4">
                   <div>
-                    <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">Staff ID</label>
-                    <p className="mt-1 text-base font-mono text-gray-900">{data.staff_id}</p>
+                    <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">Log ID</label>
+                    <p className="mt-1 text-base font-mono text-gray-900">{data.log_id}</p>
                   </div>
                   <div className="col-span-2">
                     <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">Email</label>

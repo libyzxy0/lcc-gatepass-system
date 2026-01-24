@@ -68,7 +68,7 @@ export function VisitsPie({ data }: VisitsPieType) {
       <CardContent className="flex-1 pb-0">
         {data !== null && getPeopleTypeWithHighestValue(data).length === 0 ? (
           <div className="h-full grid place-items-center">
-          <p className="text-center mx-6">Failed to show chart, theres no people inside the campus today yet.</p>
+          <p className="text-center mx-6 text-muted-foreground leading-none">Failed to show chart, theres no people inside the campus today yet.</p>
           </div>
           ) : (
         <ChartContainer

@@ -49,3 +49,13 @@ export const generateStaffID = () => {
   const year = new Date().getFullYear();
   return `STF${year}${digit4}`
 }
+export const generateLogID = () => {
+  const digit4 = Math.floor(Math.random() * (9999 - 1000 + 1)) + 1000;
+  const year = new Date().getFullYear();
+  return `LOG${year}${digit4}`
+}
+export const generateQRPassID = () => {
+  const digit4 = Math.floor(Math.random() * (9999 - 1000 + 1)) + 1000;
+  const year = new Date().getFullYear();
+  return `QRC${year}${digit4}`
+}
