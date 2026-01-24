@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
-import { UserPlus, Trash2 } from "lucide-react"
+import { UserPlus } from "lucide-react"
 import {
   Select,
   SelectContent,
@@ -26,6 +26,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form"
+import { AdminCard } from '@/components/AdminCard'
 
 const formSchema = z.object({
   name: z.string().min(1, {
@@ -72,7 +73,7 @@ export function Admins() {
       setLoading(false);
       return;
     }
-    
+
     refetch();
     toast.success(data.message);
     form.reset();
@@ -116,7 +117,7 @@ export function Admins() {
                     </FormItem>
                   )}
                 />
-                
+
                 <FormField
                   control={form.control}
                   name="password"
@@ -159,7 +160,7 @@ export function Admins() {
                     </FormItem>
                   )}
                 />
-                 <FormField
+                <FormField
                   control={form.control}
                   name="role"
                   render={({ field }) => (
@@ -202,18 +203,13 @@ export function Admins() {
         <CardContent>
           <div className="space-y-3">
             {data.map((admin, i) => (
-              <div key={i} className="flex items-center justify-between p-4 border rounded-lg">
-                <div>
-                  <p className="font-medium">{admin.name}</p>
-                  <p className="text-sm text-muted-foreground">{admin.email}</p>
-                  <p className="text-xs text-muted-foreground mt-1 capitalize">{admin.role}</p>
-                </div>
-                {!admin.is_super_admin && (
-                  <Button variant="ghost" size="icon" className="text-destructive">
-                    <Trash2 className="w-4 h-4" />
-                  </Button>
-                )}
-              </div>
+              <AdminCard
+                key={i}
+                id={admin.id}
+                name={admin.name}
+                email={admin.email}
+                is_super_admin={admin.is_super_admin}
+                role={admin.role} />
             ))}
           </div>
         </CardContent>
