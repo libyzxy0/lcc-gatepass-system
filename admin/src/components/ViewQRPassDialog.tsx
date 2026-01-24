@@ -59,7 +59,7 @@ export function ViewQRPassDialog({ id, open, onOpenChange }: ViewQRPassDialogTyp
             <img 
               src={data.visitor.photo_url || '/avatar.png'} 
               className="rounded-lg w-44 h-44 object-cover border-2 border-gray-200" 
-              alt="Student profile"
+              alt="Visitor profile"
             />
             <img 
               src={data.visitor.valid_id_photo_url || '/avatar.png'} 

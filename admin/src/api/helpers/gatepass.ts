@@ -70,15 +70,15 @@ export const approve = async (id: string) => {
     };
   } catch (error: any) {
     return {
-      success: false,
+      message: false,
       error: error.response ? error.response.data.error : 'An error occurred'
     }
   }
 }
 
-export const reject = async (id: string) => {
+export const reject = async (id: string, reason: string | null) => {
   try {
-    const response = await api.post('/gatepass/reject', { id });
+    const response = await api.post('/gatepass/reject', { id, reason });
     return {
       success: true,
       message: response.data.message
@@ -86,7 +86,7 @@ export const reject = async (id: string) => {
   } catch (error: any) {
     return {
       success: false,
-      error: error.response ? error.response.data.error : 'An error occurred'
+      message: error.response ? error.response.data.error : 'An error occurred'
     }
   }
 }
@@ -101,7 +101,7 @@ export const deletePass = async (id: string) => {
   } catch (error: any) {
     return {
       success: false,
-      error: error.response ? error.response.data.error : 'An error occurred'
+      message: error.response ? error.response.data.error : 'An error occurred'
     }
   }
 }

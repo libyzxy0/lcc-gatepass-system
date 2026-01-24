@@ -166,9 +166,10 @@ class GatepassService {
       throw error;
     }
   }
-  static async reject(id: string) {
+  static async reject(id: string, reason: string) {
     try {
-      const [result] = await db.update(gatepass).set({ status: 'rejected' }).where(eq(gatepass.id, id)).returning({
+      if(!reason) throw new BadRequestError('Please enter a valid reason to reject it!')
+      const [result] = await db.update(gatepass).set({ status: 'rejected', reject_reason: reason }).where(eq(gatepass.id, id)).returning({
         id: gatepass.id
       });
       const gpassData = await this.getGatepass(result.id);

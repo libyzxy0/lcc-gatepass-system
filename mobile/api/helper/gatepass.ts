@@ -10,6 +10,7 @@ type Gatepass = {
   qr_token: string;
   schedule_date: string;
   status: 'approved' | 'pending' | 'expired' | 'rejected';
+  reject_reason: string | null;
   created_at: string;
 };
 

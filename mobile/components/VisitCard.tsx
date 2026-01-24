@@ -27,7 +27,7 @@ interface IVisitorCard {
   permanent: boolean;
 }
 
-export function VisitCard({ id, purpose, description, vehicle, status, schedule_date, qr_token, permanent }: IVisitorCard) {
+export function VisitCard({ id, purpose, description, vehicle, status, schedule_date, qr_token, reject_reason, permanent }: IVisitorCard) {
   const router = useRouter();
   const colors = useColors();
   const [deleteModal, showDeleteModal] = useState(false);
@@ -161,6 +161,8 @@ export function VisitCard({ id, purpose, description, vehicle, status, schedule_
                   alignItems: 'center',
                   gap: 5
                 }}>
+                {status !== 'rejected' ? (
+                  <>
                   <Octicons name="calendar" size={12} color={colors.primary} />
                   <Text style={{
                     fontSize: 12,
@@ -171,6 +173,16 @@ export function VisitCard({ id, purpose, description, vehicle, status, schedule_
                     month: 'short',
                     day: 'numeric'
                   })}</Text>
+                  </>
+                  ) : (
+                    <>
+                    <Octicons name="alert" size={12} color={colors.danger} />
+                  <Text style={{
+                    fontSize: 12,
+                    color: colors.danger
+                  }}>{reject_reason}</Text>
+                  </>
+                    )}
                 </View>
             </View>
           </View>

@@ -111,7 +111,7 @@ export default function Gatepass() {
   },
   {
     id: "actions",
-    cell: ({ row }) => <GatepassTableAction id={row.original.id} />,
+    cell: ({ row }) => <GatepassTableAction id={row.original.id} pending={row.original.status === 'pending'} />,
   },
 ]
 

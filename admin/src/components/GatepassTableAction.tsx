@@ -6,6 +6,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
 import { Trash, IdCard, Ellipsis, ThumbsUp, ThumbsDown } from 'lucide-react';
 import { useQueryClient } from '@tanstack/react-query';
 import { approve, reject, deletePass } from '@/api/helpers/gatepass'
@@ -23,7 +24,7 @@ import { ViewQRPassDialog } from '@/components/ViewQRPassDialog'
 
 type ActionType = 'approve' | 'reject';
 
-export function GatepassTableAction({ id }: { id: string }) {
+export function GatepassTableAction({ id, pending }: { id: string; pending: boolean }) {
   const queryClient = useQueryClient();
   const [deleting, setDeleting] = useState(false);
   const [approving, setApproving] = useState(false);
@@ -32,8 +33,9 @@ export function GatepassTableAction({ id }: { id: string }) {
   const [approveModal, showApproveModal] = useState(false);
   const [rejectModal, showRejectModal] = useState(false);
   const [viewModal, showViewModal] = useState(false);
-  
-  const handleApproveReject = async (action: ActionType) => {
+  const [reason, setReason] = useState<string>("");
+
+  const handleApproveReject = async (action: ActionType, reason?: string | null) => {
 
     if (action === 'approve') {
       const result = await approve(id);
@@ -41,13 +43,14 @@ export function GatepassTableAction({ id }: { id: string }) {
       await queryClient.invalidateQueries({ queryKey: ['get-all-gatepass'] });
       toast.success(result.message);
     } else if (action === 'reject') {
-      const result = await reject(id);
+      const result = await reject(id, reason ? reason : null);
       if (!result.success) return toast.error(result.message);
       await queryClient.invalidateQueries({ queryKey: ['get-all-gatepass'] });
+      setReason("");
       toast.success(result.message);
     }
   }
-  
+
   const handleDelete = async () => {
     setDeleting(true);
     const deleted = await deletePass(id);
@@ -60,26 +63,26 @@ export function GatepassTableAction({ id }: { id: string }) {
     toast.success(deleted.message);
     showDeleteModal(false);
   }
-  
+
   const handleApprove = async () => {
     setApproving(true);
     await handleApproveReject('approve');
     setApproving(false);
     showApproveModal(false);
   }
-  
+
   const handleReject = async () => {
     setRejecting(true);
-    await handleApproveReject('reject');
+    await handleApproveReject('reject', reason);
     setRejecting(false);
     showRejectModal(false);
   }
-  
+
   return (
     <>
-    <ViewQRPassDialog id={id} open={viewModal} onOpenChange={showViewModal} />
-    
-    <AlertDialog open={deleteModal} onOpenChange={showDeleteModal}>
+      <ViewQRPassDialog id={id} open={viewModal} onOpenChange={showViewModal} />
+
+      <AlertDialog open={deleteModal} onOpenChange={showDeleteModal}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
@@ -93,7 +96,7 @@ export function GatepassTableAction({ id }: { id: string }) {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-      
+
       <AlertDialog open={approveModal} onOpenChange={showApproveModal}>
         <AlertDialogContent>
           <AlertDialogHeader>
@@ -115,40 +118,46 @@ export function GatepassTableAction({ id }: { id: string }) {
             <AlertDialogDescription>
               This will reject the visitor's qrpass and not allow them to enter the school.
             </AlertDialogDescription>
+            <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">Rejection Reason</label>
+            <Input onChange={(e) => setReason(e.target.value)} value={reason} aria-invalid={!reason} placeholder={'Lack of necessary details.'}/>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <Button className="bg-orange-400" onClick={handleReject} disabled={rejecting}>{rejecting ? 'Rejecting...' : 'Reject'}</Button>
+            <Button className="bg-orange-400" onClick={handleReject} disabled={rejecting || !reason}>{rejecting ? 'Rejecting...' : 'Reject'}</Button>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-      
-    <DropdownMenu>
-      <DropdownMenuTrigger>
-        <Ellipsis />
-      </DropdownMenuTrigger>
-      <DropdownMenuContent>
-        <DropdownMenuItem onClick={() => showApproveModal(true)} className="text-green-400 focus:text-green-400 hover:text-green-400 focus:bg-green-400/20 hover:focus:bg-green-400/20">
-          <ThumbsUp className="text-green-400" />
-          Approve
-        </DropdownMenuItem>
 
-        <DropdownMenuItem onClick={() => showRejectModal(true)} className="text-orange-400 focus:text-orange-400 hover:text-orange-400 focus:bg-orange-400/20 hover:focus:bg-orange-400/20">
-          <ThumbsDown className="text-orange-400" />
-          Reject
-        </DropdownMenuItem>
+      <DropdownMenu>
+        <DropdownMenuTrigger>
+          <Ellipsis />
+        </DropdownMenuTrigger>
+        <DropdownMenuContent>
+          {pending && (
+            <>
+              <DropdownMenuItem onClick={() => showApproveModal(true)} className="text-green-400 focus:text-green-400 hover:text-green-400 focus:bg-green-400/20 hover:focus:bg-green-400/20">
+                <ThumbsUp className="text-green-400" />
+                Approve
+              </DropdownMenuItem>
 
-        <DropdownMenuItem onClick={() => showViewModal(true)}>
-          <IdCard />
-          View
-        </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => showRejectModal(true)} className="text-orange-400 focus:text-orange-400 hover:text-orange-400 focus:bg-orange-400/20 hover:focus:bg-orange-400/20">
+                <ThumbsDown className="text-orange-400" />
+                Reject
+              </DropdownMenuItem>
+            </>
+          )}
 
-        <DropdownMenuItem variant="destructive" onClick={() => showDeleteModal(true)}>
-          <Trash />
-          Delete
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
+          <DropdownMenuItem onClick={() => showViewModal(true)}>
+            <IdCard />
+            View
+          </DropdownMenuItem>
+
+          <DropdownMenuItem variant="destructive" onClick={() => showDeleteModal(true)}>
+            <Trash />
+            Delete
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
     </>
   )
 }
