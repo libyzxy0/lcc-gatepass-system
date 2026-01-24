@@ -105,10 +105,8 @@ export function AddStudentDialog({ children, onCreate }: { children: React.React
       setLoading(false);
       return;
     }
-    
-    alert("Student QRKey: " + data.enrollment_secret);
 
-    toast.success(data.message);
+    toast.success(data.message + " QRKEY: " + data.enrollment_secret);
     resetForm(false);
     setLoading(false);
   }
@@ -219,7 +217,28 @@ export function AddStudentDialog({ children, onCreate }: { children: React.React
                       <FormItem className="col-span-1">
                         <FormLabel>Grade Level<span className="text-red-500">*</span></FormLabel>
                         <FormControl>
-                          <Input placeholder="SHS-12" {...field} />
+                          <Select
+                            onValueChange={field.onChange} value={field.value}
+                          >
+                            <SelectTrigger className="w-40">
+                              <SelectValue placeholder="Select grade level" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="SHS-12">SHS-12</SelectItem>
+                              <SelectItem value="SHS-11">SHS-11</SelectItem>
+                              <SelectItem value="JHS-10">JHS-10</SelectItem>
+                              <SelectItem value="JHS-9">JHS-9</SelectItem>
+                              <SelectItem value="JHS-8">JHS-8</SelectItem>
+                              <SelectItem value="JHS-7">JHS-7</SelectItem>
+                              <SelectItem value="ELEM-6">ELEM-6</SelectItem>
+                              <SelectItem value="ELEM-5">ELEM-5</SelectItem>
+                              <SelectItem value="ELEM-4">ELEM-4</SelectItem>
+                              <SelectItem value="ELEM-3">ELEM-3</SelectItem>
+                              <SelectItem value="ELEM-2">ELEM-2</SelectItem>
+                              <SelectItem value="ELEM-1">ELEM-1</SelectItem>
+                              <SelectItem value="Kindergarten">Kindergarten</SelectItem>
+                            </SelectContent>
+                          </Select>
                         </FormControl>
                         <FormMessage />
                       </FormItem>

@@ -10,6 +10,7 @@ router.post("/login", AdminController.login);
 router.post("/refresh", AdminController.refresh);
 router.post("/logout", admin_auth, AdminController.logout);
 router.get("/session", admin_auth, AdminController.getSession);
+router.get("/delete/:id", admin_auth, AdminController.delete);
 
 router.get("/overview/counts", admin_auth, AdminController.getOverviewCounts);
 

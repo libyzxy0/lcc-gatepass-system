@@ -68,7 +68,7 @@ export default function Visitors() {
       header: "Address",
       cell: (info) => {
         const value = info.getValue<string | null>()
-        return <div className="text-wrap">{value ?? "N/A"}</div>
+        return <div className="col-span-4">{value ?? "N/A"}</div>
       },
     }
   ];

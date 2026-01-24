@@ -91,7 +91,7 @@ export default function Students() {
     {
       accessorKey: "address",
       header: "Address",
-      cell: info => <div className="text-wrap">{info.getValue<string | null>() ?? "N/A"}</div>
+      cell: info => <div className="col-span-4">{info.getValue<string | null>() ?? "N/A"}</div>
     },
     { accessorKey: "rfid_code", header: "RFID CODE" },
     {

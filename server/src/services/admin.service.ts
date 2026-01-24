@@ -141,6 +141,17 @@ class AdminService {
       throw error;
     }
   }
+  static async delete(id: string) {
+    try {
+      if(!id) throw new BadRequestError('Please specify admin id you want to delete!');
+      
+      const result = await db.delete(admin).where(eq(admin.id, id)).returning({ id: admin.id });
+      return result;
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
+  }
 }
 
 export default AdminService;
