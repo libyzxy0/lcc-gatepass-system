@@ -23,7 +23,7 @@ export const getAllLogs = async (): Promise<Log[]> => {
   }
 }
 
-export const getLog = async (id: string): Promise<{ success: boolean; message: string; }> => {
+export const getLog = async (id: string): Promise<Log> => {
     const response = await api.get(`/logs/get/${id}`);
     return response.data;
 }

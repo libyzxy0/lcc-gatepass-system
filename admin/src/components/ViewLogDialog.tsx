@@ -48,7 +48,7 @@ export function ViewLogDialog({ id, open, onOpenChange }: ViewStudentDialogType)
     <>
       <ViewStudentDialog id={data.entity_id} open={studentModal} onOpenChange={showStudentModal} />
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="md:min-w-[720px] max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Log Details</DialogTitle>
             <DialogDescription>
@@ -56,28 +56,10 @@ export function ViewLogDialog({ id, open, onOpenChange }: ViewStudentDialogType)
             </DialogDescription>
           </DialogHeader>
 
-          <div className="space-y-6 py-4 grid md:grid-cols-3 gap-6">
-            <div className="flex flex-col gap-4">
-              <img
-                src={data.photo_url || '/avatar.png'}
-                className="rounded-lg w-44 h-44 object-cover border-2 border-gray-200"
-                alt="Student profile"
-              />
-              <div className="space-y-1">
-                <p className="text-sm text-gray-600">
-                  Logged at {new Date(data.created_at).toLocaleDateString('en-US', {
-                    day: '2-digit',
-                    month: 'short',
-                    year: 'numeric'
-                  })}
-                </p>
-                <p className="text-sm font-medium text-gray-900">Log ID: {data.log_id}</p>
-              </div>
-            </div>
+          <div className="space-y-6 py-4 gap-6">
 
             <div className="grid grid-cols-1 col-span-2 space-y-6">
               <div>
-                <h3 className="text-sm font-semibold text-gray-900 mb-4">General Information</h3>
                 <div className="space-y-4">
                   <div className="grid grid-cols-3 gap-4">
                     <div className="col-span-2">
@@ -103,11 +85,24 @@ export function ViewLogDialog({ id, open, onOpenChange }: ViewStudentDialogType)
                       <p className="mt-1 text-base font-mono text-gray-900">{entryTypeBadges[data.entry_type]}</p>
                     </div>
                   </div>
+                  <div className="grid grid-cols-3 gap-4">
+                  <div>
+                      <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">Logged</label>
+                      <p className="mt-1 text-base font-mono text-gray-900">{new Date(data.created_at).toLocaleDateString('en-US', {
+                        day: '2-digit',
+                        month: 'short',
+                        year: 'numeric'
+                      })}</p>
+                    </div>
+                    <div>
+                      <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">Log ID</label>
+                      <p className="mt-1 text-base font-mono text-gray-900">{data.log_id}</p>
+                    </div>
+                  </div>
                   <div className="mt-8">
                     {data.type === 'student' && (
                       <p className="text-xs">See more detailed information about {data.type} <b className="text-green-400 underline" onClick={() => showStudentModal(true)}>{data.name}</b>.</p>
                     )}
-
                   </div>
                 </div>
               </div>
