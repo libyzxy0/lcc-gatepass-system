@@ -49,7 +49,7 @@ const data = {
       url: '#',
       items: [
         {
-          title: 'Visitors',
+          title: 'Accounts',
           url: '/dashboard/visitors'
         },
         {
