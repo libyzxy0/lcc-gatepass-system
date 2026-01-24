@@ -52,7 +52,7 @@ export default function Gatepass() {
     header: "Description",
     cell: (info) => {
       const value = info.getValue<string | null>()
-      return <div className="text-wrap">{value ?? "N/A"}</div>
+      return <div className="col-span-3">{value ?? "N/A"}</div>
     },
   },
   {

@@ -53,6 +53,10 @@ export default function Logs() {
 
   const columns: ColumnDef<LogsType>[] = [
     {
+      accessorKey: "log_id",
+      header: "Log ID",
+    },
+    {
       accessorKey: "name",
       header: "Name",
     },
@@ -94,7 +98,7 @@ export default function Logs() {
     },
     {
       accessorKey: "entry_type",
-      header: "Entry Type",
+      header: "Used",
       cell: (info) => {
         const value = info.getValue<'rfid' | 'qr'>();
         return entryTypeBadges[value]

@@ -1,7 +1,9 @@
 import { api } from '../axios';
 
-type Log = {id: string;
+type Log = {
+  id: string;
   type: 'student' | 'visitor' | 'staff' | 'guardian';
+  log_id: string;
   name: string;
   time_in: string;
   time_out: string;
