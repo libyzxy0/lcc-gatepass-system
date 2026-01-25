@@ -180,7 +180,7 @@ export function Gates() {
         <CardContent>
           <div className="space-y-3">
             {data.length !== 0 ? data.map((gate, i) => (
-              <GateCard id={gate.id} gate_id={gate.gate_id} name={gate.name} status={gate.status} type={gate.type} />
+              <GateCard key={i} id={gate.id} gate_id={gate.gate_id} name={gate.name} status={gate.status} type={gate.type} />
             )) : (
               <p className="text-center">No deployed gates yet.</p>
             )}

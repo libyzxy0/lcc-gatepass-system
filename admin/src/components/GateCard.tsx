@@ -14,7 +14,15 @@ import { toast } from "sonner"
 import { useQueryClient } from '@tanstack/react-query';
 import { deleteGate } from '@/api/helpers/gate'
 
-export function GateCard({ id, gate_id, status, name, type }) {
+type GateCardType = {
+  id: string;
+  gate_id: string;
+  status: string;
+  name: string;
+  type: string;
+}
+
+export function GateCard({ id, gate_id, status, name, type }: GateCardType) {
   const [deleteModal, showDeleteModal] = useState(false);
   const [loading, setLoading] = useState(false);
   const queryClient = useQueryClient();

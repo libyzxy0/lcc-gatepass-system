@@ -3,11 +3,12 @@ import { MyTable } from '@/components/table'
 import type { ColumnDef } from "@tanstack/react-table"
 import { Download } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query'
-import { getAllVisitors, type Visitors } from '@/api/helpers/visitors'
+import { getAllVisitors, type Visitor } from '@/api/helpers/visitors'
 import { Skeleton } from "@/components/ui/skeleton"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
+import { VisitorTableActions } from '@/components/VisitorTableActions'
 
 const statusBadges = {
   verified: <Badge variant="default" className="bg-green-400/20 border-green-400/50 text-green-400">Verified</Badge>,
@@ -22,7 +23,7 @@ export default function Visitors() {
   })
   const [search, setSearch] = useState("")
 
-  const columns: ColumnDef<Visitors>[] = [
+  const columns: ColumnDef<Visitor>[] = [
     {
       accessorKey: "visitor_id",
       header: "Visitor ID",
@@ -70,6 +71,10 @@ export default function Visitors() {
         const value = info.getValue<string | null>()
         return <div className="col-span-4">{value ?? "N/A"}</div>
       },
+    },
+    {
+      id: 'actions',
+      cell: info => <VisitorTableActions id={info.row.original.id} />
     }
   ];
 

@@ -135,6 +135,28 @@ class VisitorController {
       })
     }
   }
+  static async get(req: Request, res: Response) {
+    try {
+      const { id } = req.params;
+      const visitorData = await VisitorService.get(id);
+      res.json(visitorData);
+    } catch (error) {
+      res.status(error.status || 500).json({
+        error: error.message
+      })
+    }
+  }
+  static async delete(req: Request, res: Response) {
+    try {
+      const { id } = req.params;
+      await VisitorService.delete(id);
+      res.json({ message: 'Visitor successfully deleted' });
+    } catch (error) {
+      res.status(error.status || 500).json({
+        error: error.message
+      })
+    }
+  }
 }
 
 export default VisitorController;
