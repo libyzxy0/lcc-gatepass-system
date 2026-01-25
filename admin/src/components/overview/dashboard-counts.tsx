@@ -23,12 +23,12 @@ export function Counts() {
   if (isPending) return (
     <div className="mt-4 md:mt-8">
       <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
-        <Skeleton className="w-[180px] md:w-[200px] h-[105px]" />
-        <Skeleton className="w-[180px] md:w-[200px] h-[105px]" />
-        <Skeleton className="w-[180px] md:w-[200px] h-[105px]" />
-        <Skeleton className="w-[180px] md:w-[200px] h-[105px]" />
-        <Skeleton className="w-[180px] md:w-[200px] h-[105px]" />
-        <Skeleton className="w-[180px] md:w-[200px] h-[105px]" />
+        <Skeleton className="w-[180px] md:w-[200px] lg:w-[240px] h-[105px]" />
+        <Skeleton className="w-[180px] md:w-[200px] lg:w-[240px] h-[105px]" />
+        <Skeleton className="w-[180px] md:w-[200px] lg:w-[240px] h-[105px]" />
+        <Skeleton className="w-[180px] md:w-[200px] lg:w-[240px] h-[105px]" />
+        <Skeleton className="w-[180px] md:w-[200px] lg:w-[240px] h-[105px]" />
+        <Skeleton className="w-[180px] md:w-[200px] lg:w-[240px] h-[105px]" />
       </div>
     </div>
   );
@@ -37,6 +37,7 @@ export function Counts() {
 
   return (
     <div className="mt-4 md:mt-8">
+       <h1 className="font-medium mb-4 text-gray-600">Statistics</h1>
       <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
         <CountCard
           name="People Today"

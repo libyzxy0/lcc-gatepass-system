@@ -7,8 +7,8 @@ export default function Overview() {
   return (
     <div>
       <h1 className="font-semibold text-2xl">Overview</h1>
-      <DashboardCharts />
       <Counts />
+      <DashboardCharts />
       <div className="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-4">
         <RecentLogs />
         <PendingGatepass />

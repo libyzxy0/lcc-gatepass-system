@@ -1,4 +1,3 @@
-import { TrendingUp } from "lucide-react"
 import { Pie, PieChart } from "recharts"
 
 import {
@@ -15,7 +14,6 @@ import {
   ChartLegendContent,
   type ChartConfig,
 } from "@/components/ui/chart"
-import { getPeopleTypeWithHighestValue } from '@/utils/get-highest'
 
 type MostType = {
   students: number;
@@ -66,7 +64,7 @@ export function VisitsPie({ data }: VisitsPieType) {
         <CardDescription>Shows most people type that are inside the campus today.</CardDescription>
       </CardHeader>
       <CardContent className="flex-1 pb-0">
-        {data !== null && getPeopleTypeWithHighestValue(data).length === 0 ? (
+        {!data ? (
           <div className="h-full grid place-items-center">
           <p className="text-center mx-6 text-muted-foreground leading-none">Failed to show chart, theres no people inside the campus today yet.</p>
           </div>
@@ -85,19 +83,11 @@ export function VisitsPie({ data }: VisitsPieType) {
         </ChartContainer>
         )}
       </CardContent>
-      {data !== null && getPeopleTypeWithHighestValue(data). length !== 0 && (
       <CardFooter className="flex-col gap-2 text-sm">
-        <div className="flex items-center gap-2">
-        <p className="leading-none font-medium">
-          <span className="capitalize font-medium">{data !== null && getPeopleTypeWithHighestValue(data).join(", ")}</span> are the Most
-          </p>
-          <TrendingUp className="h-4 w-4" />
-        </div>
         <div className="text-muted-foreground leading-none text-center">
           Data are calculated based on todays gate logs.
         </div>
       </CardFooter>
-      )}
     </Card>
   )
 }

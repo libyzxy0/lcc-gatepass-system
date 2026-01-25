@@ -19,9 +19,9 @@ export function DashboardCharts() {
         <div>
           <Skeleton className="w-full h-[240px]" />
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <Skeleton className="w-full h-[220px]" />
-          <Skeleton className="w-full h-[220px]" />
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+          <Skeleton className="col-span-3 w-full h-[220px]" />
+          <Skeleton className="col-span-2 w-full h-[220px]" />
         </div>
       </div>
     )
@@ -31,14 +31,17 @@ export function DashboardCharts() {
 
   return (
     <div className="mt-4 md:mt-8">
-      <h1 className="font-medium mb-4 text-gray-600">Statistics</h1>
       <div className="space-y-6">
         <div>
           <MonthlyVisits data={data.daily} />
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <TrendWeekVisits data={data.weekday} />
-          <VisitsPie data={data.most} />
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+          <div className="col-span-3">
+            <TrendWeekVisits data={data.weekday} />
+          </div>
+          <div className="col-span-2">
+            <VisitsPie data={data.most} />
+          </div>
         </div>
       </div>
     </div>
