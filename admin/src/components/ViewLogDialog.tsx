@@ -12,7 +12,7 @@ import { useQuery } from '@tanstack/react-query'
 import { getLog } from '@/api/helpers/logs'
 import { toast } from "sonner"
 import { Badge } from "@/components/ui/badge"
-import { toPHTime } from '@/utils/convert-time'
+import { toPHTime, toPHDate } from '@/utils/convert-time'
 import { ViewStudentDialog } from '@/components/ViewStudentDialog';
 import { useState } from 'react'
 
@@ -88,11 +88,7 @@ export function ViewLogDialog({ id, open, onOpenChange }: ViewStudentDialogType)
                   <div className="grid grid-cols-3 gap-4">
                   <div>
                       <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">Logged</label>
-                      <p className="mt-1 text-base font-mono text-gray-900">{new Date(data.created_at).toLocaleDateString('en-US', {
-                        day: '2-digit',
-                        month: 'short',
-                        year: 'numeric'
-                      })}</p>
+                      <p className="mt-1 text-base font-mono text-gray-900">{toPHDate(data.created_at)}</p>
                     </div>
                     <div>
                       <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">Log ID</label>

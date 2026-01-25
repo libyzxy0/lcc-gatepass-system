@@ -2,74 +2,71 @@ import db from "@/db/drizzle";
 import { logs } from "@/db/schema";
 import { sql } from "drizzle-orm";
 
-export const getDailyCounts = async () => {
+export const getDailyCounts = async (): Promise<{ date: string; visits: number }[]> => {
   try {
     const rows = await db
-      .select({
-        day: sql<string>`DATE(${logs.created_at})`,
-        count: sql<number>`COUNT(*)`
-      })
-      .from(logs)
-      .groupBy(sql`DATE(${logs.created_at})`)
-      .orderBy(sql`DATE(${logs.created_at})`);
+      .select({ created_at: logs.created_at })
+      .from(logs);
 
-    const counts = Object.fromEntries(
-      rows.map(r => [r.day, Number(r.count)])
-    );
+    const visitCounts: Record<string, number> = {};
 
-    const start = new Date(rows[0].day);
-    const today = new Date();
-    today.setUTCHours(0, 0, 0, 0);
+    let minDate: Date | null = null;
+    let maxDate: Date | null = null;
 
-    const result: Array<{ date: string; visits: number }> = [];
+    for (const item of rows) {
+      const dateUtc = new Date(item.created_at + "Z");
+      const datePh = new Date(dateUtc.getTime() + 8 * 60 * 60 * 1000);
+      const dateStr = datePh.toISOString().slice(0, 10);
 
-    for (let d = new Date(start); d <= today; d.setUTCDate(d.getUTCDate() + 1)) {
-      const key = d.toISOString().slice(0, 10);
-      result.push({
-        date: key,
-        visits: counts[key] ?? 0
-      });
+      visitCounts[dateStr] = (visitCounts[dateStr] || 0) + 1;
+
+      const currDate = new Date(dateStr);
+      if (!minDate || currDate < minDate) minDate = currDate;
+      if (!maxDate || currDate > maxDate) maxDate = currDate;
+    }
+
+    const todayPh = new Date(new Date().getTime() + 8 * 60 * 60 * 1000);
+    todayPh.setHours(0, 0, 0, 0);
+
+    if (!minDate) return [];
+
+    const endDate = maxDate && maxDate > todayPh ? maxDate : todayPh;
+
+    const result: { date: string; visits: number }[] = [];
+    let cursor = new Date(minDate);
+
+    while (cursor <= endDate) {
+      const dateStr = cursor.toISOString().slice(0, 10);
+      result.push({ date: dateStr, visits: visitCounts[dateStr] || 0 });
+      cursor.setDate(cursor.getDate() + 1);
     }
 
     return result;
-  } catch (err) {
+  } catch {
     return [];
   }
 };
 
-
 export const getWeekdayCounts = async () => {
-  const DEFAULT = {
-    Sun: 0, Mon: 0, Tue: 0, Wed: 0, Thu: 0, Fri: 0, Sat: 0
-  };
+  const DEFAULT = { Sun: 0, Mon: 0, Tue: 0, Wed: 0, Thu: 0, Fri: 0, Sat: 0 };
 
   try {
     const rows = await db
-      .select({
-        weekday: sql<number>`EXTRACT(DOW FROM ${logs.created_at})`,
-        count: sql<number>`COUNT(*)`
-      })
+      .select({ created_at: logs.created_at })
       .from(logs)
-      .where(sql`${logs.created_at} >= NOW() - INTERVAL '28 days'`)
-      .groupBy(sql`EXTRACT(DOW FROM ${logs.created_at})`);
+      .where(sql`${logs.created_at} >= NOW() - INTERVAL '28 days'`);
 
     const DAY_MAP = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
     const result = { ...DEFAULT };
 
     for (const row of rows) {
-      const name = DAY_MAP[row.weekday];
-      result[name] = Number(row.count);
+      const dateUtc = new Date(row.created_at + "Z");
+      const dayName = DAY_MAP[dateUtc.getDay()];
+      result[dayName]++;
     }
-
-    return Object.entries(result).map(([day, visits]) => ({
-      day,
-      visits
-    }));
-
-  } catch (err) {
-    return Object.entries(DEFAULT).map(([day, visits]) => ({
-      day,
-      visits
-    }));
+    
+    return Object.entries(result).map(([day, visits]) => ({ day, visits }));
+  } catch {
+    return Object.entries(DEFAULT).map(([day, visits]) => ({ day, visits }));
   }
 };

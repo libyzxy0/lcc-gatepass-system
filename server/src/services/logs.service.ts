@@ -47,7 +47,8 @@ class LogsService {
           time_in: now.toISOString(),
           entity_id,
           device_id,
-          entry_type
+          entry_type,
+          created_at: now.toISOString(),
         });
         return { entry: 'IN' };
       }

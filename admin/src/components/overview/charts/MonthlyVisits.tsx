@@ -57,6 +57,11 @@ export function MonthlyVisits({ data }: MonthlyVisitsChart) {
     const startDate = new Date(referenceDate)
     startDate.setDate(startDate.getDate() - daysToSubtract)
     return date >= startDate
+  }).map((item) => {
+    return {
+      date: item.date.split("T")[0],
+      visits: item.visits
+    }
   })
 
   return (
