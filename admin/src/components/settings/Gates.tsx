@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/select"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
-import { Building2, Trash2 } from "lucide-react"
+import { Building2 } from "lucide-react"
 import { Skeleton } from '@/components/ui/skeleton'
 import { useQuery } from '@tanstack/react-query'
 import { getGates, createGate } from '@/api/helpers/gate'
@@ -26,6 +26,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form"
+import { GateCard } from '@/components/GateCard'
 
 const formSchema = z.object({
   name: z.string().min(1, {
@@ -179,23 +180,7 @@ export function Gates() {
         <CardContent>
           <div className="space-y-3">
             {data.length !== 0 ? data.map((gate, i) => (
-              <div key={i} className={`flex items-center justify-between p-4 border rounded-lg ${gate.status === 'online' ? 'bg-green-400/10 border-green-200' : ''}`}>
-                <div>
-                  <p className={`font-medium ${gate.status === 'online' ? 'text-green-400' : ''}`}>{gate.name}</p>
-                  <p className="text-sm text-muted-foreground">{gate.gate_id}</p>
-                  <div className="flex gap-3 mt-1">
-                    <p className="text-xs text-muted-foreground capitalize">Type: {gate.type}</p>
-                    <p className={`text-xs font-medium capitalize ${gate.status === 'online' ? 'text-green-600' : 'text-gray-500'}`}>
-                      {gate.status}
-                    </p>
-                  </div>
-                </div>
-                <div className="flex gap-2">
-                  <Button variant="ghost" size="icon" className="text-destructive">
-                    <Trash2 className="w-4 h-4" />
-                  </Button>
-                </div>
-              </div>
+              <GateCard id={gate.id} gate_id={gate.gate_id} name={gate.name} status={gate.status} type={gate.type} />
             )) : (
               <p className="text-center">No deployed gates yet.</p>
             )}
