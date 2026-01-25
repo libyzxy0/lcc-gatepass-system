@@ -101,8 +101,11 @@ export default function Visitors() {
         visitor.firstname.toLowerCase().includes(word) ||
         visitor.lastname.toLowerCase().includes(word)
       )
+      const idMatch = words.every(word =>
+        visitor.visitor_id.toLowerCase().includes(word)
+      )
 
-      return nameMatch
+      return nameMatch || idMatch
     })
   }, [data, search])
 
@@ -110,6 +113,7 @@ export default function Visitors() {
     <div>
       <header className="mb-8">
         <h1 className="font-semibold text-2xl">Visitors</h1>
+        <p className="text-muted-foreground mt-2">Manage all visitor accounts informations.</p>
       </header>
       <MyTable
         emptyMessage={'No visitors data yet.'}

@@ -36,7 +36,7 @@ export function StaffTableActions({ id }: { id: string; }) {
       toast.error(deleted.message);
       return;
     }
-    await queryClient.invalidateQueries({ queryKey: ['get-all-gatepass'] });
+    await queryClient.invalidateQueries({ queryKey: ['get-all-staffs'] });
     setLoading(false);
     toast.success(deleted.message);
     showDeleteModal(false);

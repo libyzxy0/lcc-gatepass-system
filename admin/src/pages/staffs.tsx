@@ -67,16 +67,20 @@ export default function Staff() {
     const words = search.toLowerCase().trim().split(/\s+/)
 
     return data.filter(staff => {
+      
       const nameMatch = words.every(word =>
         staff.firstname.toLowerCase().includes(word) ||
         staff.lastname.toLowerCase().includes(word)
       )
+      const idMatch = words.every(word =>
+        staff.staff_id.toLowerCase().includes(word)
+      )
 
-      const sectionMatch = typeFilter.toLowerCase() === 'all' ? true : typeFilter
+      const typeMatch = typeFilter.toLowerCase() === 'all' ? true : typeFilter
         ? staff.staff_type.toLowerCase() === typeFilter.toLowerCase()
         : true
 
-      return nameMatch && sectionMatch
+      return nameMatch && typeMatch || idMatch
     })
   }, [data, search, typeFilter])
 
@@ -117,6 +121,7 @@ export default function Staff() {
     <div>
       <header className="mb-8">
         <h1 className="font-semibold text-2xl">Staffs</h1>
+        <p className="text-muted-foreground mt-2">Manage all staffs informations.</p>
       </header>
       <MyTable
         emptyMessage="No staffs data yet."

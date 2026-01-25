@@ -2,6 +2,7 @@ import { api } from '../axios';
 
 type Gatepass = {
   id: string;
+  gatepass_id: string;
   visitor_id: string;
   purpose: string;
   description: string;

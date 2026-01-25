@@ -129,8 +129,11 @@ export default function Logs() {
       const nameMatch = words.every(word =>
         log.name.toLowerCase().includes(word)
       )
+      const idMatch = words.every(word =>
+        log.log_id.toLowerCase().includes(word)
+      )
 
-      return nameMatch
+      return nameMatch || idMatch
     })
   }, [data, search])
 
@@ -148,7 +151,8 @@ export default function Logs() {
   return (
     <div>
       <header className="mb-8">
-        <h1 className="font-semibold text-2xl">Logs</h1>
+        <h1 className="font-semibold text-2xl">Gate Logs</h1>
+        <p className="text-muted-foreground mt-2">Monitor log informations.</p>
       </header>
       <MyTable
         emptyMessage={"No logs to show yet."}
@@ -158,7 +162,7 @@ export default function Logs() {
           <div className="flex justify-between items-center">
             <div className="grid grid-cols-2 gap-2">
               <Input
-                placeholder="Search by name..."
+                placeholder="Search logs..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 className="max-w-sm"

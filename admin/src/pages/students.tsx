@@ -63,12 +63,15 @@ export default function Students() {
         student.firstname.toLowerCase().includes(word) ||
         student.lastname.toLowerCase().includes(word)
       )
+      const idMatch = words.every(word =>
+        student.student_id.toLowerCase().includes(word)
+      )
 
       const sectionMatch = sectionFilter.toLowerCase() === 'all' ? true : sectionFilter
         ? student.grade_level.toLowerCase() === sectionFilter.toLowerCase()
         : true
 
-      return nameMatch && sectionMatch
+      return nameMatch && sectionMatch || idMatch
     })
   }, [data, search, sectionFilter])
 
@@ -104,6 +107,7 @@ export default function Students() {
     <div>
       <header className="mb-8">
         <h1 className="font-semibold text-2xl">Students</h1>
+        <p className="text-muted-foreground mt-2">Manage all students informations.</p>
       </header>
       <MyTable
         emptyMessage="No students data yet."

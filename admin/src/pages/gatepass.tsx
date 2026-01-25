@@ -40,6 +40,10 @@ export default function Gatepass() {
   
   const columns: ColumnDef<Gatepass>[] = [
   {
+    accessorKey: "gatepass_id",
+    header: "QRC ID",
+  },
+  {
     accessorKey: "visitor_fullname",
     header: "Visitor",
   },
@@ -137,8 +141,12 @@ export default function Gatepass() {
       const nameMatch = words.every(word =>
         gpass.visitor_fullname.toLowerCase().includes(word)
       )
+    
+    const idMatch = words.every(word =>
+        gpass.gatepass_id.toLowerCase().includes(word)
+      )
 
-      return nameMatch
+      return nameMatch || idMatch
     })
   }, [data, search])
 
@@ -146,6 +154,7 @@ export default function Gatepass() {
     <div>
       <header className="mb-8">
         <h1 className="font-semibold text-2xl">QRCode Pass</h1>
+        <p className="text-muted-foreground mt-2">Manage all gatepass informations.</p>
         <div className="border-l-4 border-green-200 px-2 text-gray-400 bg-gray-200/20 my-2 md:w-[400px]"><p className="py-2 text-[12px]"><span className="text-green-400 font-bold">Quickie Note:</span>{" "}QR Code Passes that are requested by verified visitor accounts will be automatically approve.</p></div>
       </header>
       <MyTable
