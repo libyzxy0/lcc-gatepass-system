@@ -19,7 +19,7 @@ export function NavHeader() {
 
               <div className="grid flex-1 text-left text-sm leading-tight">
                 <span className="truncate font-semibold">{"LCC GATEPASS SYSTEM"}</span>
-                <span className="truncate text-xs">{"Developed by Group 2"}</span>
+                <span className="truncate text-xs">{"Developed by ICT-12A"}</span>
               </div>
             </SidebarMenuButton>
       </SidebarMenuItem>

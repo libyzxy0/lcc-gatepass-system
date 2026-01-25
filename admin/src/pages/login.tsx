@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Spinner } from "@/components/ui/spinner"
 import Turnstile, { useTurnstile } from "react-turnstile"
+import { Eye, EyeOff } from 'lucide-react';
 import {
   Card,
   CardContent,
@@ -43,6 +44,7 @@ export function LoginForm({
   const navigate = useNavigate();
   const turnstile = useTurnstile();
   const [loading, setLoading] = useState(false);
+  const [showPass, setShowPass] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -60,34 +62,29 @@ export function LoginForm({
       navigate('/dashboard');
       turnstile.reset();
     } catch (error: any) {
-      
-      if(!error.response) {
+
+      if (!error.response) {
         alert('Somthing went wrong!');
-        return;
-      }
-      
-      if(error.response) {
-        alert(error.response.data.error);
         return;
       }
 
       if (error.response.status === 404) {
         form.setError("email", {
           type: "manual",
-          message: error.response?.data.message,
+          message: error.response?.data.error,
         });
       }
-      if (error.response.status === 400) {
+      if (error.response.status === 401) {
         form.setError("password", {
           type: "manual",
-          message: error.response?.data.message,
+          message: error.response?.data.error,
         });
       }
 
       if (error.response.status === 403) {
         form.setError("captcha", {
           type: "manual",
-          message: error.response?.data.message
+          message: error.response?.data.error
         })
         turnstile.reset();
       }
@@ -98,8 +95,8 @@ export function LoginForm({
   }
 
   return (
-    <div className={cn("w-[90%] md:w-[430px] z-20", className)} {...props}>
-      <Card className="rounded-xl text-center">
+    <div className={cn("w-[90%] md:w-[460px] z-20", className)} {...props}>
+      <Card className="rounded-3xl text-center">
         <CardHeader>
           <CardTitle className="text-2xl font-bold">Login as Admin</CardTitle>
           <CardDescription>
@@ -114,10 +111,10 @@ export function LoginForm({
                   control={form.control}
                   name="email"
                   render={({ field }) => (
-                    <FormItem>
+                    <FormItem className="text-left">
                       <FormLabel>Email</FormLabel>
                       <FormControl>
-                        <Input className="py-6 " type="text" placeholder="aieshadacallos@gmail.com" {...field} />
+                        <Input className="py-6 " type="text" placeholder="Enter your admin email" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -127,21 +124,30 @@ export function LoginForm({
                   control={form.control}
                   name="password"
                   render={({ field }) => (
-                    <FormItem>
+                    <FormItem className="text-left">
                       <FormLabel>Password</FormLabel>
                       <FormControl>
-                        <Input className="py-6" type="password" placeholder="aieshaJaden@2626" {...field} />
+                        <div className="relative">
+                          <Input className="py-6" type={showPass ? 'text' : 'password'} placeholder="Enter your admin password" {...field} />
+                          <Button type="button" onClick={() => setShowPass(!showPass)} variant={'ghost'} className="absolute right-2 bottom-1.5">
+                            {showPass ? (
+                              <Eye className="size-5 text-muted-foreground" strokeWidth={1.5} />
+                            ) : (
+                              <EyeOff className="size-5 text-muted-foreground" strokeWidth={1.5} />
+                            )}
+                          </Button>
+                        </div>
                       </FormControl>
                       <FormMessage />
+                      <div className="text-right text-sm font-medium hover:text-blue-400 hover:underline mt-1"><a href="/forgot">Forgot password?</a></div>
                     </FormItem>
                   )}
                 />
-
                 <FormField
                   control={form.control}
                   name="captcha"
                   render={({ field }) => (
-                    <FormItem>
+                    <FormItem className="text-left">
                       <FormControl>
                         <Turnstile
                           sitekey="0x4AAAAAACFTRTyVip79G4aZ"
@@ -165,6 +171,7 @@ export function LoginForm({
               </FieldGroup>
             </form>
           </Form>
+          <p className="text-xs text-muted-foreground mt-6">© Copyright 2026 La Concepcion College Digital Gatepass System All rights reserved.</p>
         </CardContent>
       </Card>
     </div >
@@ -174,7 +181,7 @@ export function LoginForm({
 export default function Login() {
   return (
     <div className="h-screen flex items-center justify-center relative">
-      
+
       <img
         src={lccBackground}
         alt="La Concepcion College"
