@@ -118,11 +118,16 @@ export function ViewVisitorDialog({ id, open, onOpenChange }: ViewStudentDialogT
                     <p className="mt-1 text-base font-mono text-gray-900">{data.address || 'No address provided'}</p>
                   </div>
                 </div>
+                {data.verified === false && data.valid_id_photo_url && (
+                  <>
                 <h3 className="text-sm font-semibold text-gray-900 mb-4">Account Actions</h3>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  <Button>Approve</Button>
+                  <Button className="bg-green-500">Approve</Button>
                   <Button variant={'destructive'}>Reject ID</Button>
                 </div>
+                </>
+                )}
+                
               </div>
             </div>
 

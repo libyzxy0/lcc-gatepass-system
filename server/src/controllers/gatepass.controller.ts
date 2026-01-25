@@ -88,7 +88,7 @@ class GatepassController {
       const gatepassId = req.body.id;
       if (!req.admin) return res.status(401).json({ error: 'Unauthorized access' })
       const result = await GatepassService.approve(gatepassId);
-      return res.json({ message: 'Gatepass status successfully set to approve' });
+      return res.json({ message: 'Gatepass successfully approve' });
     } catch (error) {
       res.status(error.status || 500).json({ error: error.message });
     }
@@ -99,7 +99,7 @@ class GatepassController {
     const reason = req.body.reason;
       if (!req.admin) return res.status(401).json({ error: 'Unauthorized access' })
       const result = await GatepassService.reject(gatepassId, reason);
-      return res.json({ message: 'Gatepass status successfully set to rejected' });
+      return res.json({ message: 'Gatepass successfully rejected' });
     } catch (error) {
       res.status(error.status || 500).json({ error: error.message });
     }

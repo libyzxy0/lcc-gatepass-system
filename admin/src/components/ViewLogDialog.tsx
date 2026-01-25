@@ -14,6 +14,7 @@ import { toast } from "sonner"
 import { Badge } from "@/components/ui/badge"
 import { toPHTime, toPHDate } from '@/utils/convert-time'
 import { ViewStudentDialog } from '@/components/ViewStudentDialog';
+import { ViewStaffDialog } from '@/components/ViewStaffDialog';
 import { useState } from 'react'
 
 type ViewStudentDialogType = {
@@ -38,7 +39,7 @@ export function ViewLogDialog({ id, open, onOpenChange }: ViewStudentDialogType)
     queryKey: ['get-log', id],
     queryFn: () => getLog(id)
   })
-  const [studentModal, showStudentModal] = useState(false);
+  const [viewModal, showViewModal] = useState(false);
 
   if (isPending || !data) return null;
 
@@ -46,7 +47,12 @@ export function ViewLogDialog({ id, open, onOpenChange }: ViewStudentDialogType)
 
   return (
     <>
-      <ViewStudentDialog id={data.entity_id} open={studentModal} onOpenChange={showStudentModal} />
+      {['student', 'guardian'].includes(data.type) && <ViewStudentDialog id={data.entity_id} open={viewModal} onOpenChange={showViewModal} />}
+
+      {data.type === 'staff' && <ViewStaffDialog id={data.entity_id} open={viewModal} onOpenChange={showViewModal} />}
+
+      {data.type === 'visitor' && <ViewStaffDialog id={data.entity_id} open={viewModal} onOpenChange={showViewModal} />}
+
       <Dialog open={open} onOpenChange={onOpenChange}>
         <DialogContent className="max-h-[90vh] overflow-y-auto">
           <DialogHeader>
@@ -86,7 +92,7 @@ export function ViewLogDialog({ id, open, onOpenChange }: ViewStudentDialogType)
                     </div>
                   </div>
                   <div className="grid grid-cols-3 gap-4">
-                  <div>
+                    <div>
                       <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">Logged</label>
                       <p className="mt-1 text-base font-mono text-gray-900">{toPHDate(data.created_at)}</p>
                     </div>
@@ -96,9 +102,7 @@ export function ViewLogDialog({ id, open, onOpenChange }: ViewStudentDialogType)
                     </div>
                   </div>
                   <div className="mt-8">
-                    {data.type === 'student' && (
-                      <p className="text-xs">See more detailed information about {data.type} <b className="text-green-400 underline" onClick={() => showStudentModal(true)}>{data.name}</b>.</p>
-                    )}
+                    <p className="text-xs">See more detailed information about {data.type} <b className="text-green-400 underline" onClick={() => showViewModal(true)}>{data.name}</b>.</p>
                   </div>
                 </div>
               </div>
