@@ -11,7 +11,7 @@ router.post("/refresh", AdminController.refresh);
 router.post("/logout", admin_auth, AdminController.logout);
 router.get("/session", admin_auth, AdminController.getSession);
 router.delete("/delete/:id", admin_auth, AdminController.delete);
-router.get("/charts", AdminController.getCharts);
+router.get("/charts", admin_auth, AdminController.getCharts);
 
 router.get("/overview/counts", admin_auth, AdminController.getOverviewCounts);
 
