@@ -135,6 +135,22 @@ class AdminController {
       return res.status(error.status || 500).json({ error: error.message });
     }
   }
+  static async getConfig(req: Request, res: Response) {
+    try {
+      const configData = await AdminService.getConfig();
+      res.json(configData);
+    } catch (error) {
+      return res.status(error.status || 500).json({ error: error.message });
+    }
+  }
+  static async updateConfig(req: Request, res: Response) {
+    try {
+      await AdminService.updateConfig(req.body);
+      res.json({ message: 'Config successfully updated!' });
+    } catch (error) {
+      return res.status(error.status || 500).json({ error: error.message });
+    }
+  }
 }
 
 export default AdminController;
