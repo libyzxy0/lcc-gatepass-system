@@ -14,5 +14,7 @@ router.delete("/delete/:id", admin_auth, AdminController.delete);
 router.get("/charts", admin_auth, AdminController.getCharts);
 
 router.get("/overview/counts", admin_auth, AdminController.getOverviewCounts);
+router.get("/config", admin_auth, AdminController.getConfig);
+router.post("/update-config", admin_auth, AdminController.updateConfig);
 
 export default router;

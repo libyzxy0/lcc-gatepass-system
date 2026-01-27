@@ -3,6 +3,7 @@ import { sendSMSGuardianNotif } from '@/sms-api/student-entry-exit'
 import EspService from '@/services/esp.service'
 import LogService from '@/services/logs.service'
 import GateService from '@/services/gate.service'
+import AdminService from '@/services/admin.service'
 
 class ESPController {
   static async handleEvent(req: Request, res: Response) {
@@ -23,6 +24,8 @@ class ESPController {
         second: '2-digit',
         hour12: false
       });
+      
+      const config = await AdminService.getConfig();
 
       if (payload.topic === `${process.env.NODE_ENV === 'production' ? 'scan/qr' : 'dev/scan/qr'}`) {
         try {
@@ -36,7 +39,7 @@ class ESPController {
             device_id: 'esp-gate-01'
           })
 
-          if (data.gatepass.student_pass) {
+          if (data.gatepass.student_pass && config.sms_alerts) {
             sendSMSGuardianNotif(data.gatepass.entity_id, entry);
           }
 
@@ -64,7 +67,9 @@ class ESPController {
             device_id: 'esp-gate-01'
           })
 
-          sendSMSGuardianNotif(rfid_verification.id, entry);
+          if(config.sms_alerts) {
+            sendSMSGuardianNotif(rfid_verification.id, entry);
+          }
 
           return res.json({
             status: 'ok',

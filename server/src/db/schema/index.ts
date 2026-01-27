@@ -7,3 +7,4 @@ export { otp, userTypeEnum } from './otp.schema';
 export { guardian } from './guardian.schema';
 export { logs, logTypeEnum, entryTypeUsedEnum } from './logs.schema';
 export { gate, gateTypeEnum, gateStatusEnum } from './gate.schema';
+export { config } from './config.schema';

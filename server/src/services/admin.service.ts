@@ -1,6 +1,6 @@
 import { eq, count, and, or, isNull } from "drizzle-orm";
 import db from "@/db/drizzle";
-import { admin, gatepass, visitor, student, logs } from "@/db/schema";
+import { admin, gatepass, visitor, student, logs, config } from "@/db/schema";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
 import {
@@ -169,7 +169,23 @@ class AdminService {
       const result = await db.delete(admin).where(eq(admin.id, id)).returning({ id: admin.id });
       return result;
     } catch (error) {
-      console.error(error);
+      throw error;
+    }
+  }
+  static async getConfig() {
+    try {
+      const [configData] = await db.select().from(config);
+      return configData;
+    } catch (error) {
+      throw error;
+    }
+  }
+  static async updateConfig(field) {
+    try {
+      const conf = await this.getConfig();
+      const [updated] = await db.update(config).set(field).where(eq(config.id, conf.id)).returning({ id: config.id });
+      return updated;
+    } catch (error) {
       throw error;
     }
   }
