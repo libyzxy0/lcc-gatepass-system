@@ -132,7 +132,7 @@ class AdminService {
       return {
         students: students.count || 0,
         pending_gatepass: gatepasses.count || 0,
-        other_people: otherPeopleToday.count + staffToday.count || 0,
+        other_people: otherPeopleToday.count || 0,
         students_today: studentsToday.count || 0,
         visitors_today: visitorsToday.count || 0,
         staffs_today: staffToday.count || 0,

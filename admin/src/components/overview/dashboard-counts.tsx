@@ -59,7 +59,7 @@ export function Counts() {
         />
         <CountCard
           name="Other People"
-          count={data.other_people}
+          count={data.other_people + data.staffs_today}
           className="bg-gradient-to-r from-purple-100/50 to-purple-200/50 border-purple-300/30"
           icon={Users}
         />
