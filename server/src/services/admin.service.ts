@@ -184,13 +184,15 @@ class AdminService {
   static async updateConfig(field) {
     try {
       const conf = await this.getConfig();
-      const [updated] = await db.update(config).set(field).where(eq(config.id, conf.id)).returning({ id: config.id });
+      
       if(typeof(field.emergency_open) === 'boolean') {
         console.log('emergency_open updated')
         await ESPService.updateConfig({
           emergency_open: field.emergency_open ?? false
         })
       }
+      
+      const [updated] = await db.update(config).set(field).where(eq(config.id, conf.id)).returning({ id: config.id });
       return updated;
     } catch (error) {
       throw error;

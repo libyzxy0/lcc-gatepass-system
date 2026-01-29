@@ -10,7 +10,6 @@ class ESPController {
     try {
       const payload = req.body;
       console.log(payload);
-      console.log("dev");
       const localDate = new Date().toLocaleDateString('en-PH', {
         weekday: 'long',
         year: 'numeric',
@@ -27,9 +26,15 @@ class ESPController {
       
       const config = await AdminService.getConfig();
 
-      if (payload.topic === `${process.env.NODE_ENV === 'production' ? 'scan/qr' : 'dev/scan/qr'}`) {
+      if(payload.topic == `${process.env.NODE_ENV === 'production' ? 'config' : 'dev/config'}` && payload.action === "READ") {
+        console.log("Catch config?")
+        res.json({
+          action: 'WRITE',
+          emergency_open: config.emergency_open ? 'yes' : 'no'
+        })
+      } else if (payload.topic === `${process.env.NODE_ENV === 'production' ? 'scan/qr' : 'dev/scan/qr'}`) {
         try {
-          
+          console.log("Catch qr");
           const data = await EspService.verifyQR(payload.data);
 
           const { entry } = await LogService.create({

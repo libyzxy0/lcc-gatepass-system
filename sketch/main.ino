@@ -340,9 +340,6 @@ void connectMQTT() {
 }
 
 void resubscribeTopics() {
-  mqtt.unsubscribe("dev/config");
-  mqtt.unsubscribe("config");
-  mqtt.unsubscribe("dev/config");
   mqtt.unsubscribe("scan/#");
   mqtt.unsubscribe("dev/scan/#");
 
@@ -351,8 +348,6 @@ void resubscribeTopics() {
   } else {
     mqtt.subscribe("dev/scan/#");
   }
-  mqtt.subscribe("config");
-  mqtt.subscribe("dev/config");
 }
 
 void setEnvToDev() {
@@ -452,13 +447,26 @@ void handleConfig(String message) {
   }
 
   if(action == "WRITE") {
-    if(production.length() != 0 && production == "yes") {
-      setEnvToProd();
-    } else {
-      setEnvToDev();
+    if(production.length() != 0) {
+      if(production == "yes") {
+        setEnvToProd();
+      } else {
+        setEnvToDev();
+      }
     }
-
-    EMERGENCY_OPEN = emergency_open == "yes";
+    
+    if(emergency_open.length() != 0) {
+      if(emergency_open == "yes") {
+        GateUtil::unlockBoth();
+        gateOpenedAt = millis();
+        gateIsOpen = true;
+        SCANNING = false;
+        EMERGENCY_OPEN = true;
+      } else {
+        GateUtil::closeGate();
+        EMERGENCY_OPEN = false;
+      }
+    }
   }
   Serial.println(message);
 }
@@ -519,6 +527,8 @@ void setup() {
   mqtt.setBufferSize(512);
 
   connectMQTT();
+  mqtt.subscribe("config");
+  mqtt.subscribe("dev/config");
   resubscribeTopics();
   Serial.println();
   String get_conf_payload = JsonUtil::create()
@@ -566,17 +576,8 @@ void loop() {
   mqtt.loop();
 
   if (EMERGENCY_OPEN) {
-    if (!emergencyHandled) {
-        GateUtil::unlockBoth();
-        gateOpenedAt = millis();
-        gateIsOpen = true;
-        SCANNING = false;
-        emergencyHandled = true;
-    }
     return;
-    } else {
-      emergencyHandled = false;
-    }
+  }
 
   if (gateIsOpen && millis() - gateOpenedAt >= GATE_AUTO_CLOSE_MS && !EMERGENCY_OPEN) {
     Serial.println("Auto-closing gate");
