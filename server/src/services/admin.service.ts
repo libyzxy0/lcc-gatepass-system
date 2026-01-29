@@ -14,6 +14,7 @@ import {
 } from '@/errors'
 import StudentService from '@/services/student.service'
 import GatepassService from '@/services/gatepass.service'
+import ESPService from '@/services/esp.service'
 import { getDailyCounts, getWeekdayCounts } from '@/utils/charts'
 
 type Admin = typeof admin.$inferSelect;
@@ -184,6 +185,12 @@ class AdminService {
     try {
       const conf = await this.getConfig();
       const [updated] = await db.update(config).set(field).where(eq(config.id, conf.id)).returning({ id: config.id });
+      if(typeof(field.emergency_open) === 'boolean') {
+        console.log('emergency_open updated')
+        await ESPService.updateConfig({
+          emergency_open: field.emergency_open ?? false
+        })
+      }
       return updated;
     } catch (error) {
       throw error;

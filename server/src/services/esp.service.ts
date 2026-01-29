@@ -9,6 +9,7 @@ import {
   NotFoundError
 } from '@/errors'
 import AuthService from '@/services/auth.service'
+import { MQTT_BRIDGE } from '@/secrets'
 
 class ESPService {
   static async findRFIDHolder(rfid: string) {
@@ -36,7 +37,9 @@ class ESPService {
         rfid_from: sql`'guardian'`.as("rfid_from"),
       }).from(guardian).where(eq(guardian.rfid_code, rfid))
       );
-      if(!result) throw new Error('Cannot find RFID from the database');
+      console.log("Data:", result)
+      if(!result) throw new BadRequestError('Cannot find RFID from the database');
+      console.log('Still continued')
 
     return result;
     } catch (error) {
@@ -73,6 +76,18 @@ class ESPService {
         throw new UnauthorizedError("Gatepass not valid");
       }
       return gatepassData;
+    } catch (error) {
+      throw error;
+    }
+  }
+  static async updateConfig({ emergency_open }: { emergency_open: boolean; }) {
+    try {
+      console.log(emergency_open, MQTT_BRIDGE);
+      const response = await axios.post(`${MQTT_BRIDGE}/config`, {
+        emergency_open: emergency_open === true ? 'yes' : 'no'
+      })
+      console.log("Data:", response.data);
+      return response.data;
     } catch (error) {
       throw error;
     }

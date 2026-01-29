@@ -10,7 +10,7 @@ class ESPController {
     try {
       const payload = req.body;
       console.log(payload);
-      console.log();
+      console.log("dev");
       const localDate = new Date().toLocaleDateString('en-PH', {
         weekday: 'long',
         year: 'numeric',
@@ -29,6 +29,7 @@ class ESPController {
 
       if (payload.topic === `${process.env.NODE_ENV === 'production' ? 'scan/qr' : 'dev/scan/qr'}`) {
         try {
+          
           const data = await EspService.verifyQR(payload.data);
 
           const { entry } = await LogService.create({
@@ -50,6 +51,7 @@ class ESPController {
             name: data.visitor.firstname + " " + data.visitor.lastname
           })
         } catch (error) {
+          console.log(error)
           return res.json({
             status: 'bad'
           })
@@ -57,6 +59,7 @@ class ESPController {
 
       } else if (payload.topic == `${process.env.NODE_ENV === 'production' ? 'scan/rfid' : 'dev/scan/rfid'}`) {
         try {
+          console.log("Verifiying rfid")
           const rfid_verification = await EspService.verifyRFID(payload.data);
 
           const { entry } = await LogService.create({
@@ -66,8 +69,9 @@ class ESPController {
             entry_type: 'rfid',
             device_id: 'esp-gate-01'
           })
+          console.log(entry)
 
-          if(config.sms_alerts) {
+          if(rfid_verification.rfid_from === 'student' && config.sms_alerts) {
             sendSMSGuardianNotif(rfid_verification.id, entry);
           }
 
@@ -78,6 +82,7 @@ class ESPController {
             name: rfid_verification.firstname + " " + rfid_verification.lastname
           })
         } catch (error) {
+          console.log(error)
           return res.json({
             status: 'bad'
           })

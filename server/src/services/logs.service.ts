@@ -26,6 +26,10 @@ class LogsService {
   }: Logs): Promise<{ entry: 'IN' | 'OUT'}> {
     try {
       const now = new Date();
+      
+      console.log(!!entity_id ? entity_id : 'ID is missing');
+      
+      if(!entity_id) throw new BadRequestError('No ID found!')
 
       const [activeLog] = await db
         .select()
@@ -33,6 +37,7 @@ class LogsService {
         .where(eq(logs.entity_id, entity_id))
         .orderBy(desc(logs.time_in))
         .limit(1);
+        console.log("Active log is")
 
       if (activeLog && !activeLog.time_out) {
         await db.update(logs)
@@ -53,6 +58,7 @@ class LogsService {
         return { entry: 'IN' };
       }
     } catch (error) {
+      console.log(error);
       throw error;
     }
   }

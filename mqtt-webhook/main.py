@@ -8,7 +8,7 @@ import requests
 from dotenv import load_dotenv
 from colorama import Fore, Style, init
 import paho.mqtt.client as mqtt
-from flask import Flask, jsonify
+from flask import Flask, request, jsonify
 
 init(autoreset=True)
 load_dotenv()
@@ -24,7 +24,7 @@ DEV_MODE = os.getenv("DEV_MODE", "false").lower() == "true"
 if not MQTT_SECRET:
     raise ValueError("MQTT_SECRET is required")
 
-TOPICS = ["scan/qr", "scan/rfid"]
+TOPICS = ["scan/qr", "scan/rfid", "config"]
 if DEV_MODE:
     TOPICS = [f"dev/{t}" for t in TOPICS]
 
@@ -124,7 +124,27 @@ app = Flask(__name__)
 
 @app.route("/")
 def root():
-    return jsonify({"status": "ok", "message": "MQTT worker is running"})
+    return jsonify({"status": "ok", "message": "MQTT worker is running", "version_code": "1.1"})
+    
+@app.route("/config", methods=['POST'])
+def write_config():
+    data = request.get_json()
+
+    if not data:
+        return jsonify({"error": "Missing config"}), 400
+
+    data_to_publish = {
+        **data,
+        "action": "WRITE",
+        "secret_key": MQTT_SECRET
+    }
+
+    topic = f"{'dev/' if DEV_MODE else ''}config"
+    message = json.dumps(data_to_publish)
+    client.publish(topic, message)
+
+    return jsonify({"message": "Config is published!"})
+
 
 def start_mqtt_thread():
     threading.Thread(target=start_mqtt_worker, daemon=True).start()

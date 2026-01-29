@@ -24,6 +24,7 @@
 /* Choose which server to communicate with, production(true) or development(false) */
 bool PRODUCTION = true;
 
+bool EMERGENCY_OPEN = false;
 /* ——————————————————————————————— */
 
 /*
@@ -42,7 +43,7 @@ const char* SECRET_KEY = "79408c3e-6c50-4fb0-98cb-98db70596411";
 
 /* ——————————————————————————————— */
 
-/* MQTT HiveMQ Configuration 
+/* MQTT HiveMQ Configuration
 * Please dont take screenshots/pictures at this part, as it may cause security issues!
 */
 const char* mqtt_server   = "37638f32d99b49fa968d88c783e2b03a.s1.eu.hivemq.cloud";
@@ -51,12 +52,6 @@ const char* mqtt_user     = "libyzxy0";
 const char* mqtt_password = "Libyzxy0@123_esp32";
 
 String statusTopic = String("status/") + client_id;
-
-/* ——————————————————————————————— */
-
-/* NTP Server Time Configuration */
-const char* ntpServer = "pool.ntp.org";
-const char* time_zone = "PST-8";
 
 /* ——————————————————————————————— */
 
@@ -110,6 +105,13 @@ bool SCANNING = false;
 char qrBuffer[MAX_SCAN_LENGTH];
 uint8_t qrIndex = 0;
 unsigned long lastQrCharTime = 0;
+String lastScanData = "";
+unsigned long lastScanTime = 0;
+const unsigned long DUPLICATE_BLOCK_MS = 30000;
+unsigned long gateOpenedAt = 0;
+const unsigned long GATE_AUTO_CLOSE_MS = 5000;
+bool gateIsOpen = false;
+static bool emergencyHandled = false;
 
 /* ——————————————————————————————— */
 
@@ -232,11 +234,29 @@ class GateUtil {
     digitalWrite(RELAY_PIN_MAIN, HIGH);
     digitalWrite(RELAY_PIN_SEC, LOW);
   }
+  static void unlockBoth() {
+    digitalWrite(RELAY_PIN_MAIN, LOW);
+    digitalWrite(RELAY_PIN_SEC, LOW);
+  }
   static void closeGate() {
     digitalWrite(RELAY_PIN_MAIN, HIGH);
     digitalWrite(RELAY_PIN_SEC, HIGH);
   }
 };
+
+/* ——————————————————————————————— */
+
+bool isDuplicateScan(const String& data) {
+  if (data == lastScanData && millis() - lastScanTime < DUPLICATE_BLOCK_MS) {
+    Serial.println("Duplicate scan blocked");
+    NotificationUtil::errorTone();
+    return true;
+  }
+
+  lastScanData = data;
+  lastScanTime = millis();
+  return false;
+}
 
 /* ——————————————————————————————— */
 
@@ -274,39 +294,39 @@ void connectWiFi() {
 void connectMQTT() {
   while (!mqtt.connected()) {
     Serial.print("Connecting to MQTT...");
-    
+
     String offlinePayload = JsonUtil::create()
       .add("client_id", client_id)
       .add("status", "offline")
       .add("secret_key", SECRET_KEY)
       .toString();
-    
+
     bool ok = mqtt.connect(
       client_id,
       mqtt_user,
       mqtt_password,
-      statusTopic.c_str(), 
+      statusTopic.c_str(),
       1,
       true,
       offlinePayload.c_str()
     );
-    
+
     if (ok) {
       Serial.println("connected");
       mqtt.subscribe(PRODUCTION ? "scan/#" : "dev/scan/#");
-      
+
       String onlinePayload = JsonUtil::create()
       .add("client_id", client_id)
       .add("status", "online")
       .add("secret_key", SECRET_KEY)
       .toString();
-      
+
       mqtt.publish(
         statusTopic.c_str(),
         onlinePayload.c_str(),
         true
       );
-      
+
       NotificationUtil::readyTone();
     } else {
       Serial.print("failed, rc=");
@@ -320,29 +340,53 @@ void connectMQTT() {
 }
 
 void resubscribeTopics() {
+  mqtt.unsubscribe("dev/config");
+  mqtt.unsubscribe("config");
+  mqtt.unsubscribe("dev/config");
   mqtt.unsubscribe("scan/#");
   mqtt.unsubscribe("dev/scan/#");
 
   if (PRODUCTION) {
     mqtt.subscribe("scan/#");
-    Serial.println("Subscribed to scan/#");
   } else {
     mqtt.subscribe("dev/scan/#");
-    Serial.println("Subscribed to dev/scan/#");
   }
+  mqtt.subscribe("config");
+  mqtt.subscribe("dev/config");
+}
+
+void setEnvToDev() {
+  PRODUCTION = false;
+  SCANNING = false;
+  resubscribeTopics();
+  Serial.println("Environment set to DEVELOPMENT");
+  NotificationUtil::initializedTone();
+}
+
+void setEnvToProd() {
+  PRODUCTION = true;
+  SCANNING = false;
+  resubscribeTopics();
+  Serial.println("Environment set to PRODUCTION");
+  NotificationUtil::initializedTone();
 }
 
 bool scanRfid(String &uidOut) {
   if (!rfid.PICC_IsNewCardPresent()) return false;
   if (!rfid.PICC_ReadCardSerial()) return false;
+
   uidOut = "";
   for (byte i = 0; i < rfid.uid.size; i++) {
     if (rfid.uid.uidByte[i] < 0x10) uidOut += '0';
     uidOut += String(rfid.uid.uidByte[i], HEX);
   }
   uidOut.toUpperCase();
+
   rfid.PICC_HaltA();
   rfid.PCD_StopCrypto1();
+  delay(50);
+  rfid.PCD_Init();
+
   return true;
 }
 
@@ -350,19 +394,73 @@ bool scanQRCode(String &qrOut) {
     static String barcode = "";
     while (QRScanner.available()) {
         char c = QRScanner.read();
-        if (c == '\n' || c == '\r') { 
+        if (c == '\n' || c == '\r') {
             if (barcode.length() > 0) {
                 qrOut = barcode;
-                barcode = ""; 
-                return true; 
+                barcode = "";
+                return true;
             }
         } else {
-            Serial.print(c); 
+            Serial.print(c);
             barcode += c;
         }
     }
 
-    return false; 
+    return false;
+}
+
+void handleGate(String message) {
+  Serial.println("Handling Gate");
+  String status = JsonUtil::getString(message, "status");
+  String entry = JsonUtil::getString(message, "entry");
+  String name = JsonUtil::getString(message, "name");
+
+  if (status.length() == 0) {
+    SCANNING = false;
+    return;
+  }
+  if (status == "ok") {
+    Serial.println("Access GRANTED");
+    if(entry == "IN") {
+      GateUtil::openEntryGate();
+      Serial.println("Access IN → Gate opened");
+    } else if(entry == "OUT") {
+      GateUtil::openExitGate();
+      Serial.println("Access OUT → Gate opened");
+    }
+
+    NotificationUtil::successTone();
+    gateOpenedAt = millis();
+    gateIsOpen = true;
+  } else if(status == "bad") {
+    Serial.println("Access DENIED");
+    GateUtil::closeGate();
+    NotificationUtil::errorTone();
+    SCANNING = false;
+  }
+  SCANNING = false;
+}
+
+void handleConfig(String message) {
+  Serial.println("Handling config");
+  String action = JsonUtil::getString(message, "action");
+  String emergency_open = JsonUtil::getString(message, "emergency_open");
+  String production = JsonUtil::getString(message, "production");
+
+  if (action.length() == 0) {
+    return;
+  }
+
+  if(action == "WRITE") {
+    if(production.length() != 0 && production == "yes") {
+      setEnvToProd();
+    } else {
+      setEnvToDev();
+    }
+
+    EMERGENCY_OPEN = emergency_open == "yes";
+  }
+  Serial.println(message);
 }
 
 void mqtt_callback(char* topic, byte* payload, unsigned int length) {
@@ -372,6 +470,9 @@ void mqtt_callback(char* topic, byte* payload, unsigned int length) {
     return;
   }
 
+  Serial.print("Topic: ");
+  Serial.println(topic);
+
   String message;
   message.reserve(length);
 
@@ -380,43 +481,17 @@ void mqtt_callback(char* topic, byte* payload, unsigned int length) {
   }
 
   if (!message.startsWith("{") || !message.endsWith("}")) return;
-  
-  String status = JsonUtil::getString(message, "status");
-  String entry = JsonUtil::getString(message, "entry");
-  String name = JsonUtil::getString(message, "name");
-  
-  if (status.length() == 0) {
-    SCANNING = false;
-    return;
-  }
-  
-  if (entry.length() == 0) {
-    SCANNING = false;
-    return;
-  }
-  
-  Serial.println(name);
 
-  if (status == "ok") {
-    Serial.println("Access GRANTED");
-    if(entry == "IN") {
-      GateUtil::openEntryGate();
-      NotificationUtil::successTone();
-      Serial.println("Access IN → Gate opened");
-    } else if(entry == "OUT") {
-      GateUtil::openExitGate();
-      NotificationUtil::successTone();
-      Serial.println("Access OUT → Gate opened");
-    } else {
-      GateUtil::closeGate();
-      NotificationUtil::errorTone();
-    }
-  } else {
-    Serial.println("Access DENIED");
-    GateUtil::closeGate();
-    NotificationUtil::errorTone();
+  String t = topic;
+
+  if(t.startsWith("config") || t.startsWith("dev/config")) {
+    handleConfig(message);
+    return;
   }
-  SCANNING = false;
+
+  if (((PRODUCTION && t.startsWith("scan/")) || (!PRODUCTION && t.startsWith("dev/"))) && t.endsWith("/response")) {
+    handleGate(message);
+  }
 }
 
 void setup() {
@@ -442,10 +517,17 @@ void setup() {
   mqtt.setServer(mqtt_server, mqtt_port);
   mqtt.setCallback(mqtt_callback);
   mqtt.setBufferSize(512);
-  
+
   connectMQTT();
   resubscribeTopics();
   Serial.println();
+  String get_conf_payload = JsonUtil::create()
+    .add("action", "READ")
+    .add("secret_key", SECRET_KEY)
+    .add("client_id", client_id)
+    .toString();
+
+  mqtt.publish(PRODUCTION ? "config" : "dev/config", get_conf_payload.c_str());
   Serial.println("Device Ready, See Configs:");
   Serial.println("[=========================]");
   Serial.print("ENVIRONMENT: ");
@@ -456,7 +538,7 @@ void setup() {
   Serial.println(client_id);
   Serial.print("SECRET KEY: ");
   Serial.println(SECRET_KEY);
-  
+
   Serial.println("[=========================]");
   Serial.println();
   NotificationUtil::initializedTone();
@@ -465,19 +547,11 @@ void setup() {
 void handleSerialCommands() {
   if (Serial.available() > 0) {
     String command = Serial.readStringUntil('\n');
-    
+
     if (command.equals("DEV_MODE")) {
-      PRODUCTION = false;
-      SCANNING = false;
-      resubscribeTopics();
-      Serial.println("Environment set to DEVELOPMENT");
-      NotificationUtil::initializedTone();
+      setEnvToDev();
     } else if (command.equals("PROD_MODE")) {
-      PRODUCTION = true;
-      SCANNING = false;
-      resubscribeTopics();
-      Serial.println("Environment set to PRODUCTION");
-      NotificationUtil::initializedTone();
+      setEnvToProd();
     }
   }
 }
@@ -490,25 +564,47 @@ void loop() {
     connectMQTT();
   }
   mqtt.loop();
-  
-  if(digitalRead(LOCK_SENSOR_RST) == LOW) {
+
+  if (EMERGENCY_OPEN) {
+    if (!emergencyHandled) {
+        GateUtil::unlockBoth();
+        gateOpenedAt = millis();
+        gateIsOpen = true;
+        SCANNING = false;
+        emergencyHandled = true;
+    }
+    return;
+    } else {
+      emergencyHandled = false;
+    }
+
+  if (gateIsOpen && millis() - gateOpenedAt >= GATE_AUTO_CLOSE_MS && !EMERGENCY_OPEN) {
+    Serial.println("Auto-closing gate");
     GateUtil::closeGate();
+    gateIsOpen = false;
+    SCANNING = false;
   }
-  
+
+  if (digitalRead(LOCK_SENSOR_RST) == LOW && gateIsOpen && !EMERGENCY_OPEN) {
+    Serial.println("Lock sensor triggered → closing gate");
+    GateUtil::closeGate();
+    gateIsOpen = false;
+  }
+
   handleSerialCommands();
-  
+
   String uid;
-  if (scanRfid(uid) && !SCANNING) {
+  if (scanRfid(uid) && !SCANNING && !isDuplicateScan(uid)) {
     SCANNING = true;
     Serial.print("Scanned RFID: ");
     Serial.println(uid);
-    
+
     String payload = JsonUtil::create()
     .add("data", uid.c_str())
     .add("secret_key", SECRET_KEY)
     .add("client_id", client_id)
     .toString();
-    
+
     if (mqtt.publish(PRODUCTION ? "scan/rfid" : "dev/scan/rfid", payload.c_str())) {
       NotificationUtil::readyTone();
     } else {
@@ -517,17 +613,17 @@ void loop() {
   }
 
   String qr_data;
-  if (scanQRCode(qr_data) && !SCANNING) {
+  if (scanQRCode(qr_data) && !SCANNING && !isDuplicateScan(qr_data)) {
     SCANNING = true;
     Serial.print("Scanned QR: ");
     Serial.println(qr_data);
-    
+
     String payload = JsonUtil::create()
     .add("data", qr_data.c_str())
     .add("secret_key", SECRET_KEY)
     .add("client_id", client_id)
     .toString();
-    
+
     if (mqtt.publish(PRODUCTION ? "scan/qr" : "dev/scan/qr", payload.c_str())) {
       NotificationUtil::readyTone();
     } else {

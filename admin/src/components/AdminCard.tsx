@@ -13,6 +13,8 @@ import { useState } from 'react'
 import { toast } from "sonner"
 import { useQueryClient } from '@tanstack/react-query';
 import { deleteAdmin } from '@/api/helpers/admin'
+import { useAuthStore } from "@/stores/useAuthStore";
+import { Badge } from '@/components/ui/badge'
 
 type AdminCardType = {
   id: string;
@@ -23,6 +25,7 @@ type AdminCardType = {
 }
 
 export function AdminCard({ id, name, email, role, is_super_admin }: AdminCardType) {
+  const { admin } = useAuthStore();
   const [deleteModal, showDeleteModal] = useState(false);
   const [loading, setLoading] = useState(false);
   const queryClient = useQueryClient();
@@ -39,6 +42,9 @@ export function AdminCard({ id, name, email, role, is_super_admin }: AdminCardTy
     toast.success(deleted.message);
     showDeleteModal(false);
   }
+  
+  if(!admin) return null;
+  
   return (
     <>
     <AlertDialog open={deleteModal} onOpenChange={showDeleteModal}>
@@ -55,16 +61,20 @@ export function AdminCard({ id, name, email, role, is_super_admin }: AdminCardTy
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-    <div className="flex items-center justify-between p-4 border rounded-lg">
+    <div className={`flex items-center justify-between p-4 border rounded-lg ${admin.id === id ? 'bg-green-400/10 border-green-200' : ''}`}>
       <div>
         <p className="font-medium">{name}</p>
         <p className="text-sm text-muted-foreground">{email}</p>
         <p className="text-xs text-muted-foreground mt-1 capitalize">{role}</p>
       </div>
-      {!is_super_admin && (
+      {(admin.id !== id && !is_super_admin) ? (
         <Button onClick={() => showDeleteModal(true)} variant="ghost" size="icon" className="text-destructive">
           <Trash2 className="w-4 h-4" />
         </Button>
+      ) : (
+        <>
+        {admin.id === id && <Badge>You</Badge>}
+        </>
       )}
     </div>
     </>
