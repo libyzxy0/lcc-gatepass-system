@@ -1,8 +1,8 @@
 import { Outlet } from "react-router";
 import { useEffect, useState } from "react";
 import { useAuthStore } from "@/stores/useAuthStore";
-import { Spinner } from "@/components/ui/spinner"
 import { useNavigate } from "react-router";
+import { HashLoader } from 'react-spinners'
 
 export default function ProtectedRoute() {
   const { getSession, isAuthenticated } = useAuthStore();
@@ -23,9 +23,9 @@ export default function ProtectedRoute() {
   }, []);
 
   if (loading) return (
-    <div className="h-screen flex justify-center items-center gap-4">
-      <Spinner className="size-8" />
-      <p className="text-muted-foreground">Wait lang po...</p>
+    <div className="h-[95vh] md:h-screen lg:h-screen flex justify-center items-center gap-6 flex-col">
+      <HashLoader color="#3b82f6" speedMultiplier={2} />
+      <p className="text-muted-foreground text-[12px]">Checking session, wait lang po...</p>
     </div>
   );
   
