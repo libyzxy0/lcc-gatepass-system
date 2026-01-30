@@ -63,7 +63,7 @@ export function ViewVisitorDialog({ id, open, onOpenChange }: ViewStudentDialogT
     } else if (action === 'reject') {
       const result = await reject(id, reason ? reason : null);
       if (!result.success) return toast.error(result.message);
-      await queryClient.invalidateQueries({ queryKey: ['get-all-visitors'] });
+      await queryClient.invalidateQueries({ queryKey: ['get-all-visitors', 'get-visitor'] });
       setReason("");
       toast.success(result.message);
     }
