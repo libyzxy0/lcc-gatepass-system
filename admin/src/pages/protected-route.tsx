@@ -23,7 +23,7 @@ export default function ProtectedRoute() {
   }, []);
 
   if (loading) return (
-    <div className="h-[95vh] md:h-screen lg:h-screen flex justify-center items-center gap-6 flex-col">
+    <div className="h-screen flex justify-center items-center gap-6 flex-col">
       <HashLoader color="#3b82f6" speedMultiplier={2} />
       <p className="text-muted-foreground text-[12px]">Checking session, wait lang po...</p>
     </div>

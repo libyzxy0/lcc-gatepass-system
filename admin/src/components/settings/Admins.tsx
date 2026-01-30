@@ -125,7 +125,7 @@ export function Admins() {
                     <FormItem>
                       <FormLabel>Desired Password<span className="text-red-500">*</span></FormLabel>
                       <FormControl>
-                        <Input placeholder="IloveuRen@123" {...field} />
+                        <Input placeholder="Enter your desired password" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -140,7 +140,7 @@ export function Admins() {
                     <FormItem className="col-span-2">
                       <FormLabel>Email<span className="text-red-500">*</span></FormLabel>
                       <FormControl>
-                        <Input placeholder="janlibydelacosta@gmail.com" {...field} />
+                        <Input placeholder="Enter your email" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
