@@ -61,7 +61,7 @@ export function AdminCard({ id, name, email, role, is_super_admin }: AdminCardTy
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-    <div className={`flex items-center justify-between p-4 border rounded-lg ${admin.id === id ? 'bg-green-400/10 border-green-200' : ''}`}>
+    <div className="flex items-center justify-between p-4 border rounded-lg">
       <div>
         <p className="font-medium">{name}</p>
         <p className="text-sm text-muted-foreground">{email}</p>
