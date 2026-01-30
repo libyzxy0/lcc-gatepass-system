@@ -13,7 +13,7 @@ import {
 } from '@tanstack/react-query'
 import { getStudent } from '@/api/helpers/student'
 import { toast } from "sonner"
-
+import { RFIDCode } from '@/components/RFIDCode'
 
 type ViewStudentDialogType = {
   id: string;
@@ -91,7 +91,7 @@ export function ViewStudentDialog({ id, open, onOpenChange }: ViewStudentDialogT
                   </div>
                   <div>
                     <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">RFID Code</label>
-                    <p className="mt-1 text-base font-mono text-gray-900">{data.rfid_code}</p>
+                    <RFIDCode value={data.rfid_code} />
                   </div>
                 </div>
               </div>
@@ -120,12 +120,12 @@ export function ViewStudentDialog({ id, open, onOpenChange }: ViewStudentDialogT
                     <p className="mt-1 text-base font-mono text-gray-900">{data.guardian.relationship}</p>
                   </div>
                   <div>
-                    <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">Phone Number</label>
+                    <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">Phone</label>
                     <p className="mt-1 text-base font-mono text-gray-900">{data.guardian.phone_number}</p>
                   </div>
                   <div>
                     <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">RFID Code</label>
-                    <p className="mt-1 text-base font-mono text-gray-900">{data.guardian.rfid_code}</p>
+                    <RFIDCode value={data.guardian.rfid_code} />
                   </div>
                   
                 </div>

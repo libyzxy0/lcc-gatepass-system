@@ -17,6 +17,7 @@ import {
   SelectValue
 } from '@/components/ui/select'
 import { Badge } from "@/components/ui/badge"
+import { RFIDCode } from '@/components/RFIDCode'
 
 interface Staff {
   id: string;
@@ -80,7 +81,7 @@ export default function Staff() {
         ? staff.staff_type.toLowerCase() === typeFilter.toLowerCase()
         : true
 
-      return nameMatch && typeMatch || idMatch
+      return (nameMatch || idMatch) && typeMatch
     })
   }, [data, search, typeFilter])
 
@@ -110,7 +111,11 @@ export default function Staff() {
         return value ? typeBadges[value] : 'N/A'
       }
     },
-    { accessorKey: "rfid_code", header: "RFID CODE" },
+    { 
+      accessorKey: "rfid_code", 
+      header: "RFID CODE",
+      cell: info => <RFIDCode value={info.row.original.rfid_code} />
+    },
     {
       id: 'actions',
       cell: info => <StaffTableActions id={info.row.original.id} />
@@ -140,8 +145,8 @@ export default function Staff() {
                 value={typeFilter}
                 onValueChange={setSectionFilter}
               >
-                <SelectTrigger className="w-40">
-                  <SelectValue placeholder="Filter by Type" />
+                <SelectTrigger className="w-32">
+                  <SelectValue placeholder="Select Type" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value={'all'}>All</SelectItem>

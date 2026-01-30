@@ -4,19 +4,16 @@ import type { ColumnDef } from "@tanstack/react-table"
 import { ArrowUpDown, Download } from 'lucide-react';
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import {
-  Select,
-  SelectItem,
-  SelectTrigger,
-  SelectContent,
-  SelectValue
-} from '@/components/ui/select'
 import { Skeleton } from "@/components/ui/skeleton"
 import { getAllLogs } from '@/api/helpers/logs'
 import { useQuery } from '@tanstack/react-query'
 import { toPHTime } from '@/utils/convert-time'
 import { LogsTableActions } from '@/components/LogsTableAction';
 import { Badge } from "@/components/ui/badge"
+import { Calendar } from "@/components/ui/calendar"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { type DateRange } from "react-day-picker"
+import { format } from "date-fns"
 
 type LogsType = {
   id: string;
@@ -43,7 +40,12 @@ const entryTypeBadges = {
 }
 
 export default function Logs() {
-  const [search, setSearch] = useState("")
+  const [search, setSearch] = useState("");
+  const [dateRange, setDateRange] = useState<DateRange | undefined>({
+    from: undefined,
+    to: undefined
+  })
+
   const { isPending, error, data } = useQuery({
     queryKey: ['get-all-logs'],
     queryFn: getAllLogs,
@@ -117,25 +119,37 @@ export default function Logs() {
       cell: (info) => <LogsTableActions id={info.row.original.id} />
     }
   ];
-  
-  if (error) return 'An error has occurred: ' + error.message
-  
-  const filteredData = useMemo(() => {
-    if (!data) return []
 
-    const words = search.toLowerCase().trim().split(/\s+/)
+  if (error) return 'An error has occurred: ' + error.message
+
+  const filteredData = useMemo(() => {
+    if (!data) return [];
+
+    const words = search.toLowerCase().trim().split(/\s+/);
 
     return data.filter(log => {
       const nameMatch = words.every(word =>
         log.name.toLowerCase().includes(word)
-      )
+      );
       const idMatch = words.every(word =>
         log.log_id.toLowerCase().includes(word)
-      )
+      );
 
-      return nameMatch || idMatch
-    })
-  }, [data, search])
+      const createdAt = new Date(log.created_at);
+
+      if (dateRange?.from && dateRange?.to) {
+        if (
+          createdAt < new Date(dateRange.from.setHours(0, 0, 0, 0)) ||
+          createdAt > new Date(dateRange.to.setHours(23, 59, 59, 999))
+        ) {
+          return false;
+        }
+      }
+
+      return nameMatch || idMatch;
+    });
+  }, [data, search, dateRange]);
+
 
   if (isPending) return (
     <div className="grid grid-cols-1 gap-5">
@@ -167,21 +181,39 @@ export default function Logs() {
                 onChange={(e) => setSearch(e.target.value)}
                 className="max-w-sm"
               />
-              <Select
-                value={'today'}
-              >
-                <SelectTrigger className="w-40">
-                  <SelectValue placeholder="Select Date" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value={'today'}>Today</SelectItem>
-                  <SelectItem value="yesterday">Yesterday</SelectItem>
-                  <SelectItem value="custom">Custom Date</SelectItem>
-                </SelectContent>
-              </Select>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className="md:max-w-[224px] justify-start text-left font-normal"
+                  >
+                    {dateRange?.from ? (
+                      dateRange.to ? (
+                        `${format(dateRange.from, "LLL dd, y")} - ${format(
+                          dateRange.to,
+                          "LLL dd, y"
+                        )}`
+                      ) : (
+                        format(dateRange.from, "LLL dd, y")
+                      )
+                    ) : (
+                      <span>Select date</span>
+                    )}
+                  </Button>
+                </PopoverTrigger>
+
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar
+                    mode="range"
+                    numberOfMonths={2}
+                    selected={dateRange}
+                    onSelect={setDateRange}
+                  />
+                </PopoverContent>
+              </Popover>
             </div>
 
-            <div>
+            <div className="hidden md:flex">
               <Button variant={'outline'}>
                 <Download />
                 Download CSV

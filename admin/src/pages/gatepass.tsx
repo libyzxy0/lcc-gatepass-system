@@ -9,6 +9,13 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Input } from '@/components/ui/input'
 import { GatepassTableAction } from '@/components/GatepassTableAction'
+import {
+  Select,
+  SelectItem,
+  SelectTrigger,
+  SelectContent,
+  SelectValue
+} from '@/components/ui/select'
 
 type Gatepass = {
   id: string;
@@ -33,6 +40,7 @@ const statusBadges = {
 
 export default function Gatepass() {
   const [search, setSearch] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
   const { isPending, error, data } = useQuery({
     queryKey: ['get-all-gatepass'],
     queryFn: getAllGatepass
@@ -145,10 +153,12 @@ export default function Gatepass() {
     const idMatch = words.every(word =>
         gpass.gatepass_id.toLowerCase().includes(word)
       )
+      const statusMatch =
+        statusFilter === "all" ? true : gpass.status === statusFilter
 
-      return nameMatch || idMatch
+      return (nameMatch || idMatch) && statusMatch;
     })
-  }, [data, search])
+  }, [data, search, statusFilter])
 
   return (
     <div>
@@ -163,16 +173,30 @@ export default function Gatepass() {
         emptyMessage={'No QrPass data yet.'}
         TableAction={
           <div className="flex justify-between gap-2">
-            <div className="grid md:grid-cols-2 md:gap-2">
+            <div className="grid grid-cols-2 gap-2">
               <Input
-                placeholder="Search by name..."
+                placeholder="Search..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 className="max-w-sm"
               />
+              <Select
+                value={statusFilter} 
+                onValueChange={setStatusFilter}
+              >
+                <SelectTrigger className="w-32">
+                  <SelectValue placeholder="Select status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value={'all'}>All Status</SelectItem>
+                  <SelectItem value="approved">Approved</SelectItem>
+                  <SelectItem value="pending">Pending</SelectItem>
+                  <SelectItem value="rejected">Rejected</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
 
-            <div>
+            <div className="hidden md:flex">
               <Button variant={'outline'}>
                 <Download />
                 Download CSV

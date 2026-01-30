@@ -9,6 +9,13 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { VisitorTableActions } from '@/components/VisitorTableActions'
+import {
+  Select,
+  SelectItem,
+  SelectTrigger,
+  SelectContent,
+  SelectValue
+} from '@/components/ui/select'
 
 const statusBadges = {
   verified: <Badge variant="default" className="bg-green-400/20 border-green-400/50 text-green-400">Verified</Badge>,
@@ -21,6 +28,7 @@ export default function Visitors() {
     queryKey: ['get-all-visitors'],
     queryFn: getAllVisitors
   })
+  const [statusFilter, setStatusFilter] = useState("all")
   const [search, setSearch] = useState("")
 
   const columns: ColumnDef<Visitor>[] = [
@@ -105,9 +113,19 @@ export default function Visitors() {
         visitor.visitor_id.toLowerCase().includes(word)
       )
 
-      return nameMatch || idMatch
+      const status =
+        visitor.verified
+          ? "verified"
+          : visitor.valid_id_photo_url
+            ? "review"
+            : "unverified"
+
+      const statusMatch =
+        statusFilter === "all" ? true : status === statusFilter
+
+      return (nameMatch || idMatch) && statusMatch
     })
-  }, [data, search])
+  }, [data, search, statusFilter])
 
   return (
     <div>
@@ -120,14 +138,26 @@ export default function Visitors() {
         columns={columns}
         data={filteredData}
         TableAction={
-          <div className="flex flex-row justify-between items-center gap-2">
-            <Input
-              placeholder="Search visitor..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="max-w-sm"
-            />
-            <div>
+          <div className="flex justify-between items-center gap-2">
+            <div className="grid grid-cols-2 gap-2">
+              <Input
+                placeholder="Search..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="max-w-sm"
+              /><Select value={statusFilter} onValueChange={setStatusFilter}>
+                <SelectTrigger className="w-32">
+                  <SelectValue placeholder="Select status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value={'all'}>All Status</SelectItem>
+                  <SelectItem value="verified">Verified</SelectItem>
+                  <SelectItem value="review">Review</SelectItem>
+                  <SelectItem value="unverified">Unverified</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="hidden md:flex">
               <Button variant={'outline'}>
                 <Download />
                 Download CSV

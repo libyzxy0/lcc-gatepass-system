@@ -1,3 +1,4 @@
+import React from 'react'
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -13,12 +14,22 @@ import {
 } from '@tanstack/react-query'
 import { getStaff } from '@/api/helpers/staff'
 import { toast } from "sonner"
-
+import { Badge } from '@/components/ui/badge'
+import { RFIDCode } from '@/components/RFIDCode'
 
 type ViewStudentDialogType = {
   id: string;
   open: boolean;
   onOpenChange: (open: boolean) => void;
+}
+
+const typeBadges: Record<string,
+  React.ReactNode> = {
+  faculty: <Badge variant="default" className="bg-blue-400/20 border-blue-400/50 text-blue-400">Faculty</Badge>,
+  guard: <Badge variant="default" className="bg-red-400/20 border-red-400/50 text-red-400">Security</Badge>,
+  administrator: <Badge variant="default" className="bg-green-400/20 border-green-400/50 text-green-400">Admin</Badge>,
+  canteen_vendors: <Badge variant="default" className="bg-yellow-400/20 border-yellow-400/50 text-yellow-400">Vendors</Badge>,
+  other: <Badge variant="default" className="bg-gray-400/20 border-gray-400/50 text-gray-400">Other</Badge>
 }
 
 export function ViewStaffDialog({ id, open, onOpenChange }: ViewStudentDialogType) {
@@ -82,7 +93,9 @@ export function ViewStaffDialog({ id, open, onOpenChange }: ViewStudentDialogTyp
                 <div className="grid grid-cols-3 gap-4">
                   <div>
                     <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">Type</label>
-                    <p className="mt-1 text-base text-gray-900">{data.staff_type}</p>
+                    <div>
+                    {typeBadges[data.staff_type]}
+                    </div>
                   </div>
                   <div>
                     <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">Phone</label>
@@ -90,7 +103,9 @@ export function ViewStaffDialog({ id, open, onOpenChange }: ViewStudentDialogTyp
                   </div>
                   <div>
                     <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">RFID Code</label>
-                    <p className="mt-1 text-base font-mono text-gray-900">{data.rfid_code}</p>
+                    <div>
+                    <RFIDCode value={data.rfid_code} />
+                    </div>
                   </div>
                 </div>
                 

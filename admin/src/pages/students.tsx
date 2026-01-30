@@ -16,6 +16,8 @@ import {
   SelectContent,
   SelectValue
 } from '@/components/ui/select'
+import { RFIDCode } from '@/components/RFIDCode'
+
 interface Student {
   id: string;
   student_id: string;
@@ -71,7 +73,7 @@ export default function Students() {
         ? student.grade_level.toLowerCase() === sectionFilter.toLowerCase()
         : true
 
-      return nameMatch && sectionMatch || idMatch
+      return (nameMatch || idMatch) && sectionMatch
     })
   }, [data, search, sectionFilter])
 
@@ -96,7 +98,11 @@ export default function Students() {
       header: "Address",
       cell: info => <div className="col-span-4">{info.getValue<string | null>() ?? "N/A"}</div>
     },
-    { accessorKey: "rfid_code", header: "RFID CODE" },
+    { 
+      accessorKey: "rfid_code",
+      header: "RFID CODE",
+      cell: info => <RFIDCode value={info.row.original.rfid_code}/>
+    },
     {
       id: 'actions',
       cell: info => <StudentTableActions id={info.row.original.id} />
@@ -117,7 +123,7 @@ export default function Students() {
           <div className="flex justify-between items-center">
             <div className="grid grid-cols-2 gap-2">
               <Input
-                placeholder="Search by name..."
+                placeholder="Search..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 className="max-w-sm"
@@ -126,10 +132,10 @@ export default function Students() {
                 value={sectionFilter}
                 onValueChange={setSectionFilter}
               >
-                <SelectTrigger className="w-40">
+                <SelectTrigger className="w-36">
                   <SelectValue placeholder="Filter by Level" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className={"max-h-[200px]"}>
                   <SelectItem value={'all'}>All</SelectItem>
                   <SelectItem value="SHS-12">SHS-12</SelectItem>
                   <SelectItem value="SHS-11">SHS-11</SelectItem>
