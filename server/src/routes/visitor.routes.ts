@@ -13,5 +13,7 @@ router.post("/me/update", visitor_auth, VisitorController.updateAccount);
 router.post("/me/check", VisitorController.checkPhoneNumber);
 router.get("/get/:id", admin_auth, VisitorController.get);
 router.delete("/delete/:id", admin_auth, VisitorController.delete);
+router.post("/approve", admin_auth, VisitorController.approve);
+router.post("/reject", admin_auth, VisitorController.reject);
 
 export default router;

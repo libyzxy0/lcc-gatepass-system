@@ -47,3 +47,33 @@ export const deleteVisitor = async (id: string): Promise<{ success: boolean; mes
     }
   }
 }
+
+export const approve = async (id: string) => {
+  try {
+    const response = await api.post('/visitor/approve', { id });
+    return {
+      success: true,
+      message: response.data.message
+    };
+  } catch (error: any) {
+    return {
+      message: false,
+      error: error.response ? error.response.data.error : 'An error occurred'
+    }
+  }
+}
+
+export const reject = async (id: string, reason: string | null) => {
+  try {
+    const response = await api.post('/visitor/reject', { id, reason });
+    return {
+      success: true,
+      message: response.data.message
+    };
+  } catch (error: any) {
+    return {
+      success: false,
+      message: error.response ? error.response.data.error : 'An error occurred'
+    }
+  }
+}

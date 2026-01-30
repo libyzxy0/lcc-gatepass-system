@@ -3,6 +3,7 @@ import { visitor } from '@/db/schema'
 import { eq } from 'drizzle-orm'
 import { generateVisitorID } from '@/utils'
 import bcrypt from "bcryptjs";
+import { sendAccountStatus } from '@/mailer/account-status';
 import {
   BadRequestError,
   UnauthorizedError,
@@ -43,7 +44,7 @@ class VisitorService {
       return newVisitor;
     } catch (error) {
       console.log(error);
-      if(error.code === "23505") throw new BadRequestError('User with that email already exist!');
+      if (error.code === "23505") throw new BadRequestError('User with that email already exist!');
       throw error;
     }
   }
@@ -55,7 +56,7 @@ class VisitorService {
         .where(eq(visitor.phone_number, phone_number));
 
       if (!visitorData) throw new NotFoundError('Invalid phone number');
-      
+
       const isValidPin = await bcrypt.compare(pin, visitorData.pin);
 
       if (!isValidPin) throw new UnauthorizedError('Opps.. Incorrect Pin');
@@ -99,8 +100,16 @@ class VisitorService {
 
       if (!visitorData) throw new NotFoundError('No visitor with that ID');
 
+      const isIdPhotoChanged =
+        fields.valid_id_photo_url !== undefined &&
+        fields.valid_id_photo_url !== visitorData.valid_id_photo_url;
+
+
       const updatedVisitor = await db.update(visitor)
-        .set(fields)
+        .set({
+          ...fields,
+          verified: isIdPhotoChanged ? false : visitorData.verified
+        })
         .where(eq(visitor.id, id))
         .returning({
           id: visitor.id
@@ -141,9 +150,9 @@ class VisitorService {
           created_at: visitor.created_at,
         })
         .from(visitor);
-        if(all.length === 0) throw new NotFoundError('No visitors data in the database yet.');
-        
-        return all;
+      if (all.length === 0) throw new NotFoundError('No visitors data in the database yet.');
+
+      return all;
     } catch (error) {
       throw error;
     }
@@ -168,10 +177,10 @@ class VisitorService {
           created_at: visitor.created_at,
         })
         .from(visitor).where(eq(visitor.id, id));
-        
-        if(!visitorData) throw new NotFoundError('No visitor with that id found!');
-        
-        return visitorData;
+
+      if (!visitorData) throw new NotFoundError('No visitor with that id found!');
+
+      return visitorData;
     } catch (error) {
       throw error;
     }
@@ -180,6 +189,41 @@ class VisitorService {
     try {
       const deleted = await db.delete(visitor).where(eq(visitor.id, id));
       return deleted;
+    } catch (error) {
+      throw error;
+    }
+  }
+  static async approve(id: string) {
+    try {
+      const [result] = await db.update(visitor).set({ verified: true }).where(eq(visitor.id, id)).returning({
+        id: visitor.id,
+        email: visitor.email
+      })
+
+      await sendAccountStatus({
+        email: result.email,
+        status: 'approve'
+      })
+
+      return result;
+    } catch (error) {
+      throw error;
+    }
+  }
+  static async reject(id: string, reason: string) {
+    try {
+      if (!reason) throw new BadRequestError('Please enter a valid reason to reject it!')
+      const [result] = await db.update(visitor).set({ verified: false, valid_id_photo_url: null }).where(eq(visitor.id, id)).returning({
+        id: visitor.id,
+        email: visitor.email
+      });
+
+      await sendAccountStatus({
+        email: result.email,
+        status: 'reject',
+        reason
+      })
+      return result;
     } catch (error) {
       throw error;
     }

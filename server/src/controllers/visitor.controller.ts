@@ -157,6 +157,29 @@ class VisitorController {
       })
     }
   }
+  static async approve(req: Request, res: Response) {
+    try {
+      const accountId = req.body.id;
+      await VisitorService.approve(accountId);
+      res.json({ message: 'Account successfully verified' });
+    } catch (error) {
+      res.status(error.status || 500).json({
+        error: error.message
+      })
+    }
+  }
+  static async reject(req: Request, res: Response) {
+    try {
+      const accountId = req.body.id;
+      const reason = req.body.reason;
+      await VisitorService.reject(accountId, reason);
+      res.json({ message: 'Account successfully rejected' });
+    } catch (error) {
+      res.status(error.status || 500).json({
+        error: error.message
+      })
+    }
+  }
 }
 
 export default VisitorController;

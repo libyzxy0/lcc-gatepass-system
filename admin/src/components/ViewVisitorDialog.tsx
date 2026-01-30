@@ -1,4 +1,6 @@
+import { useState } from 'react'
 import { Button } from "@/components/ui/button"
+import { Input } from '@/components/ui/input'
 import { Badge } from "@/components/ui/badge"
 import {
   Dialog,
@@ -12,8 +14,18 @@ import {
 import {
   useQuery,
 } from '@tanstack/react-query'
-import { getVisitor } from '@/api/helpers/visitors'
+import { getVisitor, approve, reject } from '@/api/helpers/visitors'
 import { toast } from "sonner"
+import {
+  AlertDialog,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle
+} from "@/components/ui/alert-dialog"
+import { useQueryClient } from '@tanstack/react-query';
 
 type ViewStudentDialogType = {
   id: string;
@@ -27,17 +39,86 @@ const statusBadges = {
   review: <Badge variant="default" className="bg-yellow-400/20 border-yellow-400/50 text-yellow-400">Review</Badge>
 }
 
+type ActionType = 'approve' | 'reject';
+
 export function ViewVisitorDialog({ id, open, onOpenChange }: ViewStudentDialogType) {
   const { isPending, error, data } = useQuery({
     queryKey: ['get-visitor', id],
     queryFn: () => getVisitor(id)
   })
+  const queryClient = useQueryClient();
+  const [reason, setReason] = useState<string>("");
+  const [approveModal, showApproveModal] = useState(false);
+  const [rejectModal, showRejectModal] = useState(false);
+  const [approving, setApproving] = useState(false);
+  const [rejecting, setRejecting] = useState(false);
+
+  const handleApproveReject = async (action: ActionType, reason?: string | null) => {
+
+    if (action === 'approve') {
+      const result = await approve(id);
+      if (!result.success) return toast.error(result.message);
+      await queryClient.invalidateQueries({ queryKey: ['get-all-visitors'] });
+      toast.success(result.message);
+    } else if (action === 'reject') {
+      const result = await reject(id, reason ? reason : null);
+      if (!result.success) return toast.error(result.message);
+      await queryClient.invalidateQueries({ queryKey: ['get-all-visitors'] });
+      setReason("");
+      toast.success(result.message);
+    }
+  }
+  
+  const handleApprove = async () => {
+    setApproving(true);
+    await handleApproveReject('approve');
+    setApproving(false);
+    showApproveModal(false);
+  }
+
+  const handleReject = async () => {
+    setRejecting(true);
+    await handleApproveReject('reject', reason);
+    setRejecting(false);
+    showRejectModal(false);
+  }
   
   if(isPending || !data) return null;
   
   if(error) return toast.error('Failed to get student info!');
   
   return (
+    <>
+    <AlertDialog open={approveModal} onOpenChange={showApproveModal}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Approve Account?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will set the visitor's account status to verified and automatically approve gatepass requests without waiting for admin approvals.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <Button className="bg-green-400" onClick={handleApprove} disabled={approving}>{approving ? 'Verifying...' : 'Verify'}</Button>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+      <AlertDialog open={rejectModal} onOpenChange={showRejectModal}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Reject ID?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will reject the visitor's valid id and not automatically approve their gatepass requests.
+            </AlertDialogDescription>
+            <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">Rejection Reason</label>
+            <Input onChange={(e) => setReason(e.target.value)} value={reason} aria-invalid={!reason} placeholder={'Lack of necessary details.'}/>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <Button className="bg-orange-400" onClick={handleReject} disabled={rejecting || !reason}>{rejecting ? 'Rejecting...' : 'Reject'}</Button>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="md:min-w-[720px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
@@ -122,8 +203,8 @@ export function ViewVisitorDialog({ id, open, onOpenChange }: ViewStudentDialogT
                   <>
                 <h3 className="text-sm font-semibold text-gray-900 mb-4">Account Actions</h3>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  <Button className="bg-green-500">Approve</Button>
-                  <Button variant={'destructive'}>Reject ID</Button>
+                  <Button variant={'outline'} className="bg-green-500/20 border-green-300 text-green-400" onClick={() => showApproveModal(true)}>Verify</Button>
+                  <Button className="bg-red-500/20 border-red-300 text-red-400" variant={'outline'} onClick={() => showRejectModal(true)}>Reject ID</Button>
                 </div>
                 </>
                 )}
@@ -142,5 +223,6 @@ export function ViewVisitorDialog({ id, open, onOpenChange }: ViewStudentDialogT
         </DialogFooter>
       </DialogContent>
     </Dialog>
+    </>
   )
 }
