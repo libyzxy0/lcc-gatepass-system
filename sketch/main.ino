@@ -5,58 +5,31 @@
 #include <SPI.h>
 #include <MFRC522.h>
 #include <HardwareSerial.h>
-#include <time.h>
 
 #define SS_PIN 5
 #define RST_PIN 22
-
 #define QR_RX 16
 #define QR_TX 17
-
-#define MAX_SCAN_LENGTH 512
-
 #define BUZZER_PIN 4
+#define RELAY_MAIN_PIN 27
+#define RELAY_SECONDARY_PIN 26
+#define LOCK_SENSOR_PIN 33
 
-#define RELAY_PIN_MAIN 27
-#define RELAY_PIN_SEC 26
-#define LOCK_SENSOR_RST 33
+bool productionMode = true;
+bool emergencyOpen = false;
 
-/* Choose which server to communicate with, production(true) or development(false) */
-bool PRODUCTION = true;
+const char* wifiSsid = "OrangeCat";
+const char* wifiPassword = "myorange32";
 
-bool EMERGENCY_OPEN = false;
-/* ——————————————————————————————— */
+const char* clientId = "ESP-GATE-001";
+const char* secretKey = "79408c3e-6c50-4fb0-98cb-98db70596411";
 
-/*
-* WiFi Configurations (Important)
-* @ssid - WiFi SSID;
-* @password - WiFi Password;
-*/
-const char* ssid = "OrangeCat";
-const char* password = "myorange32";
+const char* mqttHost = "37638f32d99b49fa968d88c783e2b03a.s1.eu.hivemq.cloud";
+const int mqttPort = 8883;
+const char* mqttUser = "libyzxy0";
+const char* mqttPass = "Libyzxy0@123_esp32";
 
-/* ——————————————————————————————— */
-
-/* Server Authorization Configuration */
-const char* client_id     = "ESP-GATE-001";
-const char* SECRET_KEY = "79408c3e-6c50-4fb0-98cb-98db70596411";
-
-/* ——————————————————————————————— */
-
-/* MQTT HiveMQ Configuration
-* Please dont take screenshots/pictures at this part, as it may cause security issues!
-*/
-const char* mqtt_server   = "37638f32d99b49fa968d88c783e2b03a.s1.eu.hivemq.cloud";
-const int   mqtt_port     = 8883;
-const char* mqtt_user     = "libyzxy0";
-const char* mqtt_password = "Libyzxy0@123_esp32";
-
-String statusTopic = String("status/") + client_id;
-
-/* ——————————————————————————————— */
-
-/* SSL Certificate Issued by Let's Encrypt */
-const char* ca_cert = R"EOF(
+const char* rootCaCert = R"EOF(
 -----BEGIN CERTIFICATE-----
 MIIFazCCA1OgAwIBAgIRAIIQz7DSQONZRGPgu2OCiwAwDQYJKoZIhvcNAQELBQAw
 TzELMAkGA1UEBhMCVVMxKTAnBgNVBAoTIEludGVybmV0IFNlY3VyaXR5IFJlc2Vh
@@ -90,545 +63,278 @@ emyPxgcYxn/eR44/KJ4EBs+lVDR3veyJm+kXQ99b21/+jh5Xos1AnX5iItreGCc=
 -----END CERTIFICATE-----
 )EOF";
 
-/* ——————————————————————————————— */
-
-/* Library Configurations */
 WiFiClientSecure secureClient;
 PubSubClient mqtt(secureClient);
 MFRC522 rfid(SS_PIN, RST_PIN);
-HardwareSerial QRScanner(2);
+HardwareSerial qrSerial(2);
 
-/* ——————————————————————————————— */
-
-/* Global Needed States */
-bool SCANNING = false;
-char qrBuffer[MAX_SCAN_LENGTH];
-uint8_t qrIndex = 0;
-unsigned long lastQrCharTime = 0;
-String lastScanData = "";
+bool scanning = false;
+bool gateOpen = false;
 unsigned long lastScanTime = 0;
-const unsigned long DUPLICATE_BLOCK_MS = 30000;
 unsigned long gateOpenedAt = 0;
-const unsigned long GATE_AUTO_CLOSE_MS = 5000;
-bool gateIsOpen = false;
-static bool emergencyHandled = false;
+String lastScanValue = "";
 
-/* ——————————————————————————————— */
+const unsigned long duplicateWindowMs = 10000;
+const unsigned long autoCloseMs = 5000;
 
-/* Utility Functions */
+class Tone {
+  public:
+  static unsigned long lastUpdate;
+  static int pitch;
+  static bool ascending;
+    
+  static void tone(int f, int d) { ledcWriteTone(0,f); ledcWrite(0,204); delay(d); ledcWriteTone(0,0); }
+  static void ok() { tone(880,150); delay(50); tone(988,150); }
+  static void bad() { tone(220,400); }
+  static void ready() { tone(523,100); tone(659,100); }
+  static void init() { tone(1319,100); tone(1568,100); tone(1760,100); }
+  static void duplicate() { tone(600,80); delay(60); tone(600,80); }
+  static void booted() { tone(800,100); delay(50); tone(1000,120); }
+  
+  static void emergencyLoop() {
+    unsigned long now = millis();
+    if (now - lastUpdate >= 20) {
+      lastUpdate = now;
+      if (ascending) pitch += 10;
+      else pitch -= 10;
 
-class JsonUtil {
+      if (pitch >= 1200) ascending = false;
+      if (pitch <= 800) ascending = true;
+
+      ledcWriteTone(0, pitch);
+      ledcWrite(0, 204);
+    }
+  }
+
+  static void emergencyStop() {
+    ledcWriteTone(0, 0);
+    pitch = 800;
+    ascending = true;
+  }
+};
+
+class Json {
   public:
   class Builder {
-    private:
-    StaticJsonDocument < 512 > doc;
+    StaticJsonDocument<512> doc;
     public:
-    Builder& add(const char* key, const char* value) {
-      doc[key] = value;
-      return *this;
-    }
-    Builder& add(const char* key, int value) {
-      doc[key] = value;
-      return *this;
-    }
-    Builder& add(const char* key, float value) {
-      doc[key] = value;
-      return *this;
-    }
-    Builder& add(const char* key, bool value) {
-      doc[key] = value;
-      return *this;
-    }
-    String toString() {
-      String output;
-      serializeJson(doc, output);
-      return output;
-    }
+    template<typename T> Builder& add(const char* k, T v){ doc[k]=v; return *this; }
+    String str(){ String o; serializeJson(doc,o); return o; }
   };
-
-  static Builder create() {
-    return Builder();
-  }
-
-  static String getString(const String& json, const char* key) {
-    StaticJsonDocument < 512 > doc;
-    DeserializationError error = deserializeJson(doc, json);
-    if (error) return "";
-    if (!doc.containsKey(key)) return "";
-    return String(doc[key].as < const char*>());
-  }
-
-  static int getInt(const String& json, const char* key) {
-    StaticJsonDocument < 512 > doc;
-    DeserializationError error = deserializeJson(doc, json);
-    if (error) return 0;
-    if (!doc.containsKey(key)) return 0;
-    return doc[key].as < int > ();
-  }
-
-  static bool getBool(const String& json, const char* key) {
-    StaticJsonDocument < 512 > doc;
-    DeserializationError error = deserializeJson(doc, json);
-    if (error) return false;
-    if (!doc.containsKey(key)) return false;
-    return doc[key].as < bool > ();
-  }
-
-  static float getFloat(const String& json, const char* key) {
-    StaticJsonDocument < 512 > doc;
-    DeserializationError error = deserializeJson(doc, json);
-    if (error) return 0.0;
-    if (!doc.containsKey(key)) return 0.0;
-    return doc[key].as < float > ();
+  static Builder build(){ return Builder(); }
+  template<typename T>
+  static T get(const String& json, const char* key, T def) {
+    StaticJsonDocument<512> doc;
+    if (deserializeJson(doc,json)) return def;
+    if (!doc.containsKey(key)) return def;
+    return doc[key].as<T>();
   }
 };
 
-class NotificationUtil {
-  public:
-  static void successTone () {
-    ledcWriteTone(0, 880);
-    ledcWrite(0, 204);
-    delay(150);
-    ledcWriteTone(0, 0);
-    delay(50);
-    ledcWriteTone(0, 988);
-    delay(150);
-    ledcWriteTone(0, 0);
-  }
-  static void errorTone() {
-    ledcWriteTone(0, 220);
-    ledcWrite(0, 204);
-    delay(400);
-    ledcWriteTone(0, 0);
-  }
-  static void readyTone() {
-    ledcWriteTone(0, 523);
-    ledcWrite(0, 204);
-    delay(100);
-    ledcWriteTone(0, 659);
-    ledcWrite(0, 204);
-    delay(100);
-    ledcWriteTone(0, 0);
-  }
-  static void initializedTone() {
-    ledcWriteTone(0, 1319);
-    ledcWrite(0, 204);
-    delay(100);
-    ledcWriteTone(0, 1568);
-    ledcWrite(0, 204);
-    delay(100);
-    ledcWriteTone(0, 1760);
-    ledcWrite(0, 204);
-    delay(100);
-    ledcWriteTone(0, 0);
-  }
-};
+void setGate(bool mainValue, bool secondaryValue){
+  digitalWrite(RELAY_MAIN_PIN, mainValue);
+  digitalWrite(RELAY_SECONDARY_PIN, secondaryValue);
+}
 
-class GateUtil {
-  public:
-  static void openEntryGate() {
-    digitalWrite(RELAY_PIN_MAIN, LOW);
-    digitalWrite(RELAY_PIN_SEC, HIGH);
-  }
-  static void openExitGate() {
-    digitalWrite(RELAY_PIN_MAIN, HIGH);
-    digitalWrite(RELAY_PIN_SEC, LOW);
-  }
-  static void unlockBoth() {
-    digitalWrite(RELAY_PIN_MAIN, LOW);
-    digitalWrite(RELAY_PIN_SEC, LOW);
-  }
-  static void closeGate() {
-    digitalWrite(RELAY_PIN_MAIN, HIGH);
-    digitalWrite(RELAY_PIN_SEC, HIGH);
-  }
-};
+bool readRfid(String &out){
+  if (!rfid.PICC_IsNewCardPresent()) return false;
+  if (!rfid.PICC_ReadCardSerial()) return false;
+  out="";
+  for(byte i=0;i<rfid.uid.size;i++){ if(rfid.uid.uidByte[i]<0x10) out+='0'; out+=String(rfid.uid.uidByte[i],HEX); }
+  out.toUpperCase();
+  rfid.PICC_HaltA();
+  rfid.PCD_StopCrypto1();
+  delay(50);
+  rfid.PCD_Init();
+  return true;
+}
 
-/* ——————————————————————————————— */
-
-bool isDuplicateScan(const String& data) {
-  if (data == lastScanData && millis() - lastScanTime < DUPLICATE_BLOCK_MS) {
-    Serial.println("Duplicate scan blocked");
-    NotificationUtil::errorTone();
-    return true;
+bool readQr(String &out){
+  static String buff="";
+  while(qrSerial.available()){
+    char c=qrSerial.read();
+    if(c=='\n'||c=='\r'){ if(buff.length()){ out=buff; buff=""; return true; } }
+    else buff+=c;
   }
-
-  lastScanData = data;
-  lastScanTime = millis();
   return false;
 }
 
-/* ——————————————————————————————— */
-
-/* Setup Functions */
-void connectWiFi() {
-  const int maxRetries = 5;
-  int retryCount = 0;
-
-  WiFi.begin(ssid, password);
-
-  Serial.println("Connecting to WiFi...");
-  Serial.print("CREDENTIALS: ");
-  Serial.print(ssid);
-  Serial.print(":");
-  Serial.println(password);
-
-  while (WiFi.status() != WL_CONNECTED) {
-    delay(500);
-    Serial.print(".");
-    retryCount++;
-
-    if (retryCount >= maxRetries) {
-      Serial.println("\nFailed to connect after 5 attempts. Restarting...");
-      NotificationUtil::errorTone();
-      NotificationUtil::errorTone();
-      delay(2000);
-      ESP.restart();
-    }
+bool isDuplicate(const String& data){
+  if(data==lastScanValue && millis()-lastScanTime < duplicateWindowMs){
+    Tone::duplicate();
+    return true;
   }
-
-  Serial.println("\nWiFi connected!");
-  NotificationUtil::readyTone();
+  lastScanValue=data;
+  lastScanTime=millis();
+  return false;
 }
 
-void connectMQTT() {
-  while (!mqtt.connected()) {
-    Serial.print("Connecting to MQTT...");
+void mqttPublishScan(const char* type, const String& data){
+  String payload = Json::build()
+    .add("data", data)
+    .add("secret_key", secretKey)
+    .add("client_id", clientId)
+    .str();
+  String topic = String(productionMode?"scan/":"dev/scan/") + type;
+  mqtt.publish(topic.c_str(), payload.c_str());
+}
 
-    String offlinePayload = JsonUtil::create()
-      .add("client_id", client_id)
+void mqttSubscribeScan(){
+  mqtt.unsubscribe("scan/#");
+  mqtt.unsubscribe("dev/scan/#");
+  mqtt.subscribe(productionMode?"scan/#":"dev/scan/#");
+}
+
+void setMode(bool prod){
+  productionMode = prod;
+  scanning = false;
+  mqttSubscribeScan();
+  Tone::init();
+}
+
+void wifiConnect(){
+  WiFi.begin(wifiSsid, wifiPassword);
+  int retry=0;
+  while(WiFi.status()!=WL_CONNECTED){
+    delay(500);
+    if(++retry>=5) ESP.restart();
+  }
+}
+
+void processGate(String msg){
+  String status = Json::get<String>(msg,"status","");
+  String entry = Json::get<String>(msg,"entry","");
+  if(status=="ok"){
+    if(entry=="IN") setGate(LOW,HIGH);
+    else if(entry=="OUT") setGate(HIGH,LOW);
+    Tone::ok();
+    gateOpenedAt = millis();
+    gateOpen = true;
+  } 
+  else if(status=="bad") Tone::bad();
+  scanning=false;
+}
+
+void processConfig(String msg){
+  String action = Json::get<String>(msg,"action","");
+  String emergency = Json::get<String>(msg,"emergency_open","");
+  String prod = Json::get<String>(msg,"production","");
+  if(action=="WRITE"){
+    if(prod=="yes") setMode(true);
+    else if(prod=="no") setMode(false);
+    if(emergency=="yes"){ setGate(LOW,LOW); gateOpenedAt=millis(); gateOpen=true; emergencyOpen=true; scanning=false; }
+    else if(emergency=="no"){ setGate(HIGH,HIGH); emergencyOpen=false; }
+  }
+}
+
+void mqttCallback(char* topic, byte* payload, unsigned int length){
+  if(!length) return;
+  String msg; msg.reserve(length);
+  for(unsigned int i=0;i<length;i++) msg+=(char)payload[i];
+  if(!msg.startsWith("{")||!msg.endsWith("}")) return;
+  String t = topic;
+  if(t.startsWith("config")||t.startsWith("dev/config")){ processConfig(msg); return; }
+  if(((productionMode && t.startsWith("scan/")) || (!productionMode && t.startsWith("dev/"))) && t.endsWith("/response"))
+    processGate(msg);
+}
+
+void mqttConnect(){
+  while(!mqtt.connected()){
+    String statusTopic = "status/" + String(clientId);
+    String offlinePayload = Json::build()
+      .add("client_id", clientId)
       .add("status", "offline")
-      .add("secret_key", SECRET_KEY)
-      .toString();
-
-    bool ok = mqtt.connect(
-      client_id,
-      mqtt_user,
-      mqtt_password,
-      statusTopic.c_str(),
-      1,
-      true,
-      offlinePayload.c_str()
-    );
-
-    if (ok) {
-      Serial.println("connected");
-      mqtt.subscribe(PRODUCTION ? "scan/#" : "dev/scan/#");
-
-      String onlinePayload = JsonUtil::create()
-      .add("client_id", client_id)
-      .add("status", "online")
-      .add("secret_key", SECRET_KEY)
-      .toString();
-
-      mqtt.publish(
-        statusTopic.c_str(),
-        onlinePayload.c_str(),
-        true
-      );
-
-      NotificationUtil::readyTone();
+      .add("secret_key", secretKey)
+      .str();
+    bool ok = mqtt.connect(clientId, mqttUser, mqttPass, statusTopic.c_str(), 1, true, offlinePayload.c_str());
+    if(ok){
+      mqtt.subscribe("config");
+      mqtt.subscribe("dev/config");
+      mqttSubscribeScan();
+      String onlinePayload = Json::build()
+        .add("client_id", clientId)
+        .add("status", "online")
+        .add("secret_key", secretKey)
+        .str();
+      mqtt.publish(statusTopic.c_str(), onlinePayload.c_str(), true);
+      Tone::ready();
     } else {
-      Serial.print("failed, rc=");
-      Serial.print(mqtt.state());
-      Serial.println(" retrying in 5 seconds");
-      NotificationUtil::errorTone();
-      NotificationUtil::errorTone();
+      Tone::bad();
       delay(5000);
     }
   }
 }
 
-void resubscribeTopics() {
-  mqtt.unsubscribe("scan/#");
-  mqtt.unsubscribe("dev/scan/#");
-
-  if (PRODUCTION) {
-    mqtt.subscribe("scan/#");
-  } else {
-    mqtt.subscribe("dev/scan/#");
-  }
-}
-
-void setEnvToDev() {
-  PRODUCTION = false;
-  SCANNING = false;
-  resubscribeTopics();
-  Serial.println("Environment set to DEVELOPMENT");
-  NotificationUtil::initializedTone();
-}
-
-void setEnvToProd() {
-  PRODUCTION = true;
-  SCANNING = false;
-  resubscribeTopics();
-  Serial.println("Environment set to PRODUCTION");
-  NotificationUtil::initializedTone();
-}
-
-bool scanRfid(String &uidOut) {
-  if (!rfid.PICC_IsNewCardPresent()) return false;
-  if (!rfid.PICC_ReadCardSerial()) return false;
-
-  uidOut = "";
-  for (byte i = 0; i < rfid.uid.size; i++) {
-    if (rfid.uid.uidByte[i] < 0x10) uidOut += '0';
-    uidOut += String(rfid.uid.uidByte[i], HEX);
-  }
-  uidOut.toUpperCase();
-
-  rfid.PICC_HaltA();
-  rfid.PCD_StopCrypto1();
-  delay(50);
-  rfid.PCD_Init();
-
-  return true;
-}
-
-bool scanQRCode(String &qrOut) {
-    static String barcode = "";
-    while (QRScanner.available()) {
-        char c = QRScanner.read();
-        if (c == '\n' || c == '\r') {
-            if (barcode.length() > 0) {
-                qrOut = barcode;
-                barcode = "";
-                return true;
-            }
-        } else {
-            Serial.print(c);
-            barcode += c;
-        }
-    }
-
-    return false;
-}
-
-void handleGate(String message) {
-  Serial.println("Handling Gate");
-  String status = JsonUtil::getString(message, "status");
-  String entry = JsonUtil::getString(message, "entry");
-  String name = JsonUtil::getString(message, "name");
-
-  if (status.length() == 0) {
-    SCANNING = false;
-    return;
-  }
-  if (status == "ok") {
-    Serial.println("Access GRANTED");
-    if(entry == "IN") {
-      GateUtil::openEntryGate();
-      Serial.println("Access IN → Gate opened");
-    } else if(entry == "OUT") {
-      GateUtil::openExitGate();
-      Serial.println("Access OUT → Gate opened");
-    }
-
-    NotificationUtil::successTone();
-    gateOpenedAt = millis();
-    gateIsOpen = true;
-  } else if(status == "bad") {
-    Serial.println("Access DENIED");
-    GateUtil::closeGate();
-    NotificationUtil::errorTone();
-    SCANNING = false;
-  }
-  SCANNING = false;
-}
-
-void handleConfig(String message) {
-  Serial.println("Handling config");
-  String action = JsonUtil::getString(message, "action");
-  String emergency_open = JsonUtil::getString(message, "emergency_open");
-  String production = JsonUtil::getString(message, "production");
-
-  if (action.length() == 0) {
-    return;
-  }
-
-  if(action == "WRITE") {
-    if(production.length() != 0) {
-      if(production == "yes") {
-        setEnvToProd();
-      } else {
-        setEnvToDev();
-      }
-    }
-    
-    if(emergency_open.length() != 0) {
-      if(emergency_open == "yes") {
-        GateUtil::unlockBoth();
-        gateOpenedAt = millis();
-        gateIsOpen = true;
-        SCANNING = false;
-        EMERGENCY_OPEN = true;
-      } else {
-        GateUtil::closeGate();
-        EMERGENCY_OPEN = false;
-      }
-    }
-  }
-  Serial.println(message);
-}
-
-void mqtt_callback(char* topic, byte* payload, unsigned int length) {
-
-  if (length == 0 || payload == nullptr) {
-    Serial.println("MQTT: Empty payload ignored");
-    return;
-  }
-
-  Serial.print("Topic: ");
-  Serial.println(topic);
-
-  String message;
-  message.reserve(length);
-
-  for (unsigned int i = 0; i < length; i++) {
-    message += (char)payload[i];
-  }
-
-  if (!message.startsWith("{") || !message.endsWith("}")) return;
-
-  String t = topic;
-
-  if(t.startsWith("config") || t.startsWith("dev/config")) {
-    handleConfig(message);
-    return;
-  }
-
-  if (((PRODUCTION && t.startsWith("scan/")) || (!PRODUCTION && t.startsWith("dev/"))) && t.endsWith("/response")) {
-    handleGate(message);
-  }
-}
-
-void setup() {
-  Serial.begin(115200);
+void initHardware(){
   SPI.begin();
   rfid.PCD_Init();
-  QRScanner.begin(9600, SERIAL_8N1, QR_RX, QR_TX);
-  ledcSetup(0, 1000, 8);
-  ledcAttachPin(BUZZER_PIN, 0);
-  pinMode(BUZZER_PIN, OUTPUT);
-  pinMode(RELAY_PIN_MAIN, OUTPUT);
-  pinMode(RELAY_PIN_SEC, OUTPUT);
-  pinMode(LOCK_SENSOR_RST, INPUT_PULLUP);
-  digitalWrite(BUZZER_PIN, LOW);
-  digitalWrite(RELAY_PIN_MAIN, HIGH);
-  digitalWrite(RELAY_PIN_SEC, HIGH);
-  Serial.println("PERIPHERALS ARE READY");
-  NotificationUtil::readyTone();
+  qrSerial.begin(9600, SERIAL_8N1, QR_RX, QR_TX);
+  ledcSetup(0,1000,8);
+  ledcAttachPin(BUZZER_PIN,0);
+  pinMode(RELAY_MAIN_PIN,OUTPUT);
+  pinMode(RELAY_SECONDARY_PIN,OUTPUT);
+  pinMode(LOCK_SENSOR_PIN,INPUT_PULLUP);
+  digitalWrite(RELAY_MAIN_PIN,HIGH);
+  digitalWrite(RELAY_SECONDARY_PIN,HIGH);
+  Tone::booted();
+}
 
-  connectWiFi();
+unsigned long Tone::lastUpdate = 0;
+int Tone::pitch = 800;
+bool Tone::ascending = true;
 
-  secureClient.setCACert(ca_cert);
-  mqtt.setServer(mqtt_server, mqtt_port);
-  mqtt.setCallback(mqtt_callback);
+void setup(){
+  Serial.begin(115200);
+  initHardware();
+  wifiConnect();
+  secureClient.setCACert(rootCaCert);
+  mqtt.setServer(mqttHost, mqttPort);
+  mqtt.setCallback(mqttCallback);
   mqtt.setBufferSize(512);
-
-  connectMQTT();
-  mqtt.subscribe("config");
-  mqtt.subscribe("dev/config");
-  resubscribeTopics();
-  Serial.println();
-  String get_conf_payload = JsonUtil::create()
-    .add("action", "READ")
-    .add("secret_key", SECRET_KEY)
-    .add("client_id", client_id)
-    .toString();
-
-  mqtt.publish(PRODUCTION ? "config" : "dev/config", get_conf_payload.c_str());
-  Serial.println("Device Ready, See Configs:");
-  Serial.println("[=========================]");
-  Serial.print("ENVIRONMENT: ");
-  Serial.println(PRODUCTION ? "PRODUCTION" : "DEVELOPMENT");
-  Serial.print("WIFI CRED: ");
-  Serial.println(String(ssid) + ":" + String(password));
-  Serial.print("CLIENT ID: ");
-  Serial.println(client_id);
-  Serial.print("SECRET KEY: ");
-  Serial.println(SECRET_KEY);
-
-  Serial.println("[=========================]");
-  Serial.println();
-  NotificationUtil::initializedTone();
+  mqttConnect();
+  Tone::init();
 }
 
-void handleSerialCommands() {
-  if (Serial.available() > 0) {
-    String command = Serial.readStringUntil('\n');
-
-    if (command.equals("DEV_MODE")) {
-      setEnvToDev();
-    } else if (command.equals("PROD_MODE")) {
-      setEnvToProd();
-    }
-  }
-}
-
-/* ——————————————————————————————— */
-
-/* Main Functions */
-void loop() {
-  if (!mqtt.connected()) {
-    connectMQTT();
-  }
+void loop(){
+  if(!mqtt.connected()) mqttConnect();
   mqtt.loop();
-
-  if (EMERGENCY_OPEN) {
+  
+  if (emergencyOpen) {
+    Tone::emergencyLoop();
     return;
   }
+  Tone::emergencyStop();
 
-  if (gateIsOpen && millis() - gateOpenedAt >= GATE_AUTO_CLOSE_MS && !EMERGENCY_OPEN) {
-    Serial.println("Auto-closing gate");
-    GateUtil::closeGate();
-    gateIsOpen = false;
-    SCANNING = false;
+
+
+  if(gateOpen && millis() - gateOpenedAt >= autoCloseMs){
+    setGate(HIGH,HIGH);
+    gateOpen=false;
+    scanning=false;
   }
 
-  if (digitalRead(LOCK_SENSOR_RST) == LOW && gateIsOpen && !EMERGENCY_OPEN) {
-    Serial.println("Lock sensor triggered → closing gate");
-    GateUtil::closeGate();
-    gateIsOpen = false;
+  if(digitalRead(LOCK_SENSOR_PIN)==LOW && gateOpen && !emergencyOpen){
+    setGate(HIGH,HIGH);
+    gateOpen=false;
   }
 
-  handleSerialCommands();
+  if(Serial.available()){
+    String cmd=Serial.readStringUntil('\n');
+    if(cmd=="DEV_MODE") setMode(false);
+    else if(cmd=="PROD_MODE") setMode(true);
+  }
 
   String uid;
-  if (scanRfid(uid) && !SCANNING && !isDuplicateScan(uid)) {
-    SCANNING = true;
-    Serial.print("Scanned RFID: ");
-    Serial.println(uid);
-
-    String payload = JsonUtil::create()
-    .add("data", uid.c_str())
-    .add("secret_key", SECRET_KEY)
-    .add("client_id", client_id)
-    .toString();
-
-    if (mqtt.publish(PRODUCTION ? "scan/rfid" : "dev/scan/rfid", payload.c_str())) {
-      NotificationUtil::readyTone();
-    } else {
-      NotificationUtil::errorTone();
-    }
+  if(readRfid(uid) && !scanning && !isDuplicate(uid)){
+    scanning=true;
+    mqttPublishScan("rfid",uid);
+    Tone::ready();
   }
 
-  String qr_data;
-  if (scanQRCode(qr_data) && !SCANNING && !isDuplicateScan(qr_data)) {
-    SCANNING = true;
-    Serial.print("Scanned QR: ");
-    Serial.println(qr_data);
-
-    String payload = JsonUtil::create()
-    .add("data", qr_data.c_str())
-    .add("secret_key", SECRET_KEY)
-    .add("client_id", client_id)
-    .toString();
-
-    if (mqtt.publish(PRODUCTION ? "scan/qr" : "dev/scan/qr", payload.c_str())) {
-      NotificationUtil::readyTone();
-    } else {
-      NotificationUtil::errorTone();
-    }
+  String qr;
+  if(readQr(qr) && !scanning && !isDuplicate(qr)){
+    scanning=true;
+    mqttPublishScan("qr",qr);
+    Tone::ready();
   }
 }
