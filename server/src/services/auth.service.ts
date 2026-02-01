@@ -28,9 +28,7 @@ class AuthService {
     });
   }
   static generateQRToken(id: string) {
-    return jwt.sign({ id }, JWT_QR_SECRET, {
-      expiresIn: "7d",
-    });
+    return jwt.sign({ id }, JWT_QR_SECRET);
   }
 
   static verifyQRToken(token: string) {
