@@ -19,7 +19,7 @@ export const otp = pgTable("otp", {
   code: text("code").notNull(),
   user_type: userTypeEnum("user_type").notNull(),
   visitor_id: uuid("visitor_id").references(() => visitor.id, { onDelete: 'cascade' }).unique(),
-  admin_id: uuid("admin_id").references(() => admin.id).unique(),
+  admin_id: uuid("admin_id").references(() => admin.id, {  onDelete: 'cascade' }).unique(),
   revoked: boolean("revoked").default(false),
   expires_at: timestamp("expires_at", { mode: "string" }),
   updated_at: timestamp("updated_at", { mode: "string" }).defaultNow(),
