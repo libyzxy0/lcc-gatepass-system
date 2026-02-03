@@ -49,7 +49,7 @@ export default function Logs() {
   const { isPending, error, data } = useQuery({
     queryKey: ['get-all-logs'],
     queryFn: getAllLogs,
-    refetchInterval: 1000,
+    refetchInterval: 500,
     refetchOnWindowFocus: true
   })
 

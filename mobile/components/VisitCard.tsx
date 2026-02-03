@@ -156,34 +156,40 @@ export function VisitCard({ id, purpose, description, vehicle, status, schedule_
                   {labelMap[status]}
                 </Text>
               </View>
-                <View style={{
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  gap: 5
-                }}>
+              <View style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                gap: 5
+              }}>
                 {status !== 'rejected' ? (
                   <>
-                  <Octicons name="calendar" size={12} color={colors.primary} />
-                  <Text style={{
-                    fontSize: 12,
-                    color: colors.primary
-                  }}>{permanent ? 'Use Anytime' : schedule_date && new Date(schedule_date).toLocaleDateString('en-US', {
-                    weekday: 'short',
-                    year: 'numeric',
-                    month: 'short',
-                    day: 'numeric'
-                  })}</Text>
+                    <Octicons name="calendar" size={12} color={colors.primary} />
+                    <Text style={{
+                      fontSize: 12,
+                      alignItems: 'center',
+                      color: colors.primary
+                    }}>{permanent ? 'Use Anytime' : schedule_date && new Date(schedule_date).toLocaleDateString('en-US', {
+                      weekday: 'short',
+                      year: 'numeric',
+                      month: 'short',
+                      day: 'numeric'
+                    })}</Text>
                   </>
-                  ) : (
-                    <>
-                    <Octicons name="alert" size={12} color={colors.danger} />
-                  <Text style={{
-                    fontSize: 12,
-                    color: colors.danger
-                  }}>{reject_reason}</Text>
+                ) : (
+                  <>
+                    <Text>
+                      <Octicons name="alert" size={12} color={colors.danger} />
+                        <Text style={{
+                          fontSize: 12,
+                          marginLeft: 10,
+                          color: colors.danger
+                        }}>
+                          {" "}{reject_reason}
+                        </Text>
+                    </Text>
                   </>
-                    )}
-                </View>
+                )}
+              </View>
             </View>
           </View>
 

@@ -91,7 +91,9 @@ export default function Main() {
               size="large"
               color={colors.primary}
             />
-            <Text type="secondary">Loading pre wait</Text>
+            <Text type="secondary" style={{
+              fontSize: 12
+            }}>Loading gatepasses, please wait...</Text>
           </View>
         )}
         <CreateVisitFloatingButton

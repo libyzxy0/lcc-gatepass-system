@@ -67,7 +67,7 @@ export function ProfileValidId() {
           });
           return;
         }
-        
+
         await getSession();
         showToast({
           type: "success",
@@ -94,6 +94,15 @@ export function ProfileValidId() {
       flex: 1,
       marginTop: 20
     }}>
+      <Text
+        type="semibold"
+        style={{
+          fontSize: 18,
+          marginBottom: 12
+        }}
+      >
+        Valid ID
+      </Text>
       {visitor.valid_id_photo_url || image ? (
         <View style={{
           position: 'relative'

@@ -117,21 +117,22 @@ export default function OTPPage() {
         closeAfterConfirm
       />
 
-      <View style={{ marginTop: 80, marginHorizontal: 12, gap: 10 }}>
-        <Text type="bold" style={{ color: colors.text, fontSize: 22 }}>
-          Enter your One Time Pin (OTP)
+      <View style={{ marginTop: 60, marginHorizontal: 12, gap: 10 }}>
+        <Text type="bold" style={{ color: colors.primary, fontSize: 22 }}>
+          Verify your Phone Number
         </Text>
 
         <Text>
-          Please enter the One Time Pin (OTP) we've sent to your email or phone number{" "}
+          Please enter the One Time Password (OTP) we've sent to your phone number{" "}
           <Text onPress={() => setShowConfirm(true)} type="link">
             (+63) {formatPHNumber(phoneNumber)}
           </Text>.
         </Text>
+        <Text>If it's not sent to your phone number, check your email.</Text>
       </View>
 
       <View style={{ alignItems: 'center', marginBottom: 20 }}>
-        <View style={{ flexDirection: "row", gap: 8, marginTop: 40 }}>
+        <View style={{ flexDirection: "row", gap: 8, marginTop: 30 }}>
           {[0, 1, 2, 3, 4, 5].map(i => (
             <View
               key={i}

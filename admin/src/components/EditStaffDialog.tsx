@@ -113,7 +113,7 @@ export function EditStaffDialog({ id, open, onOpenChange }: ViewStudentDialogTyp
       return;
     }
     
-    await queryClient.refetchQueries({ queryKey: ['get-all-staffs'] });
+    await queryClient.refetchQueries({ queryKey: ['get-all-staffs', 'get-staff'] });
 
     toast.success(data.message);
     resetForm(false);

@@ -43,7 +43,9 @@ export default function Gatepass() {
   const [statusFilter, setStatusFilter] = useState("all");
   const { isPending, error, data } = useQuery({
     queryKey: ['get-all-gatepass'],
-    queryFn: getAllGatepass
+    queryFn: getAllGatepass,
+    refetchInterval: 1000,
+    refetchOnWindowFocus: true
   })
   
   const columns: ColumnDef<Gatepass>[] = [

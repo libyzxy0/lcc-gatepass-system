@@ -26,7 +26,9 @@ const statusBadges = {
 export default function Visitors() {
   const { isPending, error, data } = useQuery({
     queryKey: ['get-all-visitors'],
-    queryFn: getAllVisitors
+    queryFn: getAllVisitors,
+    refetchInterval: 1000,
+    refetchOnWindowFocus: true
   })
   const [statusFilter, setStatusFilter] = useState("all")
   const [search, setSearch] = useState("")
