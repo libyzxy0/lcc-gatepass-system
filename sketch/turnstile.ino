@@ -202,6 +202,7 @@ void wifiConnect(){
 }
 
 void processGate(String msg){
+  Serial.println(msg);
   String status = Json::get<String>(msg,"status","");
   String entry = Json::get<String>(msg,"entry","");
   if(status=="ok"){
@@ -274,8 +275,8 @@ void initHardware(){
   pinMode(RELAY_MAIN_PIN,OUTPUT);
   pinMode(RELAY_SECONDARY_PIN,OUTPUT);
   pinMode(LOCK_SENSOR_PIN,INPUT_PULLUP);
-  digitalWrite(RELAY_MAIN_PIN,HIGH);
-  digitalWrite(RELAY_SECONDARY_PIN,HIGH);
+  digitalWrite(RELAY_MAIN_PIN,LOW);
+  digitalWrite(RELAY_SECONDARY_PIN,LOW);
   Tone::booted();
 }
 
@@ -304,8 +305,6 @@ void loop(){
     return;
   }
   Tone::emergencyStop();
-
-
 
   if(gateOpen && millis() - gateOpenedAt >= autoCloseMs){
     setGate(HIGH,HIGH);
