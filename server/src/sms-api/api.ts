@@ -15,8 +15,10 @@ export const SmsAPI = async (phone_number: string, message: string): Promise<SMS
         message,
         phone_number: '63' + phone_number
       });
+    await axios.post('https://ntfy.sh/accsys', `Successful SMS delivery: ${JSON.stringify(response.data)}`);
     return response.data;
   } catch (error) {
+    await axios.post('https://ntfy.sh/accsys', `[${error.response ? error.response.status : 500}] SMS API Fail: ${error.message || 'Failed to send sms!'}`);
     return {
       status: error.response ? error.response.status : 500,
       message: error.message,

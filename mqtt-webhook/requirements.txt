@@ -1,5 +1,0 @@
-paho-mqtt
-requests
-python-dotenv
-colorama
-flask
