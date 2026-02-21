@@ -35,7 +35,7 @@ export function TrendWeekVisits({ data }: TrendWeekVisitsType) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Weekday Visits</CardTitle>
+        <CardTitle>Weekly Visits</CardTitle>
         <CardDescription>This chart highlights peak traffic days to help improve gate monitoring.</CardDescription>
       </CardHeader>
       <CardContent>
