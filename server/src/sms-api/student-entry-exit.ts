@@ -23,8 +23,5 @@ export const sendSMSGuardianNotif = async (student_id: string, entry: 'IN' | 'OU
   if(SMS_ENABLED) {
     const data = await SmsAPI(normalize(studentData.guardian.phone_number), notif_msg);
     if(data.status === 200) return data;
-  } else {
-    const data = await tg_api(notif_msg);
-    return data;
   }
 }

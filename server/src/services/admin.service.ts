@@ -195,6 +195,7 @@ class AdminService {
       const [updated] = await db.update(config).set(field).where(eq(config.id, conf.id)).returning({ id: config.id });
       return updated;
     } catch (error) {
+      console.error(error)
       throw error;
     }
   }
