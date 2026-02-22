@@ -4,7 +4,8 @@ import {
   text,
   timestamp,
   pgEnum,
-  boolean
+  boolean,
+  integer
 } from "drizzle-orm/pg-core";
 import { visitor } from './visitor.schema'
 
@@ -28,6 +29,7 @@ export const gatepass = pgTable("gatepass", {
   student_pass: boolean("student_pass").default(false),
   entity_id: uuid("entity_id").default(null),
   status: statusEnum("status").default("pending"),
+  scan_count: integer("scan_count").default(0),
   reject_reason: text('reject_reason'),
   created_at: timestamp("created_at", { mode: "string" }).defaultNow()
 })

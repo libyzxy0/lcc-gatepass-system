@@ -71,10 +71,17 @@ class ESPService {
       if (!gatepassData) {
         throw new NotFoundError('Gatepass not valid');
       }
+      
+      if(gatepassData.gatepass.scan_count === 2) {
+        await db.update(gatepass).set({ status: 'expired' }).where(eq(gatepass.id, gatepassData.gatepass.id));
+      }
 
       if (gatepassData.gatepass.status !== "approved") {
         throw new UnauthorizedError("Gatepass not valid");
       }
+      
+      await db.update(gatepass).set({ scan_count: gatepassData.gatepass.scan_count + 1 }).where(eq(gatepass.id, gatepassData.gatepass.id));
+      
       return gatepassData;
     } catch (error) {
       throw error;

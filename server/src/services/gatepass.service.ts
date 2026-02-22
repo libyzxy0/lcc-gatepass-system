@@ -7,6 +7,7 @@ import {
   NotFoundError
 } from '@/errors'
 import AuthService from '@/services/auth.service'
+import AdminService from '@/services/admin.service'
 import { sendGatepassStatus } from '@/mailer/gatepass-status';
 import { generateQRPassID } from '@/utils'
 
@@ -23,7 +24,7 @@ class GatepassService {
     vehicle
   }) {
     try {
-
+      const config = await AdminService.getConfig();
       if (student_pass_secret) {
         const [studentData] = await db.select({ id: student.id }).from(student).where(eq(student.enrollment_secret, student_pass_secret));
         if (!studentData) throw new UnauthorizedError('Invalid QRKey!');
@@ -63,7 +64,7 @@ class GatepassService {
           schedule_date,
           vehicle_type: vehicle ? vehicle.type : null,
           vehicle_plate: vehicle ? vehicle.plate_number : null,
-
+          status: config.tracking_mode ? 'approved' : 'pending'
         }).returning({
           id: gatepass.id
         });
