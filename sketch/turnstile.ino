@@ -275,8 +275,8 @@ void initHardware(){
   pinMode(RELAY_MAIN_PIN,OUTPUT);
   pinMode(RELAY_SECONDARY_PIN,OUTPUT);
   pinMode(LOCK_SENSOR_PIN,INPUT_PULLUP);
-  digitalWrite(RELAY_MAIN_PIN,LOW);
-  digitalWrite(RELAY_SECONDARY_PIN,LOW);
+  digitalWrite(RELAY_MAIN_PIN,HIGH);
+  digitalWrite(RELAY_SECONDARY_PIN,HIGH);
   Tone::booted();
 }
 

@@ -11,13 +11,9 @@
 #define QR_RX 16
 #define QR_TX 17
 #define BUZZER_PIN 4
-#define RELAY_ENTRY 27
-#define RELAY_EXIT 26
+#define RELAY_MAIN_PIN 27
+#define RELAY_SECONDARY_PIN 26
 #define LOCK_SENSOR_PIN 33
-
-#define GATE_OPEN LOW
-#define GATE_CLOSE HIGH
-
 
 bool productionMode = true;
 bool emergencyOpen = false;
@@ -136,8 +132,8 @@ class Json {
 };
 
 void setGate(bool mainValue, bool secondaryValue){
-  digitalWrite(RELAY_ENTRY, mainValue);
-  digitalWrite(RELAY_EXIT, secondaryValue);
+  digitalWrite(RELAY_MAIN_PIN, mainValue);
+  digitalWrite(RELAY_SECONDARY_PIN, secondaryValue);
 }
 
 bool readRfid(String &out){
@@ -146,7 +142,6 @@ bool readRfid(String &out){
   out="";
   for(byte i=0;i<rfid.uid.size;i++){ if(rfid.uid.uidByte[i]<0x10) out+='0'; out+=String(rfid.uid.uidByte[i],HEX); }
   out.toUpperCase();
-  Serial.println(out);
   rfid.PICC_HaltA();
   rfid.PCD_StopCrypto1();
   delay(50);
@@ -207,11 +202,12 @@ void wifiConnect(){
 }
 
 void processGate(String msg){
+  Serial.println(msg);
   String status = Json::get<String>(msg,"status","");
   String entry = Json::get<String>(msg,"entry","");
   if(status=="ok"){
-    if(entry=="IN") setGate(GATE_OPEN,GATE_CLOSE);
-    else if(entry=="OUT") setGate(GATE_CLOSE,GATE_CLOSE);
+    if(entry=="IN") setGate(LOW,HIGH);
+    else if(entry=="OUT") setGate(HIGH,LOW);
     Tone::ok();
     gateOpenedAt = millis();
     gateOpen = true;
@@ -227,8 +223,8 @@ void processConfig(String msg){
   if(action=="WRITE"){
     if(prod=="yes") setMode(true);
     else if(prod=="no") setMode(false);
-    if(emergency=="yes"){ setGate(GATE_OPEN,GATE_OPEN); gateOpenedAt=millis(); gateOpen=true; emergencyOpen=true; scanning=false; }
-    else if(emergency=="no"){ setGate(GATE_CLOSE,GATE_CLOSE); emergencyOpen=false; }
+    if(emergency=="yes"){ setGate(LOW,LOW); gateOpenedAt=millis(); gateOpen=true; emergencyOpen=true; scanning=false; }
+    else if(emergency=="no"){ setGate(HIGH,HIGH); emergencyOpen=false; }
   }
 }
 
@@ -272,16 +268,15 @@ void mqttConnect(){
 
 void initHardware(){
   SPI.begin();
-  SPI.beginTransaction(SPISettings(1000000, MSBFIRST, SPI_MODE0));
   rfid.PCD_Init();
   qrSerial.begin(9600, SERIAL_8N1, QR_RX, QR_TX);
   ledcSetup(0,1000,8);
   ledcAttachPin(BUZZER_PIN,0);
-  pinMode(RELAY_ENTRY,OUTPUT);
-  pinMode(RELAY_EXIT,OUTPUT);
+  pinMode(RELAY_MAIN_PIN,OUTPUT);
+  pinMode(RELAY_SECONDARY_PIN,OUTPUT);
   pinMode(LOCK_SENSOR_PIN,INPUT_PULLUP);
-  digitalWrite(RELAY_ENTRY, GATE_CLOSE);  
-  digitalWrite(RELAY_EXIT, GATE_CLOSE);
+  digitalWrite(RELAY_MAIN_PIN,HIGH);
+  digitalWrite(RELAY_SECONDARY_PIN,HIGH);
   Tone::booted();
 }
 
@@ -312,13 +307,13 @@ void loop(){
   Tone::emergencyStop();
 
   if(gateOpen && millis() - gateOpenedAt >= autoCloseMs){
-    setGate(GATE_CLOSE,GATE_CLOSE);
+    setGate(HIGH,HIGH);
     gateOpen=false;
     scanning=false;
   }
 
   if(digitalRead(LOCK_SENSOR_PIN)==LOW && gateOpen && !emergencyOpen){
-    setGate(GATE_CLOSE,GATE_CLOSE);
+    setGate(HIGH,HIGH);
     gateOpen=false;
   }
 
