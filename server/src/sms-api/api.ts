@@ -27,7 +27,3 @@ export const SmsAPI = async (phone_number: string, message: string): Promise<SMS
   }
 }
 
-(async () => {
-  const data = await SmsAPI('639244772453', `Good Day Libs, your child Libs has entered the school on ${(new Date()).toLocaleTimeString()} ${(new Date()).toLocaleDateString()}.`);
-  console.log(data);
-})()
