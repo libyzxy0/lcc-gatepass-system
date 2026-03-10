@@ -1,6 +1,6 @@
 import { MyTable } from '@/components/table'
 import type { ColumnDef } from "@tanstack/react-table"
-import { Download, Plus } from 'lucide-react';
+import { Download, Plus } from 'lucide-react'
 import { useQuery } from '@tanstack/react-query'
 import { getStudents } from '@/api/helpers/student'
 import { Skeleton } from "@/components/ui/skeleton"
@@ -17,27 +17,61 @@ import {
   SelectValue
 } from '@/components/ui/select'
 import { RFIDCode } from '@/components/RFIDCode'
+import { CSVLink } from 'react-csv'
+import { format } from 'date-fns'
 
 interface Student {
-  id: string;
-  student_id: string;
-  firstname: string;
-  lastname: string;
-  middle_name: string | null;
-  section: string;
-  grade_level: string;
-  parent_fullname: string;
-  parent_phone_number: string;
-  rfid_code: string;
-  photo_url: string;
-  address: string;
-  created_at: string;
-};
+  id: string
+  student_id: string
+  firstname: string
+  lastname: string
+  middle_name: string | null
+  section: string
+  grade_level: string
+  parent_fullname: string
+  parent_phone_number: string
+  rfid_code: string
+  photo_url: string
+  address: string
+  created_at: string
+}
+
+const CSV_HEADERS = [
+  { label: 'Student ID',          key: 'student_id'         },
+  { label: 'First Name',          key: 'firstname'           },
+  { label: 'Last Name',           key: 'lastname'            },
+  { label: 'Middle Name',         key: 'middle_name'         },
+  { label: 'Section',             key: 'section'             },
+  { label: 'Grade Level',         key: 'grade_level'         },
+  { label: 'Parent Full Name',    key: 'parent_fullname'     },
+  { label: 'Parent Phone Number', key: 'parent_phone_number' },
+  { label: 'RFID Code',           key: 'rfid_code'           },
+  { label: 'Address',             key: 'address'             },
+  { label: 'Date Created',        key: 'created_at'          },
+]
+
+function toCSVRow(student: Student) {
+  return {
+    student_id:          student.student_id,
+    firstname:           student.firstname,
+    lastname:            student.lastname,
+    middle_name:         student.middle_name         ?? 'N/A',
+    section:             student.section             ?? 'N/A',
+    grade_level:         student.grade_level,
+    parent_fullname:     student.parent_fullname,
+    parent_phone_number: student.parent_phone_number,
+    rfid_code:           student.rfid_code,
+    address:             student.address             ?? 'N/A',
+    created_at:          student.created_at
+      ? format(new Date(student.created_at), 'MMM dd, yyyy hh:mm aa')
+      : '—',
+  }
+}
 
 export default function Students() {
   const { isPending, error, data, refetch } = useQuery({
     queryKey: ['get-students'],
-    queryFn: getStudents
+    queryFn:  getStudents,
   })
   const [sectionFilter, setSectionFilter] = useState("")
   const [search, setSearch] = useState("")
@@ -77,10 +111,13 @@ export default function Students() {
     })
   }, [data, search, sectionFilter])
 
+  const csvData     = useMemo(() => filteredData.map(toCSVRow), [filteredData])
+  const csvFilename = `students-${format(new Date(), 'yyyy-MM-dd')}.csv`
+
   const columns: ColumnDef<Student>[] = [
     { accessorKey: "student_id", header: "Student ID" },
-    { accessorKey: "firstname", header: "First Name" },
-    { accessorKey: "lastname", header: "Last Name" },
+    { accessorKey: "firstname",  header: "First Name"  },
+    { accessorKey: "lastname",   header: "Last Name"   },
     {
       accessorKey: "middle_name",
       header: "Middle Name",
@@ -91,17 +128,17 @@ export default function Students() {
       header: "Section",
       cell: info => info.getValue<string | null>() ?? "N/A"
     },
-    { accessorKey: "grade_level", header: "Level" },
+    { accessorKey: "grade_level",     header: "Level"       },
     { accessorKey: "parent_fullname", header: "Parent Name" },
     {
       accessorKey: "address",
       header: "Address",
       cell: info => <div className="col-span-4">{info.getValue<string | null>() ?? "N/A"}</div>
     },
-    { 
+    {
       accessorKey: "rfid_code",
       header: "RFID CODE",
-      cell: info => <RFIDCode value={info.row.original.rfid_code}/>
+      cell: info => <RFIDCode value={info.row.original.rfid_code} />
     },
     {
       id: 'actions',
@@ -135,8 +172,8 @@ export default function Students() {
                 <SelectTrigger className="w-36">
                   <SelectValue placeholder="Filter by Level" />
                 </SelectTrigger>
-                <SelectContent className={"max-h-[200px]"}>
-                  <SelectItem value={'all'}>All</SelectItem>
+                <SelectContent className="max-h-[200px]">
+                  <SelectItem value="all">All</SelectItem>
                   <SelectItem value="SHS-12">SHS-12</SelectItem>
                   <SelectItem value="SHS-11">SHS-11</SelectItem>
                   <SelectItem value="JHS-10">JHS-10</SelectItem>
@@ -155,10 +192,17 @@ export default function Students() {
             </div>
 
             <div className="hidden md:grid grid-cols-2 gap-2">
-              <Button variant={'outline'}>
-                <Download />
-                Download CSV
-              </Button>
+              <CSVLink
+                data={csvData}
+                headers={CSV_HEADERS}
+                filename={csvFilename}
+                className="no-underline"
+              >
+                <Button variant="outline">
+                  <Download />
+                  Download CSV
+                </Button>
+              </CSVLink>
               <AddStudentDialog onCreate={() => refetch()}>
                 <Button>
                   <Plus />

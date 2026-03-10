@@ -1,6 +1,6 @@
 import { MyTable } from '@/components/table'
 import type { ColumnDef } from "@tanstack/react-table"
-import { Download, Plus } from 'lucide-react';
+import { Download, Plus } from 'lucide-react'
 import { useQuery } from '@tanstack/react-query'
 import { getStaffs } from '@/api/helpers/staff'
 import { Skeleton } from "@/components/ui/skeleton"
@@ -18,33 +18,73 @@ import {
 } from '@/components/ui/select'
 import { Badge } from "@/components/ui/badge"
 import { RFIDCode } from '@/components/RFIDCode'
+import { CSVLink } from 'react-csv'
+import { format } from 'date-fns'
 
 interface Staff {
-  id: string;
-  staff_id: string;
-  firstname: string;
-  lastname: string;
-  middle_name: string | null;
-  phone_number: string;
-  rfid_code: string;
-  staff_type: string;
-  photo_url: string | null;
-  email: string;
-  created_at: string;
-};
+  id: string
+  staff_id: string
+  firstname: string
+  lastname: string
+  middle_name: string | null
+  phone_number: string
+  rfid_code: string
+  staff_type: string
+  photo_url: string | null
+  email: string
+  created_at: string
+}
 
-const typeBadges = {
-  faculty: <Badge variant="default" className="bg-blue-400/20 border-blue-400/50 text-blue-400">Faculty</Badge>,
-  guard: <Badge variant="default" className="bg-red-400/20 border-red-400/50 text-red-400">Security</Badge>,
-  administrator: <Badge variant="default" className="bg-green-400/20 border-green-400/50 text-green-400">Admin</Badge>,
+type StaffType = 'faculty' | 'guard' | 'administrator' | 'canteen_vendors' | 'other'
+
+const typeBadges: Record<StaffType, React.ReactNode> = {
+  faculty:         <Badge variant="default" className="bg-blue-400/20   border-blue-400/50   text-blue-400">Faculty</Badge>,
+  guard:           <Badge variant="default" className="bg-red-400/20    border-red-400/50    text-red-400">Security</Badge>,
+  administrator:   <Badge variant="default" className="bg-green-400/20  border-green-400/50  text-green-400">Admin</Badge>,
   canteen_vendors: <Badge variant="default" className="bg-yellow-400/20 border-yellow-400/50 text-yellow-400">Vendors</Badge>,
-  other: <Badge variant="default" className="bg-gray-400/20 border-gray-400/50 text-gray-400">Other</Badge>,
+  other:           <Badge variant="default" className="bg-gray-400/20   border-gray-400/50   text-gray-400">Other</Badge>,
+}
+
+const CSV_HEADERS = [
+  { label: 'Staff ID',     key: 'staff_id'    },
+  { label: 'First Name',   key: 'firstname'   },
+  { label: 'Last Name',    key: 'lastname'    },
+  { label: 'Middle Name',  key: 'middle_name' },
+  { label: 'Phone Number', key: 'phone_number'},
+  { label: 'Email',        key: 'email'       },
+  { label: 'Staff Type',   key: 'staff_type'  },
+  { label: 'RFID Code',    key: 'rfid_code'   },
+  { label: 'Date Created', key: 'created_at'  },
+]
+
+const STAFF_TYPE_LABEL: Record<StaffType, string> = {
+  faculty:         'Faculty',
+  guard:           'Security',
+  administrator:   'Administrator',
+  canteen_vendors: 'Canteen Vendors',
+  other:           'Other',
+}
+
+function toCSVRow(staff: Staff) {
+  return {
+    staff_id:     staff.staff_id,
+    firstname:    staff.firstname,
+    lastname:     staff.lastname,
+    middle_name:  staff.middle_name ?? 'N/A',
+    phone_number: staff.phone_number,
+    email:        staff.email,
+    staff_type:   STAFF_TYPE_LABEL[staff.staff_type as StaffType] ?? staff.staff_type,
+    rfid_code:    staff.rfid_code,
+    created_at:   staff.created_at
+      ? format(new Date(staff.created_at), 'MMM dd, yyyy hh:mm aa')
+      : '—',
+  }
 }
 
 export default function Staff() {
   const { isPending, error, data, refetch } = useQuery({
     queryKey: ['get-all-staffs'],
-    queryFn: getStaffs
+    queryFn:  getStaffs,
   })
   const [typeFilter, setSectionFilter] = useState("")
   const [search, setSearch] = useState("")
@@ -68,7 +108,6 @@ export default function Staff() {
     const words = search.toLowerCase().trim().split(/\s+/)
 
     return data.filter(staff => {
-      
       const nameMatch = words.every(word =>
         staff.firstname.toLowerCase().includes(word) ||
         staff.lastname.toLowerCase().includes(word)
@@ -85,10 +124,13 @@ export default function Staff() {
     })
   }, [data, search, typeFilter])
 
+  const csvData     = useMemo(() => filteredData.map(toCSVRow), [filteredData])
+  const csvFilename = `staffs-${format(new Date(), 'yyyy-MM-dd')}.csv`
+
   const columns: ColumnDef<Staff>[] = [
-    { accessorKey: "staff_id", header: "Staff ID" },
+    { accessorKey: "staff_id",  header: "Staff ID"   },
     { accessorKey: "firstname", header: "First Name" },
-    { accessorKey: "lastname", header: "Last Name" },
+    { accessorKey: "lastname",  header: "Last Name"  },
     {
       accessorKey: "middle_name",
       header: "Middle Name",
@@ -107,12 +149,12 @@ export default function Staff() {
       accessorKey: "staff_type",
       header: "Type",
       cell: info => {
-        const value = info.getValue<'faculty' | 'guard' | 'administrator' | 'canteen_vendors' | 'other'>();
+        const value = info.getValue<StaffType>()
         return value ? typeBadges[value] : 'N/A'
       }
     },
-    { 
-      accessorKey: "rfid_code", 
+    {
+      accessorKey: "rfid_code",
       header: "RFID CODE",
       cell: info => <RFIDCode value={info.row.original.rfid_code} />
     },
@@ -149,7 +191,7 @@ export default function Staff() {
                   <SelectValue placeholder="Select Type" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value={'all'}>All</SelectItem>
+                  <SelectItem value="all">All</SelectItem>
                   <SelectItem value="faculty">Faculty</SelectItem>
                   <SelectItem value="guard">Security</SelectItem>
                   <SelectItem value="administrator">Administrator</SelectItem>
@@ -159,11 +201,18 @@ export default function Staff() {
               </Select>
             </div>
 
-            <div className="hidden md:grid grid-cols-2">
-              <Button variant={'outline'}>
-                <Download />
-                Download CSV
-              </Button>
+            <div className="hidden md:grid grid-cols-2 gap-2">
+              <CSVLink
+                data={csvData}
+                headers={CSV_HEADERS}
+                filename={csvFilename}
+                className="no-underline"
+              >
+                <Button variant="outline">
+                  <Download />
+                  Download CSV
+                </Button>
+              </CSVLink>
               <AddStaffDialog onCreate={() => refetch()}>
                 <Button>
                   <Plus />
