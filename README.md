@@ -41,3 +41,6 @@ The LCC Digital Gate Pass and Visitors Management System aims to replace outdate
 - Grasa, Kelvin John C.
 - Indic, Rose Marie
 
+![Defense](docu-assets/def1.jpeg)
+
+![Defense](docu-assets/def2.jpeg)
