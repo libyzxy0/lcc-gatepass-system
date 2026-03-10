@@ -1,13 +1,9 @@
 import { MyTable } from '@/components/table'
 import type { ColumnDef } from "@tanstack/react-table"
-import { Download, Plus } from 'lucide-react'
 import { useQuery } from '@tanstack/react-query'
 import { getStaffs } from '@/api/helpers/staff'
 import { Skeleton } from "@/components/ui/skeleton"
-import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { AddStaffDialog } from '@/components/AddStaffDialog'
-import { StaffTableActions } from '@/components/StaffTableActions'
 import { useState, useMemo } from 'react'
 import {
   Select,
@@ -18,7 +14,8 @@ import {
 } from '@/components/ui/select'
 import { Badge } from "@/components/ui/badge"
 import { RFIDCode } from '@/components/RFIDCode'
-import { CSVLink } from 'react-csv'
+import { StaffTableActions } from '@/components/StaffTableActions'
+import { StaffToolbarActions } from '@/components/StaffToolbarActions'
 import { format } from 'date-fns'
 
 interface Staff {
@@ -46,15 +43,15 @@ const typeBadges: Record<StaffType, React.ReactNode> = {
 }
 
 const CSV_HEADERS = [
-  { label: 'Staff ID',     key: 'staff_id'    },
-  { label: 'First Name',   key: 'firstname'   },
-  { label: 'Last Name',    key: 'lastname'    },
-  { label: 'Middle Name',  key: 'middle_name' },
-  { label: 'Phone Number', key: 'phone_number'},
-  { label: 'Email',        key: 'email'       },
-  { label: 'Staff Type',   key: 'staff_type'  },
-  { label: 'RFID Code',    key: 'rfid_code'   },
-  { label: 'Date Created', key: 'created_at'  },
+  { label: 'Staff ID',      key: 'staff_id' },
+  { label: 'First Name',    key: 'firstname' },
+  { label: 'Last Name',     key: 'lastname' },
+  { label: 'Middle Name',   key: 'middle_name' },
+  { label: 'Phone Number',  key: 'phone_number' },
+  { label: 'Email',         key: 'email' },
+  { label: 'Staff Type',    key: 'staff_type' },
+  { label: 'RFID Code',     key: 'rfid_code' },
+  { label: 'Date Created',  key: 'created_at' },
 ]
 
 const STAFF_TYPE_LABEL: Record<StaffType, string> = {
@@ -84,9 +81,9 @@ function toCSVRow(staff: Staff) {
 export default function Staff() {
   const { isPending, error, data, refetch } = useQuery({
     queryKey: ['get-all-staffs'],
-    queryFn:  getStaffs,
+    queryFn: getStaffs,
   })
-  const [typeFilter, setSectionFilter] = useState("")
+  const [typeFilter, setTypeFilter] = useState("")
   const [search, setSearch] = useState("")
 
   if (isPending) return (
@@ -104,9 +101,7 @@ export default function Staff() {
 
   const filteredData = useMemo(() => {
     if (!data) return []
-
     const words = search.toLowerCase().trim().split(/\s+/)
-
     return data.filter(staff => {
       const nameMatch = words.every(word =>
         staff.firstname.toLowerCase().includes(word) ||
@@ -115,11 +110,9 @@ export default function Staff() {
       const idMatch = words.every(word =>
         staff.staff_id.toLowerCase().includes(word)
       )
-
       const typeMatch = typeFilter.toLowerCase() === 'all' ? true : typeFilter
         ? staff.staff_type.toLowerCase() === typeFilter.toLowerCase()
         : true
-
       return (nameMatch || idMatch) && typeMatch
     })
   }, [data, search, typeFilter])
@@ -128,16 +121,13 @@ export default function Staff() {
   const csvFilename = `staffs-${format(new Date(), 'yyyy-MM-dd')}.csv`
 
   const columns: ColumnDef<Staff>[] = [
-    { accessorKey: "staff_id",  header: "Staff ID"   },
+    { accessorKey: "staff_id",  header: "Staff ID" },
     { accessorKey: "firstname", header: "First Name" },
-    { accessorKey: "lastname",  header: "Last Name"  },
+    { accessorKey: "lastname",  header: "Last Name" },
     {
       accessorKey: "middle_name",
       header: "Middle Name",
-      cell: info => {
-        const value = info.getValue<string | null>() ?? "N/A"
-        return !!value ? value : 'N/A'
-      }
+      cell: info => info.getValue<string | null>() || 'N/A'
     },
     { accessorKey: "phone_number", header: "Phone" },
     {
@@ -183,10 +173,7 @@ export default function Staff() {
                 onChange={(e) => setSearch(e.target.value)}
                 className="max-w-sm"
               />
-              <Select
-                value={typeFilter}
-                onValueChange={setSectionFilter}
-              >
+              <Select value={typeFilter} onValueChange={setTypeFilter}>
                 <SelectTrigger className="w-32">
                   <SelectValue placeholder="Select Type" />
                 </SelectTrigger>
@@ -201,25 +188,12 @@ export default function Staff() {
               </Select>
             </div>
 
-            <div className="hidden md:grid grid-cols-2 gap-2">
-              <CSVLink
-                data={csvData}
-                headers={CSV_HEADERS}
-                filename={csvFilename}
-                className="no-underline"
-              >
-                <Button variant="outline">
-                  <Download />
-                  Download CSV
-                </Button>
-              </CSVLink>
-              <AddStaffDialog onCreate={() => refetch()}>
-                <Button>
-                  <Plus />
-                  Add Staff
-                </Button>
-              </AddStaffDialog>
-            </div>
+            <StaffToolbarActions
+              csvData={csvData}
+              csvHeaders={CSV_HEADERS}
+              csvFilename={csvFilename}
+              onRefetch={() => refetch()}
+            />
           </div>
         }
       />
