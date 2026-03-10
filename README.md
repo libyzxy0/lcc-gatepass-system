@@ -24,24 +24,21 @@ Admin Dashboard
 
 ![Settings](/docu-assets/p7.png)
 
-Mobile App
-
-<div style="display: flex; flex-wrap: wrap; gap: 10px;">
-    <img src="/docu-assets/pm1.jpg" alt="Description 1" style="width: calc(33% - 10px);">
-    <img src="/docu-assets/pm2.jpg" alt="Description 1" style="width: calc(33% - 10px);">
-    <img src="/docu-assets/pm3.jpg" alt="Description 1" style="width: calc(33% - 10px);">
-    <img src="/docu-assets/pm4.jpg" alt="Description 1" style="width: calc(33% - 10px);">
-    <img src="/docu-assets/pm5.jpg" alt="Description 1" style="width: calc(33% - 10px);">
-    <img src="/docu-assets/pm6.jpg" alt="Description 1" style="width: calc(33% - 10px);">
+<!-- Mobile App -->
+<div style="display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 20px;">
+    <img src="docu-assets/pm1.jpg" alt="Mobile App 1" style="flex: 1 1 32%; max-height: 200px; object-fit: contain;">
+    <img src="docu-assets/pm2.jpg" alt="Mobile App 2" style="flex: 1 1 32%; max-height: 200px; object-fit: contain;">
+    <img src="docu-assets/pm3.jpg" alt="Mobile App 3" style="flex: 1 1 32%; max-height: 200px; object-fit: contain;">
+    <img src="docu-assets/pm4.jpg" alt="Mobile App 4" style="flex: 1 1 32%; max-height: 200px; object-fit: contain;">
+    <img src="docu-assets/pm5.jpg" alt="Mobile App 5" style="flex: 1 1 32%; max-height: 200px; object-fit: contain;">
+    <img src="docu-assets/pm6.jpg" alt="Mobile App 6" style="flex: 1 1 32%; max-height: 200px; object-fit: contain;">
 </div>
 
-Turnstile Gate
-
-<div style="display: flex; flex-wrap: wrap; gap: 10px;">
-<img src="/docu-assets/turnstile.jpg" alt="Description 1" style="width: calc(33% - 10px);">
-<img src="/docu-assets/circuit.jpg" alt="Description 1" style="width: calc(33% - 10px);">
-<video src="docu-assets/short_demo_vid.mp4" controls="controls" style="width: calc(33% - 10px);">
-</video>
+<!-- Turnstile Gate -->
+<div style="display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 20px;">
+    <img src="docu-assets/turnstile.jpg" alt="Turnstile Gate" style="flex: 1 1 32%; max-height: 250px; object-fit: contain;">
+    <img src="docu-assets/circuit.jpg" alt="Circuit Board" style="flex: 1 1 32%; max-height: 250px; object-fit: contain;">
+    <video src="docu-assets/short_demo_vid.mp4" controls style="flex: 1 1 32%; max-height: 250px; object-fit: contain;"></video>
 </div>
 
 # Members
