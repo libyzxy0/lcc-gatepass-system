@@ -154,7 +154,7 @@ export default function Students() {
         columns={columns}
         data={filteredData}
         TableAction={
-          <div className="flex items-center">
+          <div className="flex justify-between items-center">
             <div className="grid grid-cols-2 gap-2">
               <Input
                 placeholder="Search..."
